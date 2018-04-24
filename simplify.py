@@ -1,8 +1,8 @@
 import argparse
-import json
 
-from dft_tool.storage.dft import Dft
-import dft_tool.transformer.rewriting as rewriting
+import dft_tool.io.parser
+import dft_tool.io.export
+import dft_tool.transformer.rewriting
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Simplify a DFT by rewriting.')
@@ -13,13 +13,12 @@ if __name__ == "__main__":
 
     # Read DFT file
     print("Reading {}".format(args.dft))
-    with open(args.dft) as jsonFile:
-        dft = Dft(json.load(jsonFile))
+    dft = dft_tool.io.parser.parse_dft_json(args.dft)
     print(dft)
 
-    rewriting.simplify_dft(dft)
+    # Simplify DFT
+    dft_tool.transformer.rewriting.simplify_dft(dft)
     print(dft)
 
-    # Save dft again
-    with open(args.out, 'w') as outFile:
-        json.dump(dft.json(), outFile, indent=4)
+    # Save DFT again
+    dft_tool.io.export.export_dft_json(dft, args.out)
