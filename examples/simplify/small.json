@@ -1,0 +1,123 @@
+{
+    "toplevel": 4,
+    "parameters": {},
+    "nodes": [
+        {
+            "data": {
+                "id": "0",
+                "name": "A",
+                "type": "be",
+                "repairable": false,
+                "rate": 2,
+                "repair": 0,
+                "dorm": 1,
+                "label": "A (λ: 2)"
+            },
+            "position": {
+                "x": 417,
+                "y": 352
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        },
+        {
+            "data": {
+                "id": "1",
+                "name": "B",
+                "type": "be",
+                "repairable": false,
+                "rate": 3,
+                "repair": 0,
+                "dorm": 0,
+                "label": "B (λ: 3)"
+            },
+            "position": {
+                "x": 547,
+                "y": 353
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        },
+        {
+            "data": {
+                "id": "2",
+                "name": "C",
+                "type": "be",
+                "repairable": false,
+                "rate": 5,
+                "repair": 0,
+                "dorm": 0,
+                "label": "C (λ: 5)"
+            },
+            "position": {
+                "x": 689,
+                "y": 349
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        },
+        {
+            "data": {
+                "id": "3",
+                "name": "D",
+                "type": "or",
+                "repairable": false,
+                "children": [
+                    "0",
+                    "1"
+                ],
+                "label": "D"
+            },
+            "position": {
+                "x": 492,
+                "y": 233
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "or"
+        },
+        {
+            "data": {
+                "id": "4",
+                "name": "E",
+                "type": "and",
+                "repairable": false,
+                "children": [
+                    "3",
+                    "2"
+                ],
+                "label": "E"
+            },
+            "position": {
+                "x": 593,
+                "y": 98
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "and toplevel"
+        }
+    ]
+}
