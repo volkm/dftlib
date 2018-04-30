@@ -1,0 +1,75 @@
+{
+    "toplevel": 0,
+    "parameters": {},
+    "nodes": [
+        {
+            "data": {
+                "id": "0",
+                "name": "A",
+                "type": "and",
+                "repairable": false,
+                "children": [
+                    "1"
+                ],
+                "label": "A"
+            },
+            "position": {
+                "x": 774,
+                "y": 136.5
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "and toplevel"
+        },
+        {
+            "data": {
+                "id": "1",
+                "name": "B",
+                "type": "and",
+                "repairable": false,
+                "children": [
+                    "2"
+                ],
+                "label": "B"
+            },
+            "position": {
+                "x": 766,
+                "y": 297.5
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "and"
+        },
+        {
+            "data": {
+                "id": "2",
+                "name": "C",
+                "type": "be",
+                "repairable": false,
+                "rate": 0,
+                "repair": 0,
+                "dorm": 0,
+                "label": "C (λ: 0)"
+            },
+            "position": {
+                "x": 765,
+                "y": 466.5
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        }
+    ]
+}

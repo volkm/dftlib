@@ -21,6 +21,9 @@ def create_from_json(json):
         # Voting gate
         threshold = int(data['voting'])
         return DftVotingGate(element_id, name, threshold, [], position)
+    elif element_type == "fdep":
+        # Functional dependency
+        return DftDependency(element_id, name, [], position)
     else:
         # Gate
         return DftGate(element_id, name, element_type, [], position)
@@ -84,6 +87,27 @@ class DftElement:
                 return False
         if len(list_outgoing) > 0:
             raise Exception("Some elements are not contained in {}.".format(self))
+            return False
+
+        return True
+
+    def compareSucc(self, other):
+        if self.element_id == other.element_id:
+            #raise Exception("Ids are equal: {} and {}".format(self.element_id, other.element_id))
+            return False
+        if self.element_type != other.element_type:
+            #raise Exception(
+            #    "Element types are not equal for {}: {} and {}".format(self, self.element_type, other.element_type))
+            return False
+        list_outgoing = [elem.element_id for elem in other.outgoing]
+        for element in self.outgoing:
+            if element.element_id in list_outgoing:
+                list_outgoing.remove(element.element_id)
+            else:
+                #raise Exception("Element {} is not contained in other for {}.".format(element, self))
+                return False
+        if len(list_outgoing) > 0:
+            #raise Exception("Some elements are not contained in {}.".format(self))
             return False
 
         return True
@@ -169,3 +193,16 @@ class DftVotingGate(DftGate):
             return False
 
         return True
+
+
+class DftDependency(DftGate):
+    def __init__(self, element_id, name, children, position):
+        DftGate.__init__(self, element_id, name, "fdep", children, position)
+        self.trigger = self.outgoing[0]
+
+    def get_json(self):
+        json = DftGate.get_json(self)
+        return json
+
+    def __str__(self):
+        return super().__str__() + ", trigger: {}".format(self.trigger.element_id)

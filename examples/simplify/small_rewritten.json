@@ -1,0 +1,33 @@
+{
+    "toplevel": "4",
+    "nodes": [
+        {
+            "group": "nodes",
+            "position": {
+                "y": 352,
+                "x": 417
+            },
+            "data": {
+                "dorm": "1.0",
+                "name": "A_B",
+                "id": "0",
+                "rate": "5.0",
+                "type": "be"
+            }
+        },
+        {
+            "group": "nodes",
+            "position": {
+                "y": 349,
+                "x": 689
+            },
+            "data": {
+                "dorm": "0.0",
+                "name": "C",
+                "id": "2",
+                "rate": "5.0",
+                "type": "be"
+            }
+        }
+    ]
+}
