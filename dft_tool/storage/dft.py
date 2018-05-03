@@ -78,7 +78,14 @@ class Dft:
         return element
 
     def new_gate(self, name, gate_type, children, pos):
-        element = DftGate(self.max_id + 1, name, gate_type, children, pos)
+        if gate_type == "pand":
+            element = DftPandGate(self.max_id + 1, name, children, pos)
+        elif gate_type == "por":
+            element = DftPorGate(self.max_id + 1, name, children, pos)
+        elif gate_type == "spare":
+            element = DftSpareGate(self.max_id + 1, name, children, pos)
+        else :
+            element = DftGate(self.max_id + 1, name, gate_type, children, pos)
         self.add(element)
         return element
 
@@ -97,7 +104,7 @@ class Dft:
         for (_, element) in self.elements.items():
             if element.is_be() and element.rate != "0" and element.rate != "0.0":
                 no_be += 1
-            if element.is_gate() and element.element_type != "and" and element.element_type != "or" and element.element_type != "vot":
+            if element.is_gate() and element.is_dynamic():
                 no_dynamic += 1
         return no_be, no_dynamic, len(self.elements)
 
@@ -106,6 +113,13 @@ class Dft:
         return "Dft with {} elements ({} failable BEs, {} dynamic elements), top element: {}".format(no_elements, no_be,
                                                                                                      no_dynamic,
                                                                                                      self.top_level_element.name)
+
+    def get_dynamics(self):
+        dynamic_elements = []
+        for element in self.elements:
+            if element.is_dynamic():
+                dynamic_elements.append(element)
+        return dynamic_elements
 
     def verbose_str(self):
         return "{}\n".format(self) + "\n".join([str(element) for (_, element) in self.elements.items()])

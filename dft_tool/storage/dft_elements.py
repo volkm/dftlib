@@ -24,6 +24,15 @@ def create_from_json(json):
     elif element_type == "fdep":
         # Functional dependency
         return DftDependency(element_id, name, [], position)
+    elif element_type == "pand":
+        # PAND gate
+        return DftPandGate(element_id, name, [], position)
+    elif element_type == "por":
+        # POR gate
+        return DftPorGate(element_id, name, [], position)
+    elif element_type == "spare":
+        # SPARE gate
+        return DftSpareGate(element_id, name, [], position)
     else:
         # Gate
         return DftGate(element_id, name, element_type, [], position)
@@ -41,6 +50,10 @@ class DftElement:
         self.position = position
         self.ingoing = []
         self.outgoing = []
+        self.isDynamic = False
+
+    def is_dynamic(self):
+        return self.isDynamic
 
     def is_be(self):
         return self.element_type == "be"
@@ -195,14 +208,29 @@ class DftVotingGate(DftGate):
         return True
 
 
+class DftPandGate(DftGate):
+    def __init__(self, element_id, name, children, position):
+        DftGate.__init__(self, element_id, name, "pand", children, position)
+        self.isDynamic = True
+
+
+class DftPorGate(DftGate):
+    def __init__(self, element_id, name, children, position):
+        DftGate.__init__(self, element_id, name, "por", children, position)
+        self.isDynamic = True
+
+
+class DftSpareGate(DftGate):
+    def __init__(self, element_id, name, children, position):
+        DftGate.__init__(self, element_id, name, "spare", children, position)
+        self.isDynamic = True
+
+
 class DftDependency(DftGate):
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "fdep", children, position)
-        self.trigger = self.outgoing[0]
-
-    def get_json(self):
-        json = DftGate.get_json(self)
-        return json
+        self.trigger = None
+        self.dependent = []
 
     def __str__(self):
-        return super().__str__() + ", trigger: {}".format(self.trigger.element_id)
+        return super().__str__() + ", trigger: {} dependent element: {}".format(self.trigger.element_id, self.dependent.element_id)

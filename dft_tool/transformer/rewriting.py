@@ -138,8 +138,8 @@ def try_merge_identical_gates(dft, gate):
 def try_remove_gates_with_one_successor(dft, gate):
     """
     (Rule #3): Remove gates with just one successor.
-    These gates will fail together with this child, so they can be directly be eliminated.
-    :param dft: DFT
+    These gates will fail together with this child, so they can directly be eliminated.
+    :param dft: DFT.
     :param gate: Gate to remove.
     :return: True if gate has been removed.
     """
@@ -158,6 +158,73 @@ def try_remove_gates_with_one_successor(dft, gate):
             parent.add_child(child)
 
     dft.remove(gate)
+
+    return True
+
+def add_or_in_between(dft, element):
+    """
+    (Rule #4): Replace the single successor of an element by an OR.
+    This is helpful for other rules, e.g., rule #24.
+    :param dft: DFT.
+    :param element: Element which gets an OR as predecessor.
+    :return: True if operation was successful
+    """
+    # Check if element has only one predecessor and if so, if it is already an OR
+    if len(element.ingoing) != 1:
+        return False
+    if element.outgoing[0].element_type == "or":
+        return False
+
+    parent = element.ingoing[0]
+
+    # Remove element from parents children
+    parent.remove_child(element)
+    position = (element.position[0] + 25, element.position[1] + 25)
+    or_gate = dft.new_gate("OR_" + str(dft.max_id + 1), "or", [], position)
+    parent.add_child(or_gate)
+    or_gate.add_child(element)
+    or_gate.add_child(trigger)
+
+    return True
+
+def try_elim_fdeps_with_new_or(dft, fdep):
+    """
+    (Rule #24): Eliminate FDEPs by introduction of an OR.
+    Let A be the trigger and B be the dependent element. Both have to be TopConnected. B must have only one predecessor and no SPARE or PAND/POR in its 
+    predecessor closure.
+    :param dft: DFT.
+    :param fdep: FDEP which can eventually be removed.
+    :return: True if fdep has been removed.
+    """
+    # Check if trigger and dependent element top connected is.
+    if fdep.element_type != "fdep":
+        return False
+    else:
+        trigger = fdep.trigger
+        dependent = fdep.dependent
+        if not trigger in dft.top_level_element.outgoing or not dependent in dft.top_level_element.outgoing:
+            return False
+
+    # Check if B has some dynamic elements in the predecessor closure
+    for dyn in dft.get_dynamics():
+        if dependent in dyn.outgoing:
+            return False
+
+    # Check if B has only one predecessor
+    if len(dependent.ingoing) != 1:
+        return False
+
+    # Check if predecessor of B is OR
+    if dependent.ingoing[0].element_type == "or":
+        # Remove fdep and add trigger to OR
+        dft.remove(fdep)
+        dependent.ingoing[0].add_child(trigger)
+    else: 
+        # Add OR in front of B
+        if add_or_in_between(dependent):
+            dft.remove(fdep)
+        else:
+            return False
 
     return True
 
