@@ -1,3 +1,37 @@
+def split_fdeps(dft):
+    """
+    Split fdeps with two or more children into single fdeps with only one child.
+    :param dft: DFT.
+    :param fdep: FDEP to check and eventually to split.
+    :return: True if fdep is split.
+    """
+    # Check all fdeps and save the interesting ones
+    fdeps = []
+    for (_, fdep) in dft.elements.items():
+        if fdep.element_type == "fdep":
+            if len(fdep.dependent) > 1:
+                fdeps.append(fdep)
+
+    # Only go on if fdeps is not empty
+    if fdeps:
+        for fdep in fdeps:
+            pos_add = 1
+            trigger = fdep.trigger
+            dependent = fdep.dependent
+            num_dep = len(dependent)
+            while num_dep > 1:
+                # Create new FDEP with last dependent element
+                position = (fdep.position[0] - (50*pos_add), fdep.position[1] - (75*pos_add))
+                new_fdep = dft.new_gate("FDEP_" + str(dft.max_id + 1), "fdep", [], position)
+                pos_add += 1
+                # Add parents and children
+                new_fdep.add_child(trigger)
+                rem_dep = dependent.pop()
+                new_fdep.add_child(rem_dep)
+                num_dep -= 1
+                fdep.remove_child(rem_dep)
+
+
 def try_merge_bes_in_or(dft, or_gate):
     """
     Try to merge BEs under an OR into one BE.
@@ -123,7 +157,9 @@ def try_merge_identical_gates(dft, gate):
                 potChild.append(child)
 
     for child in potChild:
+        print("Actual child: {}".format(child.element_id))
         if not gate.compareSucc(child):
+            print("remove child: {}".format(child))
             potChild.remove(child)
 
     if len(potChild) == 0:
@@ -167,25 +203,41 @@ def add_or_in_between(dft, element):
     This is helpful for other rules, e.g., rule #24.
     :param dft: DFT.
     :param element: Element which gets an OR as predecessor.
-    :return: True if operation was successful
+    :return: The new OR gate or None.
     """
-    # Check if element has only one predecessor and if so, if it is already an OR
-    if len(element.ingoing) != 1:
-        return False
-    if element.outgoing[0].element_type == "or":
-        return False
+    # Check if predecessor is already an OR
+    for elem in element.ingoing:
+        if elem.element_type == "or":
+            return None
 
-    parent = element.ingoing[0]
+    for elem in element.ingoing:
+        if not elem.element_type == "fdep":
+            parent = elem
 
     # Remove element from parents children
     parent.remove_child(element)
-    position = (element.position[0] + 25, element.position[1] + 25)
+    position = (element.position[0] - 100, element.position[1] - 150)
     or_gate = dft.new_gate("OR_" + str(dft.max_id + 1), "or", [], position)
     parent.add_child(or_gate)
     or_gate.add_child(element)
-    or_gate.add_child(trigger)
 
-    return True
+    return or_gate
+
+
+def is_connected(a, b):
+    """
+    Check if element b is reachable from a.
+    :param a: First element a.
+    :param b: Second element b.
+    :return: True if b is reachable from a. False otherwise.
+    """
+    for elem in a.outgoing:
+        if elem.compareSucc(b):
+            return True
+        if is_connected(elem, b):
+            return True
+
+    return False
 
 def try_elim_fdeps_with_new_or(dft, fdep):
     """
@@ -201,8 +253,8 @@ def try_elim_fdeps_with_new_or(dft, fdep):
         return False
     else:
         trigger = fdep.trigger
-        dependent = fdep.dependent
-        if not trigger in dft.top_level_element.outgoing or not dependent in dft.top_level_element.outgoing:
+        dependent = fdep.dependent[0]
+        if not is_connected(dft.top_level_element, trigger) or not is_connected(dft.top_level_element, dependent):
             return False
 
     # Check if B has some dynamic elements in the predecessor closure
@@ -211,7 +263,7 @@ def try_elim_fdeps_with_new_or(dft, fdep):
             return False
 
     # Check if B has only one predecessor
-    if len(dependent.ingoing) != 1:
+    if (len(dependent.ingoing)-1) != 1:
         return False
 
     # Check if predecessor of B is OR
@@ -221,7 +273,9 @@ def try_elim_fdeps_with_new_or(dft, fdep):
         dependent.ingoing[0].add_child(trigger)
     else: 
         # Add OR in front of B
-        if add_or_in_between(dependent):
+        or_gate = add_or_in_between(dft, dependent)
+        if not or_gate is None:
+            or_gate.add_child(trigger)
             dft.remove(fdep)
         else:
             return False
@@ -238,30 +292,34 @@ def simplify_dft(dft):
     changed = True
     while changed:
         for _, element in dft.elements.items():
-            changed = try_merge_or(dft, element)
-            if changed:
-                break
-            changed = try_merge_bes_in_or(dft, element)
-            if changed:
-                break
-            changed = try_remove_dependencies(dft, element)
-            if changed:
-                break
+            #changed = try_merge_or(dft, element)
+            #if changed:
+            #    break
+            #changed = try_merge_bes_in_or(dft, element)
+            #if changed:
+            #    break
+            #changed = try_remove_dependencies(dft, element)
+            #if changed:
+            #    break
             changed = try_merge_identical_gates(dft, element)
             if changed:
                 break
             changed = try_remove_gates_with_one_successor(dft, element)
             if changed:
                 break
+            changed = try_elim_fdeps_with_new_or(dft, element)
+            if changed:
+                break
 
     return dft
 
 """
+
 def simplify_dft(dft):
     changed = True
     while changed:
         for _, element in dft.elements.items():
-            changed = try_remove_gates_with_one_successor(dft, element)
+            changed = try_elim_fdeps_with_new_or(dft, element)
             if changed:
                 break
 

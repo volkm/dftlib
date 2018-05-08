@@ -232,5 +232,21 @@ class DftDependency(DftGate):
         self.trigger = None
         self.dependent = []
 
+    def add_child(self, element):
+        if self.trigger is None:
+            self.trigger = element
+        else:
+            self.dependent.append(element)
+
+        self.outgoing.append(element)
+        element.ingoing.append(self)
+
+    def remove_last_dep(self):
+        if len(self.dependent) > 1:
+            self.dependent.pop()
+            return True
+        else: 
+            return False
+
     def __str__(self):
-        return super().__str__() + ", trigger: {} dependent element: {}".format(self.trigger.element_id, self.dependent.element_id)
+        return super().__str__() + ", trigger: {} , first dependent element: {}".format(self.trigger.element_id, self.dependent[0].element_id)

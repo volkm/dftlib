@@ -1,4 +1,4 @@
-from dft_tool.storage.dft_elements import create_from_json, DftBe, DftGate
+from dft_tool.storage.dft_elements import create_from_json, DftBe, DftGate, DftDependency, DftPandGate, DftPorGate, DftSpareGate
 
 
 class Dft:
@@ -84,6 +84,8 @@ class Dft:
             element = DftPorGate(self.max_id + 1, name, children, pos)
         elif gate_type == "spare":
             element = DftSpareGate(self.max_id + 1, name, children, pos)
+        elif gate_type == "fdep":
+            element = DftDependency(self.max_id + 1, name, children, pos)
         else :
             element = DftGate(self.max_id + 1, name, gate_type, children, pos)
         self.add(element)
@@ -116,7 +118,7 @@ class Dft:
 
     def get_dynamics(self):
         dynamic_elements = []
-        for element in self.elements:
+        for (_, element) in self.elements.items():
             if element.is_dynamic():
                 dynamic_elements.append(element)
         return dynamic_elements

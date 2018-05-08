@@ -16,6 +16,9 @@ if __name__ == "__main__":
     dft = dft_tool.io.parser.parse_dft_json(args.dft)
     print(dft)
 
+    # Split FDEPs in DFT
+    dft_tool.transformer.rewriting.split_fdeps(dft)
+
     # Simplify DFT
     dft_tool.transformer.rewriting.simplify_dft(dft)
     print(dft)
