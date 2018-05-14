@@ -154,13 +154,8 @@ def try_merge_identical_gates(dft, gate):
     for child in parent.outgoing:
         if child.element_type == gate.element_type and child.element_id != gate.element_id:
             if len(child.ingoing) == 1:
-                potChild.append(child)
-
-    for child in potChild:
-        print("Actual child: {}".format(child.element_id))
-        if not gate.compareSucc(child):
-            print("remove child: {}".format(child))
-            potChild.remove(child)
+                if gate.compareSucc(child):
+                    potChild.append(child)
 
     if len(potChild) == 0:
         return False
@@ -232,7 +227,7 @@ def is_connected(a, b):
     :return: True if b is reachable from a. False otherwise.
     """
     for elem in a.outgoing:
-        if elem.compareSucc(b):
+        if elem.compare(b):
             return True
         if is_connected(elem, b):
             return True
@@ -289,39 +284,39 @@ def simplify_dft(dft):
     :param dft: DFT.
     :return: Simplified DFT.
     """
+    # Rewriting rules which are going to be performed
+    rules = [1,2,3,4,5,6]
+
     changed = True
     while changed:
         for _, element in dft.elements.items():
-            #changed = try_merge_or(dft, element)
-            #if changed:
-            #    break
-            #changed = try_merge_bes_in_or(dft, element)
-            #if changed:
-            #    break
-            #changed = try_remove_dependencies(dft, element)
-            #if changed:
-            #    break
-            changed = try_merge_identical_gates(dft, element)
-            if changed:
+
+            if len(rules) == 0:
                 break
-            changed = try_remove_gates_with_one_successor(dft, element)
-            if changed:
-                break
-            changed = try_elim_fdeps_with_new_or(dft, element)
-            if changed:
-                break
+
+            if 1 in rules:
+                changed = try_merge_or(dft, element)
+                if changed:
+                    break
+            if 2 in rules:
+                changed = try_merge_bes_in_or(dft, element)
+                if changed:
+                    break
+            if 3 in rules:
+                changed = try_remove_dependencies(dft, element)
+                if changed:
+                    break
+            if 4 in rules:
+                changed = try_merge_identical_gates(dft, element)
+                if changed:
+                    break
+            if 5 in rules:
+                changed = try_remove_gates_with_one_successor(dft, element)
+                if changed:
+                    break
+            if 6 in rules:
+                changed = try_elim_fdeps_with_new_or(dft, element)
+                if changed:
+                    break
 
     return dft
-
-"""
-
-def simplify_dft(dft):
-    changed = True
-    while changed:
-        for _, element in dft.elements.items():
-            changed = try_elim_fdeps_with_new_or(dft, element)
-            if changed:
-                break
-
-    return dft
-"""

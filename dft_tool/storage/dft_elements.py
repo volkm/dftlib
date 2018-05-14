@@ -85,28 +85,7 @@ class DftElement:
 
     def compare(self, other):
         if self.element_id != other.element_id:
-            raise Exception("Ids are not equal: {} and {}".format(self.element_id, other.element_id))
-            return False
-        if self.element_type != other.element_type:
-            raise Exception(
-                "Element types are not equal for {}: {} and {}".format(self, self.element_type, other.element_type))
-            return False
-        list_outgoing = [elem.element_id for elem in other.outgoing]
-        for element in self.outgoing:
-            if element.element_id in list_outgoing:
-                list_outgoing.remove(element.element_id)
-            else:
-                raise Exception("Element {} is not contained in other for {}.".format(element, self))
-                return False
-        if len(list_outgoing) > 0:
-            raise Exception("Some elements are not contained in {}.".format(self))
-            return False
-
-        return True
-
-    def compareSucc(self, other):
-        if self.element_id == other.element_id:
-            #raise Exception("Ids are equal: {} and {}".format(self.element_id, other.element_id))
+            #raise Exception("Ids are not equal: {} and {}".format(self.element_id, other.element_id))
             return False
         if self.element_type != other.element_type:
             #raise Exception(
@@ -150,10 +129,10 @@ class DftBe(DftElement):
         if not super(DftBe, self).compare(other):
             return False
         if self.rate != other.rate:
-            raise Exception("Rates are different {} and {} for {}".format(self.rate, other.rate, self))
+            #raise Exception("Rates are different {} and {} for {}".format(self.rate, other.rate, self))
             return False
         if self.dorm != other.dorm:
-            raise Exception("Dormancy factors are different {} and {} for {}".format(self.dorm, other.dorm, self))
+            #raise Exception("Dormancy factors are different {} and {} for {}".format(self.dorm, other.dorm, self))
             return False
 
         return True
@@ -174,6 +153,22 @@ class DftGate(DftElement):
         assert element in self.outgoing
         self.outgoing.remove(element)
         element.remove_parent(self)
+
+    def compareSucc(self, other):
+        if self.element_id == other.element_id:
+            return True
+        if self.element_type != other.element_type:
+            return False
+        list_outgoing = [elem.element_id for elem in other.outgoing]
+        for element in self.outgoing:
+            if element.element_id in list_outgoing:
+                list_outgoing.remove(element.element_id)
+            else:
+                return False
+        if len(list_outgoing) > 0:
+            return False
+
+        return True
 
     def get_json(self):
         json = DftElement.get_json(self)
@@ -201,8 +196,8 @@ class DftVotingGate(DftGate):
         if not super(DftVotingGate, self).compare(other):
             return False
         if self.votingThreshold != other.votingThreshold:
-            raise Exception(
-                "Threshold are different {} and {} for {}".format(self.votingThreshold, other.votingThreshold, self))
+            #raise Exception(
+            #    "Threshold are different {} and {} for {}".format(self.votingThreshold, other.votingThreshold, self))
             return False
 
         return True
