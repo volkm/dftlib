@@ -1,4 +1,5 @@
 {
+    "toplevel": "0",
     "nodes": [
         {
             "position": {
@@ -6,13 +7,14 @@
                 "x": 613.1782829074817
             },
             "data": {
-                "name": "Hallo",
-                "type": "and",
                 "children": [
                     "1",
                     "8",
-                    "9"
+                    "9",
+                    "10"
                 ],
+                "name": "Hallo",
+                "type": "and",
                 "id": "0"
             },
             "group": "nodes"
@@ -23,11 +25,12 @@
                 "x": 480.25
             },
             "data": {
-                "name": "Test",
                 "dorm": "0.0",
-                "type": "be",
                 "rate": "0.0",
-                "id": "1"
+                "type": "be",
+                "id": "1",
+                "repair": "0.0",
+                "name": "Test"
             },
             "group": "nodes"
         },
@@ -37,11 +40,12 @@
                 "x": 726.2084702844929
             },
             "data": {
-                "name": "Be2",
                 "dorm": "0.0",
-                "type": "be",
                 "rate": "0.0",
-                "id": "2"
+                "type": "be",
+                "id": "2",
+                "repair": "0.0",
+                "name": "Be2"
             },
             "group": "nodes"
         },
@@ -51,11 +55,12 @@
                 "x": 600.106366158185
             },
             "data": {
-                "name": "Hallo2",
                 "dorm": "0.0",
-                "type": "be",
                 "rate": "0.0",
-                "id": "3"
+                "type": "be",
+                "id": "3",
+                "repair": "0.0",
+                "name": "Hallo2"
             },
             "group": "nodes"
         },
@@ -65,11 +70,12 @@
                 "x": 844.0143833498593
             },
             "data": {
-                "name": "Test3",
                 "dorm": "0.0",
-                "type": "be",
                 "rate": "0.0",
-                "id": "5"
+                "type": "be",
+                "id": "5",
+                "repair": "0.0",
+                "name": "Test3"
             },
             "group": "nodes"
         },
@@ -79,12 +85,12 @@
                 "x": 500.106366158185
             },
             "data": {
-                "name": "OR_8",
-                "type": "or",
                 "children": [
                     "3",
                     "1"
                 ],
+                "name": "OR_8",
+                "type": "or",
                 "id": "8"
             },
             "group": "nodes"
@@ -95,16 +101,31 @@
                 "x": 744.0143833498593
             },
             "data": {
-                "name": "OR_9",
-                "type": "or",
                 "children": [
                     "5",
                     "1"
                 ],
+                "name": "OR_9",
+                "type": "or",
                 "id": "9"
             },
             "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 182.44894793684608,
+                "x": 626.2084702844929
+            },
+            "data": {
+                "children": [
+                    "2",
+                    "1"
+                ],
+                "name": "OR_10",
+                "type": "or",
+                "id": "10"
+            },
+            "group": "nodes"
         }
-    ],
-    "toplevel": "0"
+    ]
 }

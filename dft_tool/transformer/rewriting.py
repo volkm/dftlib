@@ -327,7 +327,7 @@ def try_rem_fdep_succ_or(dft, fdep):
     dependent = fdep.dependent[0]
 
     # Check if trigger and dependent have the same parent 
-    if len(dependent.ingoing) > 1:
+    if len_without_deps(dependent.ingoing) != 1:
         return False
 
     parent = dependent.ingoing[0]
@@ -343,6 +343,72 @@ def try_rem_fdep_succ_or(dft, fdep):
     return True
 
 
+def try_rem_fded_succ_pand(dft, fdep):
+    """
+    (Rule #28): Eliminate FDEP between two successors of an PAND.
+    If the trigger element is right to the dependent element, the FDEP is superfluous.
+    :param dft: DFT.
+    :param pand: FDEP to check.
+    :return: True iff elimination was successful.
+    """
+    # Check if fdep is suitable
+    if fdep.element_type != "fdep":
+        return False
+
+    if len(fdep.dependent) > 1:
+        return False
+
+    trigger = fdep.trigger
+    dependent = fdep.dependent[0]
+
+    # Check if trigger and dependent have the same parent
+    if len_without_deps(dependent.ingoing) != 1:
+        return False
+
+    parent = dependent.ingoing[0]
+    if parent.element_type != "pand":
+        return False
+
+    if not trigger in parent.outgoing:
+        return False
+
+    # Check if the dependent element is left to the trigger
+    first = False
+    for child in parent.outgoing:
+        if not first:
+            if child.compare(dependent):
+                first = True
+            else: 
+                # Trigger is first
+                break
+
+    if not first:
+        return False
+    else:
+        dft.remove(fdep)
+        return True
+
+
+def len_without_deps(element):
+    """
+    Calculate len without FDEPs.
+    :param element: The elements of interest.
+    :return: length without FDEPs.
+    """
+    if not len(element):
+        return False
+
+    count = 0
+    for elem in element:
+        if elem.element_type == "fdep":
+            count += 1
+
+    result = len(element) - count
+    assert result > -1
+
+    return result 
+
+
 def simplify_dft(dft):
     """
     Simplify DFT.
@@ -350,13 +416,13 @@ def simplify_dft(dft):
     :return: Simplified DFT.
     """
     # Rewriting rules which are going to be performed
-    rules = [1,2,3,4,5,6,7,8]
+    rules = [1,2,3,4,5,6,7,8,9]
 
     changed = True
     while changed:
         for _, element in dft.elements.items():
 
-            if len(rules) == 0:
+            if not rules:
                 break
 
             if 1 in rules:
@@ -389,6 +455,10 @@ def simplify_dft(dft):
                     break
             if 8 in rules:
                 changed = try_rem_fdep_succ_or(dft, element)
+                if changed:
+                    break
+            if 9 in rules:
+                changed = try_rem_fded_succ_pand(dft, element)
                 if changed:
                     break
 

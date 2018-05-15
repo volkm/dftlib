@@ -1,0 +1,170 @@
+{
+    "toplevel": 0,
+    "parameters": {},
+    "nodes": [
+        {
+            "data": {
+                "id": "0",
+                "name": "A",
+                "type": "and",
+                "repairable": false,
+                "children": [
+                    "6"
+                ],
+                "label": "A"
+            },
+            "position": {
+                "x": 1017.0111426817175,
+                "y": 121.50932269086826
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "and toplevel"
+        },
+        {
+            "data": {
+                "id": "1",
+                "name": "B",
+                "type": "pand",
+                "repairable": false,
+                "children": [
+                    "2",
+                    "3"
+                ],
+                "label": "B"
+            },
+            "position": {
+                "x": 1021.5,
+                "y": 448.5
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": true,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "pand"
+        },
+        {
+            "data": {
+                "id": "2",
+                "name": "B1",
+                "type": "be",
+                "repairable": false,
+                "rate": 0,
+                "repair": 0,
+                "dorm": 0,
+                "label": "B1 (λ: 0)"
+            },
+            "position": {
+                "x": 963.5,
+                "y": 619.5
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        },
+        {
+            "data": {
+                "id": "3",
+                "name": "B2",
+                "type": "be",
+                "repairable": false,
+                "rate": 0,
+                "repair": 0,
+                "dorm": 0,
+                "label": "B2 (λ: 0)"
+            },
+            "position": {
+                "x": 1074.5,
+                "y": 619.5
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        },
+        {
+            "data": {
+                "id": "4",
+                "name": "da",
+                "type": "fdep",
+                "repairable": false,
+                "children": [
+                    "2",
+                    "3"
+                ],
+                "label": "da"
+            },
+            "position": {
+                "x": 784.5,
+                "y": 406.5
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "fdep"
+        },
+        {
+            "data": {
+                "id": "5",
+                "name": "weg",
+                "type": "fdep",
+                "repairable": false,
+                "children": [
+                    "3",
+                    "2"
+                ],
+                "label": "weg"
+            },
+            "position": {
+                "x": 1238.5,
+                "y": 423.5
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "fdep"
+        },
+        {
+            "data": {
+                "id": "6",
+                "name": "Weg2",
+                "type": "and",
+                "repairable": false,
+                "children": [
+                    "1"
+                ],
+                "label": "Weg2"
+            },
+            "position": {
+                "x": 1015.4647519639977,
+                "y": 282.3273998016879
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "and"
+        }
+    ]
+}

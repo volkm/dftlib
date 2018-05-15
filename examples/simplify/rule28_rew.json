@@ -1,0 +1,82 @@
+{
+    "toplevel": "0",
+    "nodes": [
+        {
+            "data": {
+                "children": [
+                    "1"
+                ],
+                "name": "A",
+                "type": "and",
+                "id": "0"
+            },
+            "position": {
+                "x": 1017.0111426817175,
+                "y": 121.50932269086826
+            },
+            "group": "nodes"
+        },
+        {
+            "data": {
+                "children": [
+                    "2",
+                    "3"
+                ],
+                "name": "B",
+                "type": "pand",
+                "id": "1"
+            },
+            "position": {
+                "x": 1021.5,
+                "y": 448.5
+            },
+            "group": "nodes"
+        },
+        {
+            "data": {
+                "name": "B1",
+                "repair": "0.0",
+                "rate": "0.0",
+                "id": "2",
+                "type": "be",
+                "dorm": "0.0"
+            },
+            "position": {
+                "x": 963.5,
+                "y": 619.5
+            },
+            "group": "nodes"
+        },
+        {
+            "data": {
+                "name": "B2",
+                "repair": "0.0",
+                "rate": "0.0",
+                "id": "3",
+                "type": "be",
+                "dorm": "0.0"
+            },
+            "position": {
+                "x": 1074.5,
+                "y": 619.5
+            },
+            "group": "nodes"
+        },
+        {
+            "data": {
+                "children": [
+                    "2",
+                    "3"
+                ],
+                "name": "da",
+                "type": "fdep",
+                "id": "4"
+            },
+            "position": {
+                "x": 784.5,
+                "y": 406.5
+            },
+            "group": "nodes"
+        }
+    ]
+}
