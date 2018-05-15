@@ -1,0 +1,147 @@
+{
+    "toplevel": 0,
+    "parameters": {},
+    "nodes": [
+        {
+            "data": {
+                "id": "0",
+                "name": "and_0",
+                "type": "and",
+                "repairable": false,
+                "children": [
+                    "2",
+                    "3"
+                ],
+                "label": "and_0"
+            },
+            "position": {
+                "x": 701.4679926321396,
+                "y": -692.8855090916175
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "and toplevel"
+        },
+        {
+            "data": {
+                "id": "1",
+                "name": "be_1",
+                "type": "be",
+                "repairable": false,
+                "rate": 0,
+                "repair": 0,
+                "dorm": 0,
+                "label": "be_1 (λ: 0)"
+            },
+            "position": {
+                "x": 1033.9971586454153,
+                "y": -94.69346488445494
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        },
+        {
+            "data": {
+                "id": "2",
+                "name": "Trigger_A",
+                "type": "be",
+                "repairable": false,
+                "rate": 0,
+                "repair": 0,
+                "dorm": 0,
+                "label": "Trigger_A (λ: 0)"
+            },
+            "position": {
+                "x": 459.97653446985964,
+                "y": -87.89661644990395
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        },
+        {
+            "data": {
+                "id": "3",
+                "name": "and_3",
+                "type": "and",
+                "repairable": false,
+                "children": [
+                    "1",
+                    "4"
+                ],
+                "label": "and_3"
+            },
+            "position": {
+                "x": 929.4651512775549,
+                "y": -440.64463212570723
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "and"
+        },
+        {
+            "data": {
+                "id": "4",
+                "name": "Dependent_B",
+                "type": "be",
+                "repairable": false,
+                "rate": 0,
+                "repair": 0,
+                "dorm": 0,
+                "label": "Dependent_B (λ: 0)"
+            },
+            "position": {
+                "x": 780.1337121806114,
+                "y": -89.71575024789016
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        },
+        {
+            "data": {
+                "id": "5",
+                "name": "fdep_5",
+                "type": "fdep",
+                "repairable": false,
+                "children": [
+                    "2",
+                    "4"
+                ],
+                "label": "fdep_5"
+            },
+            "position": {
+                "x": 668.1351328579037,
+                "y": -338.6014820761293
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "fdep"
+        }
+    ]
+}

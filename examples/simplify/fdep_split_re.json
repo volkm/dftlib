@@ -1,0 +1,110 @@
+{
+    "nodes": [
+        {
+            "position": {
+                "y": 73.18152357562349,
+                "x": 613.1782829074817
+            },
+            "data": {
+                "name": "Hallo",
+                "type": "and",
+                "children": [
+                    "1",
+                    "8",
+                    "9"
+                ],
+                "id": "0"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 336.25,
+                "x": 480.25
+            },
+            "data": {
+                "name": "Test",
+                "dorm": "0.0",
+                "type": "be",
+                "rate": "0.0",
+                "id": "1"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 332.4489479368461,
+                "x": 726.2084702844929
+            },
+            "data": {
+                "name": "Be2",
+                "dorm": "0.0",
+                "type": "be",
+                "rate": "0.0",
+                "id": "2"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 334.93780525512847,
+                "x": 600.106366158185
+            },
+            "data": {
+                "name": "Hallo2",
+                "dorm": "0.0",
+                "type": "be",
+                "rate": "0.0",
+                "id": "3"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 333.27856704294027,
+                "x": 844.0143833498593
+            },
+            "data": {
+                "name": "Test3",
+                "dorm": "0.0",
+                "type": "be",
+                "rate": "0.0",
+                "id": "5"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 184.93780525512847,
+                "x": 500.106366158185
+            },
+            "data": {
+                "name": "OR_8",
+                "type": "or",
+                "children": [
+                    "3",
+                    "1"
+                ],
+                "id": "8"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 183.27856704294027,
+                "x": 744.0143833498593
+            },
+            "data": {
+                "name": "OR_9",
+                "type": "or",
+                "children": [
+                    "5",
+                    "1"
+                ],
+                "id": "9"
+            },
+            "group": "nodes"
+        }
+    ],
+    "toplevel": "0"
+}

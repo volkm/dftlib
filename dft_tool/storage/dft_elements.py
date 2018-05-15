@@ -16,7 +16,8 @@ def create_from_json(json):
         # BE
         rate = float(data['rate'])
         dorm = float(data['dorm'])
-        return DftBe(element_id, name, rate, dorm, position)
+        repair = float(data['repair'])
+        return DftBe(element_id, name, rate, dorm, repair, position)
     elif element_type == "vot":
         # Voting gate
         threshold = int(data['voting'])
@@ -106,22 +107,26 @@ class DftElement:
 
 
 class DftBe(DftElement):
-    def __init__(self, element_id, name, rate, dorm, position):
+    def __init__(self, element_id, name, rate, dorm, repair, position):
         DftElement.__init__(self, element_id, name, "be", position)
         assert self.is_be()
         self.rate = rate
         self.dorm = dorm
+        self.repair = repair
 
     def get_json(self):
         json = DftElement.get_json(self)
         json['data']['rate'] = str(self.rate)
         json['data']['dorm'] = str(self.dorm)
+        json['data']['repair'] = str(self.repair)
         return json
 
     def __str__(self):
         s = super().__str__()
         s += " with rate {}".format(self.rate)
-        if self.dorm != 1:
+        if self.dorm != 1 and self.repair > 0:
+            s += " and repair {} ({})".format(self.repair, self.dorm)
+        elif self.dorm != 1:
             s += " ({})".format(self.dorm)
         return s
 
@@ -133,6 +138,8 @@ class DftBe(DftElement):
             return False
         if self.dorm != other.dorm:
             #raise Exception("Dormancy factors are different {} and {} for {}".format(self.dorm, other.dorm, self))
+            return False
+        if self.repair != other.repair:
             return False
 
         return True

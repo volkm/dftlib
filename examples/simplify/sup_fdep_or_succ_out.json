@@ -1,0 +1,82 @@
+{
+    "nodes": [
+        {
+            "position": {
+                "y": 529.5,
+                "x": 1144.5
+            },
+            "group": "nodes",
+            "data": {
+                "children": [
+                    "2",
+                    "1"
+                ],
+                "type": "or",
+                "name": "A",
+                "id": "0"
+            }
+        },
+        {
+            "position": {
+                "y": 687.5,
+                "x": 1228.5
+            },
+            "group": "nodes",
+            "data": {
+                "type": "be",
+                "name": "C",
+                "dorm": "0.0",
+                "repair": "0.0",
+                "id": "1",
+                "rate": "0.0"
+            }
+        },
+        {
+            "position": {
+                "y": 672.5,
+                "x": 1058.5
+            },
+            "group": "nodes",
+            "data": {
+                "children": [
+                    "3",
+                    "4"
+                ],
+                "type": "and",
+                "name": "B",
+                "id": "2"
+            }
+        },
+        {
+            "position": {
+                "y": 776.5,
+                "x": 1006.5
+            },
+            "group": "nodes",
+            "data": {
+                "type": "be",
+                "name": "B1",
+                "dorm": "0.0",
+                "repair": "0.0",
+                "id": "3",
+                "rate": "0.0"
+            }
+        },
+        {
+            "position": {
+                "y": 773.5,
+                "x": 1129.5
+            },
+            "group": "nodes",
+            "data": {
+                "type": "be",
+                "name": "B2",
+                "dorm": "0.0",
+                "repair": "0.0",
+                "id": "4",
+                "rate": "0.0"
+            }
+        }
+    ],
+    "toplevel": "0"
+}

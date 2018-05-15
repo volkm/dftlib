@@ -157,7 +157,8 @@ def try_merge_identical_gates(dft, gate):
                 if gate.compareSucc(child):
                     potChild.append(child)
 
-    if len(potChild) == 0:
+    # Check if potChild is empty
+    if not potChild:
         return False
     else:
         for child in potChild:
@@ -191,6 +192,7 @@ def try_remove_gates_with_one_successor(dft, gate):
     dft.remove(gate)
 
     return True
+
 
 def add_or_in_between(dft, element):
     """
@@ -233,6 +235,7 @@ def is_connected(a, b):
             return True
 
     return False
+
 
 def try_elim_fdeps_with_new_or(dft, fdep):
     """
@@ -278,6 +281,68 @@ def try_elim_fdeps_with_new_or(dft, fdep):
     return True
 
 
+def try_rem_superfluous_fdeps(dft, fdep):
+    """
+    (Rule #25): Eliminate superfluous FDEP from AND\PAND\OR\POR\VOT.
+    This FDEP is triggered after the failure of the dependent element and thus it does not influence anything else.
+    :param dft: DFT.
+    :param fdep: FDEP to check.
+    :return: True iff elimination was successful.
+    """
+    # Check if fdep is suitable
+    if fdep.element_type != "fdep":
+        return False
+
+    if len(fdep.dependent) > 1:
+        return False
+
+    trigger = fdep.trigger
+    dependent = fdep.dependent[0]
+
+    if not dependent in trigger.outgoing:
+        return False
+
+    # Remove superfluous fdep
+    dft.remove(fdep)
+
+    return True
+
+
+def try_rem_fdep_succ_or(dft, fdep):
+    """
+    (Rule #27): Eliminate FDEP between two successors of an OR.
+    This FDEP is superfluous. Only supports FDEPs with one common predecessor.
+    :param dft: DFT.
+    :param fdep: FDEP to check.
+    :return: True iff elimination was successful.
+    """
+    # Check if fdep is suitable
+    if fdep.element_type != "fdep":
+        return False
+
+    if len(fdep.dependent) > 1:
+        return False
+
+    trigger = fdep.trigger
+    dependent = fdep.dependent[0]
+
+    # Check if trigger and dependent have the same parent 
+    if len(dependent.ingoing) > 1:
+        return False
+
+    parent = dependent.ingoing[0]
+    if parent.element_type != "or":
+        return False
+
+    if not trigger in parent.outgoing:
+        return False
+
+    # Trigger and dependent element are both successors of the same or, thus remove the fdep
+    dft.remove(fdep)
+
+    return True
+
+
 def simplify_dft(dft):
     """
     Simplify DFT.
@@ -285,7 +350,7 @@ def simplify_dft(dft):
     :return: Simplified DFT.
     """
     # Rewriting rules which are going to be performed
-    rules = [1,2,3,4,5,6]
+    rules = [1,2,3,4,5,6,7,8]
 
     changed = True
     while changed:
@@ -316,6 +381,14 @@ def simplify_dft(dft):
                     break
             if 6 in rules:
                 changed = try_elim_fdeps_with_new_or(dft, element)
+                if changed:
+                    break
+            if 7 in rules:
+                changed = try_rem_superfluous_fdeps(dft, element)
+                if changed:
+                    break
+            if 8 in rules:
+                changed = try_rem_fdep_succ_or(dft, element)
                 if changed:
                     break
 

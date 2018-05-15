@@ -1,0 +1,150 @@
+{
+    "toplevel": 0,
+    "parameters": {},
+    "nodes": [
+        {
+            "data": {
+                "id": "0",
+                "name": "Hallo",
+                "type": "and",
+                "repairable": false,
+                "children": [
+                    "1",
+                    "3",
+                    "2",
+                    "5"
+                ],
+                "label": "Hallo"
+            },
+            "position": {
+                "x": 613.1782829074817,
+                "y": 73.18152357562349
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "and toplevel"
+        },
+        {
+            "data": {
+                "id": "1",
+                "name": "Test",
+                "type": "be",
+                "repairable": false,
+                "rate": 0,
+                "repair": 0,
+                "dorm": 0,
+                "label": "Test (λ: 0)"
+            },
+            "position": {
+                "x": 480.25,
+                "y": 336.25
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        },
+        {
+            "data": {
+                "id": "2",
+                "name": "Be2",
+                "type": "be",
+                "repairable": false,
+                "rate": 0,
+                "repair": 0,
+                "dorm": 0,
+                "label": "Be2 (λ: 0)"
+            },
+            "position": {
+                "x": 726.2084702844929,
+                "y": 332.4489479368461
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        },
+        {
+            "data": {
+                "id": "3",
+                "name": "Hallo2",
+                "type": "be",
+                "repairable": false,
+                "rate": 0,
+                "repair": 0,
+                "dorm": 0,
+                "label": "Hallo2 (λ: 0)"
+            },
+            "position": {
+                "x": 600.106366158185,
+                "y": 334.93780525512847
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        },
+        {
+            "data": {
+                "id": "4",
+                "name": "FDEP",
+                "type": "fdep",
+                "repairable": false,
+                "children": [
+                    "1",
+                    "3",
+                    "2",
+                    "5"
+                ],
+                "label": "FDEP"
+            },
+            "position": {
+                "x": 844.1824598381932,
+                "y": 109.9332569943775
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "fdep"
+        },
+        {
+            "data": {
+                "id": "5",
+                "name": "Test3",
+                "type": "be",
+                "repairable": false,
+                "rate": 0,
+                "repair": 0,
+                "dorm": 0,
+                "label": "Test3 (λ: 0)"
+            },
+            "position": {
+                "x": 844.0143833498593,
+                "y": 333.27856704294027
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": true,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        }
+    ]
+}
