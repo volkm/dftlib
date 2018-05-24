@@ -1,0 +1,27 @@
+{
+    "toplevel": 0,
+    "parameters": {},
+    "nodes": [
+        {
+            "data": {
+                "id": "0",
+                "name": "Test",
+                "type": "and",
+                "repairable": false,
+                "children": [],
+                "label": "Test"
+            },
+            "position": {
+                "x": 810,
+                "y": 239.5
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "and toplevel"
+        }
+    ]
+}
