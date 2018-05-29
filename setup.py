@@ -31,6 +31,7 @@ setup(
     packages=['dft_lib'],
     cmdclass={'test': PyTest},
     zip_safe=False,
+    install_requires=['flask', 'flask-cors'],
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
     python_requires='>=3',
