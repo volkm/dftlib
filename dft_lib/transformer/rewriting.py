@@ -1,3 +1,14 @@
+class Message:
+    """docstring for Message"""
+    def __init__(self, level, text):
+        self.level = level
+        self.text = text
+
+    def toString(self):
+        string = str(self.level) + ': ' + str(self.text)
+        return string
+        
+
 def split_fdeps(dft):
     """
     Split fdeps with two or more children into single fdeps with only one child.
@@ -409,12 +420,26 @@ def len_without_deps(element):
     return result 
 
 
+def logging():
+    # Logging
+    logger = list()
+    data = Message('Error', 'Hallo. Dies ist ein Fehler!')
+    data2 = Message('Error', 'Hallo. Dies ist ein zweiter Fehler!')
+    data3 = Message('Info', 'End')
+    logger.append(data)
+    logger.append(data2)
+    logger.append(data3)
+
+    return logger
+
+
 def simplify_dft(dft):
     """
     Simplify DFT.
     :param dft: DFT.
     :return: Simplified DFT.
     """
+
     # Rewriting rules which are going to be performed
     rules = [1,2,3,4,5,6,7,8,9]
 
