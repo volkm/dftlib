@@ -7,7 +7,49 @@ class Message:
     def toString(self):
         string = str(self.level) + ': ' + str(self.text)
         return string
-        
+
+    def get_level(self):
+        return self.level
+
+    def get_text(self):
+        return self.text
+
+
+class Logger:
+
+    messages = list()
+
+    def add_message(self, message):
+        self.messages.append(message)
+
+    def pop_message(self):
+        return self.messages.pop(len(messages))
+
+    def clear(self):
+        self.messages.clear()
+
+    def get_messages(self):
+        if self.messages:
+            string = ''
+            for msg in self.messages:
+                if string:
+                    # Insert '#' for separating 
+                    string = string + '#' + msg.toString()
+                else:
+                    string = msg.toString()
+            return string
+        else:
+            return ''
+
+
+# Global Logger
+simpLogger = Logger()
+
+
+#""""""""""""""""""""""""""""""""""""""""""#
+#       Methods for DFT-Simplifying        #
+#""""""""""""""""""""""""""""""""""""""""""#
+
 
 def split_fdeps(dft):
     """
@@ -63,12 +105,24 @@ def try_merge_bes_in_or(dft, or_gate):
         return False
 
     # Merge BEs into one
+    count = 0
     first_child = child_bes[0]
     for element in child_bes[1:]:
         first_child.name += "_{}".format(element.name)
         first_child.rate = element.rate + first_child.rate
         # TODO: combine dormancy factors as well
+        count = count + 1
         dft.remove(element)
+
+    tmp = ''
+    if count > 0:
+        if count == 1:
+            tmp = 'element'
+        else:
+            tmp = 'elements'
+
+        message = Message('Info', 'Removed {} {} while combining BEs.'.format(count, tmp))
+        simpLogger.add_message(message)
 
     return True
 
@@ -420,25 +474,15 @@ def len_without_deps(element):
     return result 
 
 
-def logging():
-    # Logging
-    logger = list()
-    data = Message('Error', 'Hallo. Dies ist ein Fehler!')
-    data2 = Message('Error', 'Hallo. Dies ist ein zweiter Fehler!')
-    data3 = Message('Info', 'End')
-    logger.append(data)
-    logger.append(data2)
-    logger.append(data3)
-
-    return logger
-
-
 def simplify_dft(dft):
     """
     Simplify DFT.
     :param dft: DFT.
     :return: Simplified DFT.
     """
+
+    # Clear Logger
+    simpLogger.clear()
 
     # Rewriting rules which are going to be performed
     rules = [1,2,3,4,5,6,7,8,9]
@@ -486,5 +530,10 @@ def simplify_dft(dft):
                 changed = try_rem_fded_succ_pand(dft, element)
                 if changed:
                     break
+
+
+    # Add finish message to logger
+    endMessage = Message('End', '')
+    simpLogger.add_message(endMessage)
 
     return dft
