@@ -474,7 +474,7 @@ def len_without_deps(element):
     return result 
 
 
-def simplify_dft(dft):
+def simplify_dft(dft, rules):
     """
     Simplify DFT.
     :param dft: DFT.
@@ -484,9 +484,6 @@ def simplify_dft(dft):
     # Clear Logger
     simpLogger.clear()
 
-    # Rewriting rules which are going to be performed
-    rules = [1,2,3,4,5,6,7,8,9]
-
     changed = True
     while changed:
         for _, element in dft.elements.items():
@@ -494,39 +491,39 @@ def simplify_dft(dft):
             if not rules:
                 break
 
-            if 1 in rules:
+            if '1' in rules:
                 changed = try_merge_or(dft, element)
                 if changed:
                     break
-            if 2 in rules:
+            if '2' in rules:
                 changed = try_merge_bes_in_or(dft, element)
                 if changed:
                     break
-            if 3 in rules:
+            if '3' in rules:
                 changed = try_remove_dependencies(dft, element)
                 if changed:
                     break
-            if 4 in rules:
+            if '4' in rules:
                 changed = try_merge_identical_gates(dft, element)
                 if changed:
                     break
-            if 5 in rules:
+            if '5' in rules:
                 changed = try_remove_gates_with_one_successor(dft, element)
                 if changed:
                     break
-            if 6 in rules:
+            if '6' in rules:
                 changed = try_elim_fdeps_with_new_or(dft, element)
                 if changed:
                     break
-            if 7 in rules:
+            if '7' in rules:
                 changed = try_rem_superfluous_fdeps(dft, element)
                 if changed:
                     break
-            if 8 in rules:
+            if '7' in rules:
                 changed = try_rem_fdep_succ_or(dft, element)
                 if changed:
                     break
-            if 9 in rules:
+            if '7' in rules:
                 changed = try_rem_fded_succ_pand(dft, element)
                 if changed:
                     break
