@@ -1,3 +1,4 @@
+
 class Message:
     """docstring for Message"""
     def __init__(self, level, text):
@@ -45,6 +46,9 @@ class Logger:
 # Global Logger
 simpLogger = Logger()
 
+# Global Transformer
+transformer = dft_lib.transformer.transformation.Transformation()
+
 
 #""""""""""""""""""""""""""""""""""""""""""#
 #       Methods for DFT-Simplifying        #
@@ -59,6 +63,7 @@ def split_fdeps(dft):
     :return: True if fdep is split.
     """
     # Check all fdeps and save the interesting ones
+    print("Start")
     fdeps = []
     for (_, fdep) in dft.elements.items():
         if fdep.element_type == "fdep":
@@ -481,56 +486,53 @@ def simplify_dft(dft, rules):
     :return: Simplified DFT.
     """
 
-    # Clear Logger
+    # Clear Logger and Transformer
     simpLogger.clear()
+    transformer.clear()
 
-    changed = True
-    while changed:
-        for _, element in dft.elements.items():
+    # Set number of elements to Transformer
+    transformer.setNumberOfElements(dft.count_elements)
 
-            if not rules:
-                break
+    if not len(rules) == 0:
+        changed = True
+        while changed:
+            for _, element in dft.elements.items():
 
-            if '1' in rules:
-                changed = try_merge_or(dft, element)
-                if changed:
-                    break
-            if '2' in rules:
-                changed = try_merge_bes_in_or(dft, element)
-                if changed:
-                    break
-            if '3' in rules:
-                changed = try_remove_dependencies(dft, element)
-                if changed:
-                    break
-            if '4' in rules:
-                changed = try_merge_identical_gates(dft, element)
-                if changed:
-                    break
-            if '5' in rules:
-                changed = try_remove_gates_with_one_successor(dft, element)
-                if changed:
-                    break
-            if '6' in rules:
-                changed = try_elim_fdeps_with_new_or(dft, element)
-                if changed:
-                    break
-            if '7' in rules:
-                changed = try_rem_superfluous_fdeps(dft, element)
-                if changed:
-                    break
-            if '7' in rules:
-                changed = try_rem_fdep_succ_or(dft, element)
-                if changed:
-                    break
-            if '7' in rules:
-                changed = try_rem_fded_succ_pand(dft, element)
-                if changed:
-                    break
-
-
-    # Add finish message to logger
-    endMessage = Message('End', '')
-    simpLogger.add_message(endMessage)
+                if '1' in rules:
+                    changed = try_merge_or(dft, element)
+                    if changed:
+                        break
+                if '2' in rules:
+                    changed = try_merge_bes_in_or(dft, element)
+                    if changed:
+                        break
+                if '3' in rules:
+                    changed = try_remove_dependencies(dft, element)
+                    if changed:
+                        break
+                if '4' in rules:
+                    changed = try_merge_identical_gates(dft, element)
+                    if changed:
+                        break
+                if '5' in rules:
+                    changed = try_remove_gates_with_one_successor(dft, element)
+                    if changed:
+                        break
+                if '6' in rules:
+                    changed = try_elim_fdeps_with_new_or(dft, element)
+                    if changed:
+                        break
+                if '7' in rules:
+                    changed = try_rem_superfluous_fdeps(dft, element)
+                    if changed:
+                        break
+                if '7' in rules:
+                    changed = try_rem_fdep_succ_or(dft, element)
+                    if changed:
+                        break
+                if '7' in rules:
+                    changed = try_rem_fded_succ_pand(dft, element)
+                    if changed:
+                        break
 
     return dft

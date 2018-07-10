@@ -39,6 +39,9 @@ class Dft:
             raise Exception("Top level element not defined")
         self.set_top_level_element(top_level_id)
 
+    def count_elements(self):
+        return len(self.elements)
+
     def get_element(self, element_id):
         assert element_id in self.elements
         return self.elements[element_id]
