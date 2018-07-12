@@ -1,3 +1,4 @@
+import dft_lib.transformer.transformation
 
 class Message:
     """docstring for Message"""
@@ -63,10 +64,9 @@ def split_fdeps(dft):
     :return: True if fdep is split.
     """
     # Check all fdeps and save the interesting ones
-    print("Start")
     fdeps = []
     for (_, fdep) in dft.elements.items():
-        if fdep.element_type == "fdep":
+        if fdep.element_type == 'fdep':
             if len(fdep.dependent) > 1:
                 fdeps.append(fdep)
 
@@ -80,7 +80,9 @@ def split_fdeps(dft):
             while num_dep > 1:
                 # Create new FDEP with last dependent element
                 position = (fdep.position[0] - (50*pos_add), fdep.position[1] - (75*pos_add))
-                new_fdep = dft.new_gate("FDEP_" + str(dft.max_id + 1), "fdep", [], position)
+                new_fdep = dft.new_gate('FDEP_' + str(dft.max_id + 1), 'fdep', [], position)
+                # Add gate to transformer
+                transformer.addFdepAdd()
                 pos_add += 1
                 # Add parents and children
                 new_fdep.add_child(trigger)
@@ -98,7 +100,7 @@ def try_merge_bes_in_or(dft, or_gate):
     :return: True iff merge was successful.
     """
     # Check if rule is applicable
-    if or_gate.element_type != "or":
+    if or_gate.element_type != 'or':
         return False
 
     child_bes = []
@@ -110,24 +112,14 @@ def try_merge_bes_in_or(dft, or_gate):
         return False
 
     # Merge BEs into one
-    count = 0
     first_child = child_bes[0]
     for element in child_bes[1:]:
         first_child.name += "_{}".format(element.name)
         first_child.rate = element.rate + first_child.rate
         # TODO: combine dormancy factors as well
-        count = count + 1
         dft.remove(element)
-
-    tmp = ''
-    if count > 0:
-        if count == 1:
-            tmp = 'element'
-        else:
-            tmp = 'elements'
-
-        message = Message('Info', 'Removed {} {} while combining BEs.'.format(count, tmp))
-        simpLogger.add_message(message)
+        # Add removed element to transformer
+        transformer.addBe()
 
     return True
 
@@ -140,13 +132,13 @@ def try_merge_or(dft, or_gate):
     :return: True iff merge was successful.
     """
     # Check if rule is applicable
-    if or_gate.element_type != "or":
+    if or_gate.element_type != 'or':
         return False
 
     if len(or_gate.ingoing) != 1:
         return False
     parent = or_gate.ingoing[0]
-    if parent.element_type != "or":
+    if parent.element_type != 'or':
         return False
 
     # Add children to parent gate
@@ -154,8 +146,10 @@ def try_merge_or(dft, or_gate):
         if child not in parent.outgoing:
             parent.add_child(child)
 
-    # Delete or gate
+    # Delete or gate and add to transformer
     dft.remove(or_gate)
+    transformer.addOr()
+
 
     return True
 
@@ -169,10 +163,10 @@ def has_immediate_failure(dft, gate):
     :return: True iff failure leads to system failure.
     """
     if gate.element_id == dft.top_level_element.element_id:
-        return gate.element_type == "or"
+        return gate.element_type == 'or'
     else:
         for parent in gate.ingoing:
-            if parent.element_type == "or":
+            if parent.element_type == 'or':
                 if has_immediate_failure(dft, parent):
                     return True
         return False
@@ -187,15 +181,17 @@ def try_remove_dependencies(dft, dependency):
     :return: True iff removal was successful.
     """
     # Check if rule is applicable
-    if dependency.element_type != "fdep":
+    if dependency.element_type != 'fdep':
         return False
 
     trigger = dependency.trigger
     if not has_immediate_failure(dft, trigger):
         return False
 
-    # Remove superfluous dependency
+    # Remove superfluous dependency and add to transformer
     dft.remove(dependency)
+    transformer.addFdepRem()
+
     return True
 
 
@@ -208,7 +204,7 @@ def try_merge_identical_gates(dft, gate):
     :return: True iff merge and removal was successful.
     """
     # Check if rule is applicable. Therefore, check if gate is no SPARE or FDEP
-    if gate.element_type == "fdep" or gate.element_type == "spare" or gate.element_type == "be":
+    if gate.element_type == 'fdep' or gate.element_type == 'spare' or gate.element_type == 'be':
         return False
 
     # Check if gate has more than one parent (for simplicity atm)
@@ -234,6 +230,18 @@ def try_merge_identical_gates(dft, gate):
         for child in potChild:
             dft.remove(child)
 
+            # Add removed child to transformer
+            if child.element_type == 'and':
+                transformer.addAnd()
+            elif child.element_type == 'or':
+                transformer.addOr()
+            elif child.element_type == 'vot':
+                transformer.addVot()
+            elif child.element_type == 'pand':
+                transformer.addPand()
+            elif child.element_type == 'por':
+                transformer.addPor()
+
     return True
 
 
@@ -246,7 +254,7 @@ def try_remove_gates_with_one_successor(dft, gate):
     :return: True if gate has been removed.
     """
     # Check if rule is applicable.
-    if gate.element_type == "fdep" or gate.element_type == "spare" or gate.element_type == "be" or gate.element_id == dft.top_level_element.element_id:
+    if gate.element_type == 'fdep' or gate.element_type == 'spare' or gate.element_type == 'be' or gate.element_id == dft.top_level_element.element_id:
         return False
 
     if len(gate.outgoing) != 1:
@@ -261,6 +269,18 @@ def try_remove_gates_with_one_successor(dft, gate):
 
     dft.remove(gate)
 
+    # Add removed child to transformer
+    if gate.element_type == 'and':
+        transformer.addAnd()
+    elif gate.element_type == 'or':
+        transformer.addOr()
+    elif gate.element_type == 'vot':
+        transformer.addVot()
+    elif gate.element_type == 'pand':
+        transformer.addPand()
+    elif gate.element_type == 'por':
+        transformer.addPor()
+
     return True
 
 
@@ -274,17 +294,21 @@ def add_or_in_between(dft, element):
     """
     # Check if predecessor is already an OR
     for elem in element.ingoing:
-        if elem.element_type == "or":
+        if elem.element_type == 'or':
             return None
 
     for elem in element.ingoing:
-        if not elem.element_type == "fdep":
+        if not elem.element_type == 'fdep':
             parent = elem
 
     # Remove element from parents children
     parent.remove_child(element)
     position = (element.position[0] - 100, element.position[1] - 150)
-    or_gate = dft.new_gate("OR_" + str(dft.max_id + 1), "or", [], position)
+    or_gate = dft.new_gate('OR_' + str(dft.max_id + 1), 'or', [], position)
+
+    # Add OR to transformer
+    transformer.addOrAdd()
+
     parent.add_child(or_gate)
     or_gate.add_child(element)
 
@@ -317,7 +341,7 @@ def try_elim_fdeps_with_new_or(dft, fdep):
     :return: True if fdep has been removed.
     """
     # Check if trigger and dependent element top connected is.
-    if fdep.element_type != "fdep":
+    if fdep.element_type != 'fdep':
         return False
     else:
         trigger = fdep.trigger
@@ -335,9 +359,10 @@ def try_elim_fdeps_with_new_or(dft, fdep):
         return False
 
     # Check if predecessor of B is OR
-    if dependent.ingoing[0].element_type == "or":
-        # Remove fdep and add trigger to OR
+    if dependent.ingoing[0].element_type == 'or':
+        # Remove fdep and add trigger to OR and add removed FDEP to transformer
         dft.remove(fdep)
+        transformer.addFdepRem()
         dependent.ingoing[0].add_child(trigger)
     else: 
         # Add OR in front of B
@@ -345,6 +370,7 @@ def try_elim_fdeps_with_new_or(dft, fdep):
         if not or_gate is None:
             or_gate.add_child(trigger)
             dft.remove(fdep)
+            transformer.addFdepRem()
         else:
             return False
 
@@ -360,7 +386,7 @@ def try_rem_superfluous_fdeps(dft, fdep):
     :return: True iff elimination was successful.
     """
     # Check if fdep is suitable
-    if fdep.element_type != "fdep":
+    if fdep.element_type != 'fdep':
         return False
 
     if len(fdep.dependent) > 1:
@@ -372,8 +398,9 @@ def try_rem_superfluous_fdeps(dft, fdep):
     if not dependent in trigger.outgoing:
         return False
 
-    # Remove superfluous fdep
+    # Remove superfluous fdep and add to transformer
     dft.remove(fdep)
+    transformer.addFdepRem()
 
     return True
 
@@ -387,7 +414,7 @@ def try_rem_fdep_succ_or(dft, fdep):
     :return: True iff elimination was successful.
     """
     # Check if fdep is suitable
-    if fdep.element_type != "fdep":
+    if fdep.element_type != 'fdep':
         return False
 
     if len(fdep.dependent) > 1:
@@ -401,14 +428,15 @@ def try_rem_fdep_succ_or(dft, fdep):
         return False
 
     parent = dependent.ingoing[0]
-    if parent.element_type != "or":
+    if parent.element_type != 'or':
         return False
 
     if not trigger in parent.outgoing:
         return False
 
-    # Trigger and dependent element are both successors of the same or, thus remove the fdep
+    # Trigger and dependent element are both successors of the same or, thus remove the fdep and add it to transformer
     dft.remove(fdep)
+    transformer.addFdepRem()
 
     return True
 
@@ -422,7 +450,7 @@ def try_rem_fded_succ_pand(dft, fdep):
     :return: True iff elimination was successful.
     """
     # Check if fdep is suitable
-    if fdep.element_type != "fdep":
+    if fdep.element_type != 'fdep':
         return False
 
     if len(fdep.dependent) > 1:
@@ -455,7 +483,9 @@ def try_rem_fded_succ_pand(dft, fdep):
     if not first:
         return False
     else:
+        # Remove FDEP and add to transformer
         dft.remove(fdep)
+        transformer.addFdepRem()
         return True
 
 
@@ -470,7 +500,7 @@ def len_without_deps(element):
 
     count = 0
     for elem in element:
-        if elem.element_type == "fdep":
+        if elem.element_type == 'fdep':
             count += 1
 
     result = len(element) - count
@@ -486,14 +516,7 @@ def simplify_dft(dft, rules):
     :return: Simplified DFT.
     """
 
-    # Clear Logger and Transformer
-    simpLogger.clear()
-    transformer.clear()
-
-    # Set number of elements to Transformer
-    transformer.setNumberOfElements(dft.count_elements)
-
-    if not len(rules) == 0:
+    if rules:
         changed = True
         while changed:
             for _, element in dft.elements.items():
@@ -535,4 +558,60 @@ def simplify_dft(dft, rules):
                     if changed:
                         break
 
+    # Prepare output from transformer
+    prepareTransformer(dft)
+
     return dft
+
+
+def prepareTransformer(dft):
+
+    staticNum = transformer.sumStatic()
+    dynamicNum = transformer.sumDynamic()
+    beNum = transformer.sumBEs()
+
+    if beNum == 1:
+        beString = 'BE'
+    else:
+        beString = 'BEs'
+
+    if staticNum == 1:
+        staticString = 'Static Gate'
+    else:
+        staticString = 'Static Gates'
+
+    if dynamicNum == 1:
+        dynamicString = 'Dynamic Gate'
+    else:
+        dynamicString = 'Dynamic Gates'
+
+    # Add message to logger
+    simpLogger.add_message(Message('Info', 'Removed {} {}, {} {} and {} {} from DFT while simplifying.'.format(beNum, beString, staticNum, staticString, dynamicNum, dynamicString)))
+
+    # If FDEPs were splitted, tell here
+    addedFdeps = transformer.getFdepsAdd()
+    if addedFdeps > 0:
+        if addedFdeps == 1:
+            simpLogger.add_message(Message('Info', 'Added 1 FDEP while splitting FDEPs.'))
+        else:
+            simpLogger.add_message(Message('Info', 'Added {} FDEPs while splitting FDEPs.'.format(transformer.getFdepsAdd())))
+
+    # If ORs were added, tell here
+    addedOrs = transformer.getOrsAdd()
+    if addedOrs > 0:
+        if addedOrs == 1:
+            simpLogger.add_message(Message('Info', 'Added 1 OR Gate while simplifying.'))
+        else:
+            simpLogger.add_message(Message('Info', 'Added {} OR Gates while simplifying.'.format(transformer.getOrsAdd())))
+
+    # Check for percentage of optimisation
+    simpLogger.add_message(Message('Debug', 'Alt: {} Neu: {}'.format(transformer.getNumberOfElements(), dft.count_elements())))
+    count = transformer.getNumberOfElements() - dft.count_elements()
+    if count == 1:
+        simpLogger.add_message(Message('Info', 'Optimisation removes 1 Element (-{}%).'.format(transformer.getPercentage(dft.count_elements()))))
+    elif count == -1:
+        simpLogger.add_message(Message('Info', 'Optimisation adds 1 Element (+{}%).'.format(transformer.getPercentage(dft.count_elements()))))
+    elif count < -1:
+        simpLogger.add_message(Message('Info', 'Optimisation adds {} Elements (+{}%).'.format(count*-1, transformer.getPercentage(dft.count_elements()))))
+    else:
+        simpLogger.add_message(Message('Info', 'Optimisation removes {} Elements (-{}%).'.format(count, transformer.getPercentage(dft.count_elements()))))
