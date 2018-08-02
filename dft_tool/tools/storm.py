@@ -34,43 +34,45 @@ class Storm:
             smtlib = f.read()
 
         lines = smtlib.splitlines()
-        last_line = lines[-1]
-        assert last_line == "(check-sat)"
-        last_assert = lines[-2]
-        match = re.search(r"\(assert \(= t_(.*) (.*)\)\)", last_assert)
+        assert lines[-1] == "(check-sat)"
+        match = re.search(r"\(assert \(= t_(.*) (.*)\)\)", lines[-2])
         assert match
         toplevel = match.group(1)
         length = int(match.group(2))
+
+        lines = ["(set-logic QF_UFIDL)", "(set-option :smt.arith.solver 3)"] + lines
 
         with open(outfile, 'w') as fout:
             fout.write("\n".join(lines[:-2]))
 
         # Check upper bound
         # All basic failures should lead to complete failure
-        sat = self.check_threshold(lines[:-2], length, "=", toplevel, outfile)
-        assert not sat
-
-        # Refine
-        l, u = 0, length
-        while l != u:
-            threshold = math.ceil((l + u) / 2)
-            sat = self.check_threshold(lines[:-2], threshold, ">=", toplevel, outfile)
-            if sat:
-                l = threshold
-            else:
-                u = threshold - 1
-        upper = l
+        sat = self.check_threshold(lines[:-2], length, length, toplevel, outfile)
+        if sat:
+            print("IS FAILSAFE")
+            upper = length
+        else:
+            # Refine
+            l, u = 0, length
+            while l != u:
+                threshold = math.ceil((l + u) / 2)
+                sat = self.check_threshold(lines[:-2], threshold, u, toplevel, outfile)
+                if sat:
+                    l = threshold
+                else:
+                    u = threshold - 1
+            upper = l
 
         # Check lower bound
         # No basic failures should lead to no failure
-        sat = self.check_threshold(lines[0:-2], 0, "=", toplevel, outfile)
+        sat = self.check_threshold(lines[0:-2], 0, 0, toplevel, outfile)
         assert not sat
 
         # Refine
         l, u = 0, upper
         while l != u:
             threshold = math.floor((l + u) / 2)
-            sat = self.check_threshold(lines[:-2], threshold, "<=", toplevel, outfile)
+            sat = self.check_threshold(lines[:-2], l, threshold, toplevel, outfile)
             if sat:
                 u = threshold
             else:
@@ -79,20 +81,26 @@ class Storm:
 
         return lower, upper, length
 
-    def check_threshold(self, lines, threshold, comparison, toplevel, out):
+    def check_threshold(self, lines, threshold_l, threshold_u, toplevel, out):
         tmp_file = "tmp.smt2"
+        assert threshold_l <= threshold_u
+        if threshold_l == threshold_u:
+            comparison = "= t_{} {}".format(toplevel, threshold_l)
+        else:
+            comparison = "and (>= t_{0} {1}) (<= t_{0} {2})".format(toplevel, threshold_l, threshold_u)
+
         with open(out, 'a') as fout:
             with open(tmp_file, 'w') as ftmp:
                 ftmp.write("\n".join(lines))
-                ftmp.write("\n(assert ({} t_{} {}))".format(comparison, toplevel, threshold))
+                ftmp.write("\n(assert ({}))".format(comparison))
                 ftmp.write("\n(check-sat)")
 
             fout.write("\n(push)")
-            fout.write("\n(assert ({} t_{} {}))".format(comparison, toplevel, threshold))
+            fout.write("\n(assert ({}))".format(comparison))
             fout.write("\n(check-sat)")
             fout.write("\n(pop)")
 
-            print("Threshold: {}".format(threshold))
+            # print("Threshold {}".format(threshold))
             args_z3 = ['z3', tmp_file]
             outputstr = run_tool(args_z3, True)
             os.remove(tmp_file)
