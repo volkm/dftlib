@@ -148,7 +148,7 @@ def try_merge_or(dft, or_gate):
 
     # Delete or gate and add to transformer
     dft.remove(or_gate)
-    transformer.addOr()
+    transformer.addOrRem()
 
 
     return True
@@ -234,7 +234,7 @@ def try_merge_identical_gates(dft, gate):
             if child.element_type == 'and':
                 transformer.addAnd()
             elif child.element_type == 'or':
-                transformer.addOr()
+                transformer.addOrRem()
             elif child.element_type == 'vot':
                 transformer.addVot()
             elif child.element_type == 'pand':
@@ -273,7 +273,7 @@ def try_remove_gates_with_one_successor(dft, gate):
     if gate.element_type == 'and':
         transformer.addAnd()
     elif gate.element_type == 'or':
-        transformer.addOr()
+        transformer.addOrRem()
     elif gate.element_type == 'vot':
         transformer.addVot()
     elif gate.element_type == 'pand':
@@ -340,6 +340,10 @@ def try_elim_fdeps_with_new_or(dft, fdep):
     :param fdep: FDEP which can eventually be removed.
     :return: True if fdep has been removed.
     """
+    # Check if fdep has more than one dependent element
+    if len(fdep.outgoing) > 2:
+        return False
+
     # Check if trigger and dependent element top connected is.
     if fdep.element_type != 'fdep':
         return False
