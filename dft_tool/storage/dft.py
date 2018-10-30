@@ -1,5 +1,4 @@
-from dft_tool.storage.dft_elements import create_from_json, DftBe, DftGate
-
+from dft_tool.storage.dft_elements import create_from_json, DftBe, DftGate, DftDependency
 
 class Dft:
     """
@@ -32,6 +31,11 @@ class Dft:
             if element.is_gate():
                 for child_id in node['data']['children']:
                     element.add_child(self.get_element(int(child_id)))
+
+        # Set trigger for dependencies
+        for (_, element) in self.elements.items():
+            if isinstance(element, DftDependency):
+                element.trigger = element.outgoing[0]
 
         # Set top level element
         top_level_id = int(json['toplevel'])

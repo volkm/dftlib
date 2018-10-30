@@ -1,5 +1,7 @@
 import json
 
+from dft_tool.storage.dft_elements import DftVotingGate
+
 
 def export_dft_json(dft, file):
     """
@@ -38,6 +40,11 @@ def export_dft_galileo(dft, file):
             elements.append(element)
             for child in element.outgoing:
                 queue.append(child)
+
+    # Add remaining elements
+    for _, element in dft.elements.items():
+        if element not in elements:
+            elements.append(element)
     assert len(elements) == len(dft.elements)
 
     with open(file, 'w') as out_file:
@@ -50,7 +57,12 @@ def export_dft_galileo(dft, file):
                 out_file.write(out + ";\n")
             else:
                 assert element.is_gate()
-                out += " " + element.element_type
+                if isinstance(element, DftVotingGate):
+                    out += " vot{}".format(element.votingThreshold)
+                elif element.element_type == "spare":
+                    out += " wsp"
+                else:
+                    out += " " + element.element_type
                 for child in element.outgoing:
                     out += " " + galileo_name(child)
                 out_file.write(out + ";\n")

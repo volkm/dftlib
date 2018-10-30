@@ -49,7 +49,6 @@ def try_merge_or(dft, or_gate):
     for child in or_gate.outgoing:
         if child not in parent.outgoing:
             parent.add_child(child)
-
     # Delete or gate
     dft.remove(or_gate)
 
@@ -86,7 +85,7 @@ def try_remove_dependencies(dft, dependency):
     if dependency.element_type != "fdep":
         return False
 
-    trigger = dependency.trigger
+    trigger = dependency.outgoing[0]
     if not has_immediate_failure(dft, trigger):
         return False
 

@@ -198,7 +198,7 @@ class DftVotingGate(DftGate):
 class DftDependency(DftGate):
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "fdep", children, position)
-        self.trigger = self.outgoing[0]
+        #self.trigger = self.outgoing[0]
 
     def get_json(self):
         json = DftGate.get_json(self)
