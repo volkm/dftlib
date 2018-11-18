@@ -26,7 +26,14 @@ def create_from_json(json):
         return DftVotingGate(element_id, name, threshold, [], position)
     elif element_type == "fdep":
         # Functional dependency
-        return DftDependency(element_id, name, [], position)
+        return DftDependency(element_id, name, 1, [], position)
+    elif element_type == "pdep":
+        # Dependency with probability
+        if 'probability' in data:
+            prob = float(data['probability'])
+        else:
+            prob = 1
+        return DftDependency(element_id, name, prob, [], position)
     else:
         # Gate
         return DftGate(element_id, name, element_type, [], position)
@@ -199,7 +206,7 @@ class DftVotingGate(DftGate):
 
 
 class DftDependency(DftGate):
-    def __init__(self, element_id, name, children, position):
+    def __init__(self, element_id, name, probability, children, position):
         DftGate.__init__(self, element_id, name, "fdep", children, position)
         #self.trigger = self.outgoing[0]
 
