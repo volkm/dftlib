@@ -10,7 +10,10 @@ def create_from_json(json):
     element_id = int(data['id'])
     name = data['name']
     element_type = data['type']
-    position = (json['position']['x'], json['position']['y'])
+    if 'position' in json:
+        position = (json['position']['x'], json['position']['y'])
+    else:
+        position = (0, 0)
 
     if element_type == "be":
         # BE
