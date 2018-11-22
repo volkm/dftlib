@@ -1,0 +1,131 @@
+{
+    "toplevel": "0",
+    "nodes": [
+        {
+            "position": {
+                "y": 73.18152357562349,
+                "x": 613.1782829074817
+            },
+            "data": {
+                "children": [
+                    "1",
+                    "8",
+                    "9",
+                    "10"
+                ],
+                "name": "Hallo",
+                "type": "and",
+                "id": "0"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 336.25,
+                "x": 480.25
+            },
+            "data": {
+                "dorm": "0.0",
+                "rate": "0.0",
+                "type": "be",
+                "id": "1",
+                "repair": "0.0",
+                "name": "Test"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 332.4489479368461,
+                "x": 726.2084702844929
+            },
+            "data": {
+                "dorm": "0.0",
+                "rate": "0.0",
+                "type": "be",
+                "id": "2",
+                "repair": "0.0",
+                "name": "Be2"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 334.93780525512847,
+                "x": 600.106366158185
+            },
+            "data": {
+                "dorm": "0.0",
+                "rate": "0.0",
+                "type": "be",
+                "id": "3",
+                "repair": "0.0",
+                "name": "Hallo2"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 333.27856704294027,
+                "x": 844.0143833498593
+            },
+            "data": {
+                "dorm": "0.0",
+                "rate": "0.0",
+                "type": "be",
+                "id": "5",
+                "repair": "0.0",
+                "name": "Test3"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 184.93780525512847,
+                "x": 500.106366158185
+            },
+            "data": {
+                "children": [
+                    "3",
+                    "1"
+                ],
+                "name": "OR_8",
+                "type": "or",
+                "id": "8"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 183.27856704294027,
+                "x": 744.0143833498593
+            },
+            "data": {
+                "children": [
+                    "5",
+                    "1"
+                ],
+                "name": "OR_9",
+                "type": "or",
+                "id": "9"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 182.44894793684608,
+                "x": 626.2084702844929
+            },
+            "data": {
+                "children": [
+                    "2",
+                    "1"
+                ],
+                "name": "OR_10",
+                "type": "or",
+                "id": "10"
+            },
+            "group": "nodes"
+        }
+    ]
+}

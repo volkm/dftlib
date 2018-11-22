@@ -19,7 +19,8 @@ def create_from_json(json):
         # BE
         rate = float(data['rate'])
         dorm = float(data['dorm'])
-        return DftBe(element_id, name, rate, dorm, position)
+        repair = float(data['repair'])
+        return DftBe(element_id, name, rate, dorm, repair, position)
     elif element_type == "vot":
         # Voting gate
         threshold = int(data['voting'])
@@ -34,6 +35,15 @@ def create_from_json(json):
         else:
             prob = 1
         return DftDependency(element_id, name, prob, [], position)
+    elif element_type == "pand":
+        # PAND gate
+        return DftPandGate(element_id, name, [], position)
+    elif element_type == "por":
+        # POR gate
+        return DftPorGate(element_id, name, [], position)
+    elif element_type == "spare":
+        # SPARE gate
+        return DftSpareGate(element_id, name, [], position)
     else:
         # Gate
         return DftGate(element_id, name, element_type, [], position)
@@ -51,6 +61,10 @@ class DftElement:
         self.position = position
         self.ingoing = []
         self.outgoing = []
+        self.isDynamic = False
+
+    def is_dynamic(self):
+        return self.isDynamic
 
     def is_be(self):
         return self.element_type == "be"
@@ -82,28 +96,7 @@ class DftElement:
 
     def compare(self, other):
         if self.element_id != other.element_id:
-            raise Exception("Ids are not equal: {} and {}".format(self.element_id, other.element_id))
-            return False
-        if self.element_type != other.element_type:
-            raise Exception(
-                "Element types are not equal for {}: {} and {}".format(self, self.element_type, other.element_type))
-            return False
-        list_outgoing = [elem.element_id for elem in other.outgoing]
-        for element in self.outgoing:
-            if element.element_id in list_outgoing:
-                list_outgoing.remove(element.element_id)
-            else:
-                raise Exception("Element {} is not contained in other for {}.".format(element, self))
-                return False
-        if len(list_outgoing) > 0:
-            raise Exception("Some elements are not contained in {}.".format(self))
-            return False
-
-        return True
-
-    def compareSucc(self, other):
-        if self.element_id == other.element_id:
-            #raise Exception("Ids are equal: {} and {}".format(self.element_id, other.element_id))
+            #raise Exception("Ids are not equal: {} and {}".format(self.element_id, other.element_id))
             return False
         if self.element_type != other.element_type:
             #raise Exception(
@@ -124,22 +117,26 @@ class DftElement:
 
 
 class DftBe(DftElement):
-    def __init__(self, element_id, name, rate, dorm, position):
+    def __init__(self, element_id, name, rate, dorm, repair, position):
         DftElement.__init__(self, element_id, name, "be", position)
         assert self.is_be()
         self.rate = rate
         self.dorm = dorm
+        self.repair = repair
 
     def get_json(self):
         json = DftElement.get_json(self)
         json['data']['rate'] = str(self.rate)
         json['data']['dorm'] = str(self.dorm)
+        json['data']['repair'] = str(self.repair)
         return json
 
     def __str__(self):
         s = super().__str__()
         s += " with rate {}".format(self.rate)
-        if self.dorm != 1:
+        if self.dorm != 1 and self.repair > 0:
+            s += " and repair {} ({})".format(self.repair, self.dorm)
+        elif self.dorm != 1:
             s += " ({})".format(self.dorm)
         return s
 
@@ -147,10 +144,12 @@ class DftBe(DftElement):
         if not super(DftBe, self).compare(other):
             return False
         if self.rate != other.rate:
-            raise Exception("Rates are different {} and {} for {}".format(self.rate, other.rate, self))
+            #raise Exception("Rates are different {} and {} for {}".format(self.rate, other.rate, self))
             return False
         if self.dorm != other.dorm:
-            raise Exception("Dormancy factors are different {} and {} for {}".format(self.dorm, other.dorm, self))
+            #raise Exception("Dormancy factors are different {} and {} for {}".format(self.dorm, other.dorm, self))
+            return False
+        if self.repair != other.repair:
             return False
 
         return True
@@ -171,6 +170,22 @@ class DftGate(DftElement):
         assert element in self.outgoing
         self.outgoing.remove(element)
         element.remove_parent(self)
+
+    def compareSucc(self, other):
+        if self.element_id == other.element_id:
+            return True
+        if self.element_type != other.element_type:
+            return False
+        list_outgoing = [elem.element_id for elem in other.outgoing]
+        for element in self.outgoing:
+            if element.element_id in list_outgoing:
+                list_outgoing.remove(element.element_id)
+            else:
+                return False
+        if len(list_outgoing) > 0:
+            return False
+
+        return True
 
     def get_json(self):
         json = DftElement.get_json(self)
@@ -198,21 +213,52 @@ class DftVotingGate(DftGate):
         if not super(DftVotingGate, self).compare(other):
             return False
         if self.votingThreshold != other.votingThreshold:
-            raise Exception(
-                "Threshold are different {} and {} for {}".format(self.votingThreshold, other.votingThreshold, self))
+            #raise Exception(
+            #    "Threshold are different {} and {} for {}".format(self.votingThreshold, other.votingThreshold, self))
             return False
 
         return True
 
 
+class DftPandGate(DftGate):
+    def __init__(self, element_id, name, children, position):
+        DftGate.__init__(self, element_id, name, "pand", children, position)
+        self.isDynamic = True
+
+
+class DftPorGate(DftGate):
+    def __init__(self, element_id, name, children, position):
+        DftGate.__init__(self, element_id, name, "por", children, position)
+        self.isDynamic = True
+
+
+class DftSpareGate(DftGate):
+    def __init__(self, element_id, name, children, position):
+        DftGate.__init__(self, element_id, name, "spare", children, position)
+        self.isDynamic = True
+
+
 class DftDependency(DftGate):
     def __init__(self, element_id, name, probability, children, position):
         DftGate.__init__(self, element_id, name, "fdep", children, position)
-        #self.trigger = self.outgoing[0]
+        self.trigger = None
+        self.dependent = []
 
-    def get_json(self):
-        json = DftGate.get_json(self)
-        return json
+    def add_child(self, element):
+        if self.trigger is None:
+            self.trigger = element
+        else:
+            self.dependent.append(element)
+
+        self.outgoing.append(element)
+        element.ingoing.append(self)
+
+    def remove_last_dep(self):
+        if len(self.dependent) > 1:
+            self.dependent.pop()
+            return True
+        else: 
+            return False
 
     def __str__(self):
-        return super().__str__() + ", trigger: {}".format(self.trigger.element_id)
+        return super().__str__() + ", trigger: {} , first dependent element: {}".format(self.trigger.element_id, self.dependent[0].element_id)

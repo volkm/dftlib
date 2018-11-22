@@ -1,0 +1,95 @@
+{
+    "nodes": [
+        {
+            "position": {
+                "x": 701.4679926321396,
+                "y": -692.8855090916175
+            },
+            "data": {
+                "id": "0",
+                "children": [
+                    "2",
+                    "3"
+                ],
+                "type": "and",
+                "name": "and_0"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "x": 1033.9971586454153,
+                "y": -94.69346488445494
+            },
+            "data": {
+                "id": "1",
+                "rate": "0.0",
+                "dorm": "0.0",
+                "type": "be",
+                "name": "be_1"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "x": 459.97653446985964,
+                "y": -87.89661644990395
+            },
+            "data": {
+                "id": "2",
+                "rate": "0.0",
+                "dorm": "0.0",
+                "type": "be",
+                "name": "Trigger_A"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "x": 929.4651512775549,
+                "y": -440.64463212570723
+            },
+            "data": {
+                "id": "3",
+                "children": [
+                    "1",
+                    "6"
+                ],
+                "type": "and",
+                "name": "and_3"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "x": 780.1337121806114,
+                "y": -89.71575024789016
+            },
+            "data": {
+                "id": "4",
+                "rate": "0.0",
+                "dorm": "0.0",
+                "type": "be",
+                "name": "Dependent_B"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "x": 680.1337121806114,
+                "y": -239.71575024789016
+            },
+            "data": {
+                "id": "6",
+                "children": [
+                    "4",
+                    "2"
+                ],
+                "type": "or",
+                "name": "OR_6"
+            },
+            "group": "nodes"
+        }
+    ],
+    "toplevel": "0"
+}

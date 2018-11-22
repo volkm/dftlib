@@ -1,0 +1,18 @@
+{
+    "nodes": [
+        {
+            "data": {
+                "children": [],
+                "id": "0",
+                "name": "Test",
+                "type": "and"
+            },
+            "group": "nodes",
+            "position": {
+                "x": 810,
+                "y": 239.5
+            }
+        }
+    ],
+    "toplevel": "0"
+}

@@ -46,7 +46,6 @@ def parse_dft_json(file):
         dft = Dft(json.load(jsonFile))
     return dft
 
-
 def parse_dft(file):
     """
     Parse DFT from file.
@@ -60,3 +59,12 @@ def parse_dft(file):
         return parse_dft_json(file)
     else:
         print("ERROR")
+
+def parse_dft_json_string(string):
+	"""
+	Parse DFT from JSON string.
+	:param file: File.
+	:return: DFT.
+	"""
+	dft = Dft(string)
+	return dft

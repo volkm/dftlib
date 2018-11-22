@@ -1,0 +1,351 @@
+{
+    "toplevel": "0",
+    "nodes": [
+        {
+            "position": {
+                "y": 245,
+                "x": 925
+            },
+            "data": {
+                "type": "or",
+                "children": [
+                    "4",
+                    "1",
+                    "7"
+                ],
+                "id": "0",
+                "name": "HECS"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 392.7536681265336,
+                "x": 572.3163976449501
+            },
+            "data": {
+                "type": "and",
+                "children": [
+                    "5",
+                    "6"
+                ],
+                "id": "1",
+                "name": "PSF"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 398.56260204569674,
+                "x": 1254.8066879209532
+            },
+            "data": {
+                "type": "vot",
+                "children": [
+                    "11",
+                    "12",
+                    "13",
+                    "14",
+                    "15"
+                ],
+                "voting": "3",
+                "id": "4",
+                "name": "MSF"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 566.2711527012247,
+                "x": 492.14680534192195
+            },
+            "data": {
+                "type": "spare",
+                "children": [
+                    "16",
+                    "18"
+                ],
+                "id": "5",
+                "name": "P1"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 565.8953126310369,
+                "x": 652.3182667709827
+            },
+            "data": {
+                "type": "spare",
+                "children": [
+                    "17",
+                    "18"
+                ],
+                "id": "6",
+                "name": "P2"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 530.2792946499487,
+                "x": 754.738654179866
+            },
+            "data": {
+                "type": "be",
+                "rate": "0.030052000000000002",
+                "repair": "0.0",
+                "id": "7",
+                "name": "HW_SW_BUS1_BUS2",
+                "dorm": "0.0"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 675.7787481907039,
+                "x": 1037.9112541878092
+            },
+            "data": {
+                "type": "be",
+                "rate": "6e-05",
+                "repair": "0.0",
+                "id": "11",
+                "name": "M1",
+                "dorm": "0.0"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 676.6572020760149,
+                "x": 1152.1863630098553
+            },
+            "data": {
+                "type": "be",
+                "rate": "6e-05",
+                "repair": "0.0",
+                "id": "12",
+                "name": "M2",
+                "dorm": "0.0"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 676.288512936568,
+                "x": 1269.1202185688687
+            },
+            "data": {
+                "type": "be",
+                "rate": "6e-05",
+                "repair": "0.0",
+                "id": "13",
+                "name": "M3",
+                "dorm": "0.0"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 676.1718700807443,
+                "x": 1387.6591957871938
+            },
+            "data": {
+                "type": "be",
+                "rate": "6e-05",
+                "repair": "0.0",
+                "id": "14",
+                "name": "M4",
+                "dorm": "0.0"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 676.4075336808564,
+                "x": 1504.430968547221
+            },
+            "data": {
+                "type": "be",
+                "rate": "6e-05",
+                "repair": "0.0",
+                "id": "15",
+                "name": "M5",
+                "dorm": "0.0"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 674.5152224824357,
+                "x": 491.3892271662764
+            },
+            "data": {
+                "type": "be",
+                "rate": "0.0001",
+                "repair": "0.0",
+                "id": "16",
+                "name": "A1",
+                "dorm": "0.0"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 676.8216627634662,
+                "x": 651.3024199843874
+            },
+            "data": {
+                "type": "be",
+                "rate": "0.0001",
+                "repair": "0.0",
+                "id": "17",
+                "name": "A2",
+                "dorm": "0.0"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 674.5152224824358,
+                "x": 823.5166276346605
+            },
+            "data": {
+                "type": "be",
+                "rate": "0.0001",
+                "repair": "0.0",
+                "id": "18",
+                "name": "AS",
+                "dorm": "0.0"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 828.2779078844653,
+                "x": 1262.5090944574554
+            },
+            "data": {
+                "type": "and",
+                "children": [
+                    "20",
+                    "21"
+                ],
+                "id": "19",
+                "name": "MIU"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 952.2925332332114,
+                "x": 1212.041640688407
+            },
+            "data": {
+                "type": "be",
+                "rate": "5e-05",
+                "repair": "0.0",
+                "id": "20",
+                "name": "MIU1",
+                "dorm": "0.0"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 952.3543558598848,
+                "x": 1345.2550852543475
+            },
+            "data": {
+                "type": "be",
+                "rate": "5e-05",
+                "repair": "0.0",
+                "id": "21",
+                "name": "MIU2",
+                "dorm": "0.0"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 855.1863778298208,
+                "x": 1422.422287275566
+            },
+            "data": {
+                "type": "fdep",
+                "children": [
+                    "19",
+                    "13"
+                ],
+                "id": "22",
+                "name": "FDEP_A"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 900.5463700234193,
+                "x": 1040.3220140515223
+            },
+            "data": {
+                "type": "fdep",
+                "children": [
+                    "20",
+                    "11"
+                ],
+                "id": "23",
+                "name": "FDEP_B"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 852.5324068833877,
+                "x": 1638.5038663777611
+            },
+            "data": {
+                "type": "fdep",
+                "children": [
+                    "21",
+                    "15"
+                ],
+                "id": "24",
+                "name": "FDEP_C"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 825.5463700234193,
+                "x": 990.3220140515223
+            },
+            "data": {
+                "type": "fdep",
+                "children": [
+                    "20",
+                    "12"
+                ],
+                "id": "25",
+                "name": "FDEP_25"
+            },
+            "group": "nodes"
+        },
+        {
+            "position": {
+                "y": 777.5324068833877,
+                "x": 1588.5038663777611
+            },
+            "data": {
+                "type": "fdep",
+                "children": [
+                    "21",
+                    "14"
+                ],
+                "id": "26",
+                "name": "FDEP_26"
+            },
+            "group": "nodes"
+        }
+    ]
+}
