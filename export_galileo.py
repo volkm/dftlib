@@ -1,8 +1,8 @@
 import argparse
 
-import dft_tool.io.parser
-import dft_tool.io.export
-import dft_tool.transformer.rewriting
+import dftlib.io.parser
+import dftlib.io.export
+import dftlib.transformer.rewriting
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Export a DFT into Galileo format.')
@@ -13,8 +13,8 @@ if __name__ == "__main__":
 
     # Read DFT file
     print("Reading {}".format(args.dft))
-    dft = dft_tool.io.parser.parse_dft_json(args.dft)
+    dft = dftlib.io.parser.parse_dft_json(args.dft)
     print(dft)
 
     # Save DFT again
-    dft_tool.io.export.export_dft_galileo(dft, args.out)
+    dftlib.io.export.export_dft_galileo(dft, args.out)

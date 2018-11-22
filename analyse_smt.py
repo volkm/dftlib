@@ -1,6 +1,6 @@
 import argparse
 
-from dft_tool.analysis.smt import SMTAnalysis
+from dftlib.analysis import SMTAnalysis
 
 if __name__ == "__main__":
     argument_parser = argparse.ArgumentParser(description='Analyse a DFT via SMT.')

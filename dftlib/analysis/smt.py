@@ -1,5 +1,5 @@
-from dft_tool.tools.storm import Storm
-from dft_tool.settings import STORM_PATH
+from dftlib.tools.storm import Storm
+from dftlib.settings import STORM_PATH
 
 
 class SMTAnalysis:

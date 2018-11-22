@@ -3,7 +3,7 @@ import os
 import re
 import math
 
-from dft_tool.utility.os_functions import run_tool
+from dftlib.utility.os_functions import run_tool
 
 
 class Storm:

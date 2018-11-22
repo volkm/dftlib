@@ -1,6 +1,6 @@
 import json
 
-from dft_tool.storage.dft_elements import DftVotingGate
+from dftlib.storage.dft_elements import DftVotingGate
 
 
 def export_dft_json(dft, file):

@@ -1,9 +1,9 @@
 import json
 import tempfile
 
-from dft_tool.storage.dft import Dft
-from dft_tool.tools.storm import Storm
-from dft_tool.settings import STORM_PATH
+from dftlib.storage.dft import Dft
+from dftlib.tools.storm import Storm
+from dftlib.settings import STORM_PATH
 
 
 def is_galileo_file(file):

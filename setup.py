@@ -18,17 +18,17 @@ class PyTest(test):
 
 
 setup(
-    name='dft_lib',
+    name='dftlib',
     version='0.1',
     author='M. Volk',
     author_email='matthias.volk@cs.rwth-aachen.de',
     maintainer='M. Volk',
     maintainer_email='matthias.volk@cs.rwth-aachen.de',
     url='http://moves.rwth-aachen.de',
-    description='dft_lib - Dynamic Fault Tree Analysis',
+    description='dftlib - Python library for dynamic fault tree analysis',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    packages=['dft_lib'],
+    packages=['dftlib'],
     cmdclass={'test': PyTest},
     zip_safe=False,
     install_requires=['z3', 'flask', 'flask-cors'],

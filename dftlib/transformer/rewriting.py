@@ -1,4 +1,4 @@
-import dft_lib.transformer.transformation
+import dftlib.transformer.transformation
 
 class Message:
     """docstring for Message"""
@@ -243,7 +243,6 @@ def try_merge_identical_gates(dft, gate):
                 transformer.addPor()
 
     return True
-
 
 def try_remove_gates_with_one_successor(dft, gate):
     """
