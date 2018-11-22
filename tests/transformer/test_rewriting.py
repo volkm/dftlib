@@ -16,4 +16,4 @@ def test_rewrite_small():
     no_be, no_dynamic, no_elements = dft.statistics()
     assert no_be == 2
     assert no_dynamic == 0
-    assert no_elements == 4
+    assert no_elements == 3

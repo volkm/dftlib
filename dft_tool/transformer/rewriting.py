@@ -143,7 +143,7 @@ def try_remove_gates_with_one_successor(dft, gate):
     :return: True if gate has been removed.
     """
     # Check if rule is applicable.
-    if gate.element_type == "fdep" or gate.elemnt_type == "pdep" or gate.element_type == "spare" or gate.element_type == "be" or gate.element_id == dft.top_level_element.element_id:
+    if gate.element_type == "fdep" or gate.element_type == "pdep" or gate.element_type == "spare" or gate.element_type == "be" or gate.element_id == dft.top_level_element.element_id:
         return False
 
     if len(gate.outgoing) != 1:
