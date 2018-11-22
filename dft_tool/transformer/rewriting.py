@@ -103,7 +103,7 @@ def try_merge_identical_gates(dft, gate):
     :return: True iff merge and removal was successful.
     """
     # Check if rule is applicable. Therefore, check if gate is no SPARE or FDEP
-    if gate.element_type == "fdep" or gate.element_type == "spare" or gate.element_type == "be":
+    if gate.element_type == "fdep" or gate.element_type == "pdep" or gate.element_type == "spare" or gate.element_type == "be":
         return False
 
     # Check if gate has more than one parent (for simplicity atm)
@@ -143,7 +143,7 @@ def try_remove_gates_with_one_successor(dft, gate):
     :return: True if gate has been removed.
     """
     # Check if rule is applicable.
-    if gate.element_type == "fdep" or gate.element_type == "spare" or gate.element_type == "be" or gate.element_id == dft.top_level_element.element_id:
+    if gate.element_type == "fdep" or gate.elemnt_type == "pdep" or gate.element_type == "spare" or gate.element_type == "be" or gate.element_id == dft.top_level_element.element_id:
         return False
 
     if len(gate.outgoing) != 1:
