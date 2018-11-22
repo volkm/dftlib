@@ -31,6 +31,7 @@ setup(
     packages=['dft_tool'],
     cmdclass={'test': PyTest},
     zip_safe=False,
+    install_requires=['z3'],
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
     python_requires='>=3',
