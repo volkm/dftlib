@@ -383,7 +383,7 @@ def try_elim_fdeps_with_new_or(dft, fdep):
 
 def try_rem_superfluous_fdeps(dft, fdep):
     """
-    (Rule #25): Eliminate superfluous FDEP from AND\PAND\OR\POR\VOT.
+    (Rule #25): Eliminate superfluous FDEP from AND/PAND/OR/POR/VOT.
     This FDEP is triggered after the failure of the dependent element and thus it does not influence anything else.
     :param dft: DFT.
     :param fdep: FDEP to check.
@@ -569,6 +569,7 @@ def simplify_dft(dft, rules=["1", "2", "3", "4", "5", "6", "7"]):
 
 
 def prepareTransformer(dft):
+    transformer.setNumberOfElements(dft.count_elements())
     staticNum = transformer.sumStatic()
     dynamicNum = transformer.sumDynamic()
     beNum = transformer.sumBEs()

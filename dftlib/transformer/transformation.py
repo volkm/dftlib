@@ -43,11 +43,11 @@ class Transformation:
 
     def getPercentage(self, newNumber):
         if self.numberOfElementsDFT > newNumber:
-            return (100 - ((newNumber / self.numberOfElementsDFT) * 100))
+            return 100 - ((newNumber / self.numberOfElementsDFT) * 100)
         elif self.numberOfElementsDFT == newNumber:
             return 0
         else:
-            return (((newNumber / self.numberOfElementsDFT) * 100) - 100)
+            return ((newNumber / self.numberOfElementsDFT) * 100) - 100
 
     # Functions for each type
     def getBes(self):
