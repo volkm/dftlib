@@ -1,7 +1,9 @@
 import dftlib.transformer.transformation
 
+
 class Message:
     """docstring for Message"""
+
     def __init__(self, level, text):
         self.level = level
         self.text = text
@@ -18,14 +20,13 @@ class Message:
 
 
 class Logger:
-
     messages = list()
 
     def add_message(self, message):
         self.messages.append(message)
 
     def pop_message(self):
-        return self.messages.pop(len(messages))
+        return self.messages.pop(len(self.messages))
 
     def clear(self):
         self.messages.clear()
@@ -48,12 +49,12 @@ class Logger:
 simpLogger = Logger()
 
 # Global Transformer
-transformer = dft_lib.transformer.transformation.Transformation()
+transformer = dftlib.transformer.transformation.Transformation()
 
 
-#""""""""""""""""""""""""""""""""""""""""""#
+# """"""""""""""""""""""""""""""""""""""""""#
 #       Methods for DFT-Simplifying        #
-#""""""""""""""""""""""""""""""""""""""""""#
+# """"""""""""""""""""""""""""""""""""""""""#
 
 
 def split_fdeps(dft):
@@ -79,7 +80,7 @@ def split_fdeps(dft):
             num_dep = len(dependent)
             while num_dep > 1:
                 # Create new FDEP with last dependent element
-                position = (fdep.position[0] - (50*pos_add), fdep.position[1] - (75*pos_add))
+                position = (fdep.position[0] - (50 * pos_add), fdep.position[1] - (75 * pos_add))
                 new_fdep = dft.new_gate('FDEP_' + str(dft.max_id + 1), 'fdep', [], position)
                 # Add gate to transformer
                 transformer.addFdepAdd()
@@ -149,7 +150,6 @@ def try_merge_or(dft, or_gate):
     # Delete or gate and add to transformer
     dft.remove(or_gate)
     transformer.addOrRem()
-
 
     return True
 
@@ -243,6 +243,7 @@ def try_merge_identical_gates(dft, gate):
                 transformer.addPor()
 
     return True
+
 
 def try_remove_gates_with_one_successor(dft, gate):
     """
@@ -358,7 +359,7 @@ def try_elim_fdeps_with_new_or(dft, fdep):
             return False
 
     # Check if B has only one predecessor
-    if (len(dependent.ingoing)-1) != 1:
+    if (len(dependent.ingoing) - 1) != 1:
         return False
 
     # Check if predecessor of B is OR
@@ -367,7 +368,7 @@ def try_elim_fdeps_with_new_or(dft, fdep):
         dft.remove(fdep)
         transformer.addFdepRem()
         dependent.ingoing[0].add_child(trigger)
-    else: 
+    else:
         # Add OR in front of B
         or_gate = add_or_in_between(dft, dependent)
         if not or_gate is None:
@@ -479,7 +480,7 @@ def try_rem_fded_succ_pand(dft, fdep):
         if not first:
             if child.compare(dependent):
                 first = True
-            else: 
+            else:
                 # Trigger is first
                 break
 
@@ -509,10 +510,10 @@ def len_without_deps(element):
     result = len(element) - count
     assert result > -1
 
-    return result 
+    return result
 
 
-def simplify_dft(dft, rules):
+def simplify_dft(dft, rules=["1", "2", "3", "4", "5", "6", "7"]):
     """
     Simplify DFT.
     :param dft: DFT.
@@ -568,7 +569,6 @@ def simplify_dft(dft, rules):
 
 
 def prepareTransformer(dft):
-
     staticNum = transformer.sumStatic()
     dynamicNum = transformer.sumDynamic()
     beNum = transformer.sumBEs()
@@ -589,7 +589,8 @@ def prepareTransformer(dft):
         dynamicString = 'Dynamic Gates'
 
     # Add message to logger
-    simpLogger.add_message(Message('Info', 'Removed {} {}, {} {} and {} {} from DFT while simplifying.'.format(beNum, beString, staticNum, staticString, dynamicNum, dynamicString)))
+    simpLogger.add_message(
+        Message('Info', 'Removed {} {}, {} {} and {} {} from DFT while simplifying.'.format(beNum, beString, staticNum, staticString, dynamicNum, dynamicString)))
 
     # If FDEPs were splitted, tell here
     addedFdeps = transformer.getFdepsAdd()
@@ -615,6 +616,6 @@ def prepareTransformer(dft):
     elif count == -1:
         simpLogger.add_message(Message('Info', 'Optimisation adds 1 Element (+{}%).'.format(transformer.getPercentage(dft.count_elements()))))
     elif count < -1:
-        simpLogger.add_message(Message('Info', 'Optimisation adds {} Elements (+{}%).'.format(count*-1, transformer.getPercentage(dft.count_elements()))))
+        simpLogger.add_message(Message('Info', 'Optimisation adds {} Elements (+{}%).'.format(count * -1, transformer.getPercentage(dft.count_elements()))))
     else:
         simpLogger.add_message(Message('Info', 'Optimisation removes {} Elements (-{}%).'.format(count, transformer.getPercentage(dft.count_elements()))))

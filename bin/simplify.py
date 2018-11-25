@@ -1,8 +1,8 @@
 import argparse
 
-import dft_lib.io.parser
-import dft_lib.io.export
-import dft_lib.transformer.rewriting
+import dftlib.io.parser
+import dftlib.io.export
+import dftlib.transformer.rewriting
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Simplify a DFT by rewriting.')
@@ -13,15 +13,15 @@ if __name__ == "__main__":
 
     # Read DFT file
     print("Reading {}".format(args.dft))
-    dft = dft_lib.io.parser.parse_dft_json(args.dft)
+    dft = dftlib.io.parser.parse_dft_json(args.dft)
     print(dft)
 
     # Split FDEPs in DFT
-    dft_lib.transformer.rewriting.split_fdeps(dft)
+    dftlib.transformer.rewriting.split_fdeps(dft)
 
     # Simplify DFT
-    dft_lib.transformer.rewriting.simplify_dft(dft)
+    dftlib.transformer.rewriting.simplify_dft(dft)
     print(dft)
 
     # Save DFT again
-    dft_lib.io.export.export_dft_json(dft, args.out)
+    dftlib.io.export.export_dft_json(dft, args.out)

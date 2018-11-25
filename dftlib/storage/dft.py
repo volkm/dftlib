@@ -1,4 +1,5 @@
-from dft_lib.storage.dft_elements import create_from_json, DftBe, DftGate, DftDependency, DftPandGate, DftPorGate, DftSpareGate
+from dftlib.storage.dft_elements import create_from_json, DftBe, DftGate, DftDependency, DftPandGate, DftPorGate, DftSpareGate
+
 
 class Dft:
     """
@@ -93,7 +94,7 @@ class Dft:
             element = DftSpareGate(self.max_id + 1, name, children, pos)
         elif gate_type == "fdep":
             element = DftDependency(self.max_id + 1, name, children, pos)
-        else :
+        else:
             element = DftGate(self.max_id + 1, name, gate_type, children, pos)
         self.add(element)
         return element

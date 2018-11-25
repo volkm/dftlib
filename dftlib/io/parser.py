@@ -3,7 +3,7 @@ import tempfile
 
 from dftlib.storage.dft import Dft
 from dftlib.tools.storm import Storm
-from dftlib.settings import STORM_PATH
+from dftlib._config import storm_path
 
 
 def is_galileo_file(file):
@@ -30,7 +30,7 @@ def parse_dft_galileo(file):
     :param file: File.
     :return: DFT.
     """
-    storm = Storm(STORM_PATH)
+    storm = Storm(storm_path)
     _, tmpjson = tempfile.mkstemp(suffix=".json")
     storm.convert_to_json(file, tmpjson)
     return parse_dft_json(tmpjson)
@@ -46,6 +46,7 @@ def parse_dft_json(file):
         dft = Dft(json.load(jsonFile))
     return dft
 
+
 def parse_dft(file):
     """
     Parse DFT from file.
@@ -60,11 +61,12 @@ def parse_dft(file):
     else:
         print("ERROR")
 
+
 def parse_dft_json_string(string):
-	"""
-	Parse DFT from JSON string.
-	:param file: File.
-	:return: DFT.
-	"""
-	dft = Dft(string)
-	return dft
+    """
+    Parse DFT from JSON string.
+    :param file: File.
+    :return: DFT.
+    """
+    dft = Dft(string)
+    return dft
