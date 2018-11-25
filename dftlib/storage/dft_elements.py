@@ -19,7 +19,10 @@ def create_from_json(json):
         # BE
         rate = float(data['rate'])
         dorm = float(data['dorm'])
-        repair = float(data['repair'])
+        if 'repair' in data:
+            repair = float(data['repair'])
+        else:
+            repair = 0
         return DftBe(element_id, name, rate, dorm, repair, position)
     elif element_type == "vot":
         # Voting gate
