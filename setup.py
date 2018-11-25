@@ -29,9 +29,15 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     packages=['dftlib'],
-    cmdclass={'test': PyTest},
+    cmdclass={
+        'test': PyTest
+    },
     zip_safe=False,
-    install_requires=['z3', 'flask', 'flask-cors'],
+    install_requires=[],
+    extras_require={
+        'with_smt': ['z3'],
+        'with_stormpy': ['stormpy']
+    },
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
     python_requires='>=3',
