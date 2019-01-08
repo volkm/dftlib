@@ -106,7 +106,7 @@ def try_merge_bes_in_or(dft, or_gate):
 
     child_bes = []
     for child in or_gate.outgoing:
-        if child.is_be() and len(child.ingoing) <= 1:
+        if child.is_be() and len(child.ingoing) <= 1 and child.dorm == 1:
             child_bes.append(child)
 
     if len(child_bes) <= 1:
@@ -116,7 +116,7 @@ def try_merge_bes_in_or(dft, or_gate):
     first_child = child_bes[0]
     for element in child_bes[1:]:
         first_child.name += "_{}".format(element.name)
-        first_child.rate = element.rate + first_child.rate
+        first_child.rate += element.rate
         # TODO: combine dormancy factors as well
         dft.remove(element)
         # Add removed element to transformer
@@ -138,6 +138,7 @@ def try_merge_or(dft, or_gate):
 
     if len(or_gate.ingoing) != 1:
         return False
+
     parent = or_gate.ingoing[0]
     if parent.element_type != 'or':
         return False
