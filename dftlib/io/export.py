@@ -1,6 +1,6 @@
 import json
 
-from dftlib.storage.dft_elements import DftVotingGate
+from dftlib.storage.dft_elements import *
 
 
 def export_dft_json(dft, file):
@@ -59,9 +59,21 @@ def export_dft_galileo(dft, file):
                 assert element.is_gate()
                 if isinstance(element, DftVotingGate):
                     out += " vot{}".format(element.votingThreshold)
-                elif element.element_type == "spare":
+                elif isinstance(element, DftSpareGate):
+                    assert element.element_type == "spare"
                     out += " wsp"
+                elif isinstance(element, DftDependency):
+                    if element.probability == 1:
+                        out += " fdep"
+                    else:
+                        out += " pdep={}".format(element.probability)
                 else:
+                    if isinstance(element, DftPandGate):
+                        assert element.element_type == "pand"
+                    elif isinstance(element, DftPorGate):
+                        assert element.element_type == "por"
+                    else:
+                        assert element.element_type == "and" or element.element_type == "or"
                     out += " " + element.element_type
                 for child in element.outgoing:
                     out += " " + galileo_name(child)
