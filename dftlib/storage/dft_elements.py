@@ -33,10 +33,8 @@ def create_from_json(json):
         return DftDependency(element_id, name, 1, [], position)
     elif element_type == "pdep":
         # Dependency with probability
-        if 'probability' in data:
-            prob = float(data['probability'])
-        else:
-            prob = 1
+        assert 'probability' in data
+        prob = float(data['probability'])
         return DftDependency(element_id, name, prob, [], position)
     elif element_type == "pand":
         # PAND gate
@@ -243,10 +241,16 @@ class DftSpareGate(DftGate):
 
 class DftDependency(DftGate):
     def __init__(self, element_id, name, probability, children, position):
-        DftGate.__init__(self, element_id, name, "fdep", children, position)
+        DftGate.__init__(self, element_id, name, "fdep" if probability == 1 else "pdep", children, position)
         self.trigger = None
         self.dependent = []
         self.probability = probability
+
+    def get_json(self):
+        json = DftGate.get_json(self)
+        if self.probability != 1:
+            json['data']['probability'] = str(self.probability)
+        return json
 
     def add_child(self, element):
         if self.trigger is None:
