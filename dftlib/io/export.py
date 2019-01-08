@@ -19,7 +19,7 @@ def galileo_name(element):
     :param element: Element.
     :return: Name as "Name_Id"
     """
-    return '"{}_{}"'.format(element.name, element.element_id)
+    return '"{}"'.format(element.name)
 
 
 def export_dft_galileo(dft, file):
@@ -46,6 +46,12 @@ def export_dft_galileo(dft, file):
         if element not in elements:
             elements.append(element)
     assert len(elements) == len(dft.elements)
+
+    # Assert unique names
+    names = dict()
+    for element in elements:
+        assert element.name not in names
+        names[element.name] = element
 
     with open(file, 'w') as out_file:
         out_file.write("toplevel {};\n".format(galileo_name(dft.top_level_element)))
