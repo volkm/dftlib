@@ -78,6 +78,8 @@ def export_dft_galileo(dft, file):
                         assert element.element_type == "pand"
                     elif isinstance(element, DftPorGate):
                         assert element.element_type == "por"
+                    elif isinstance(element, DftSeqGate):
+                        assert element.element_type == "seq"
                     else:
                         assert element.element_type == "and" or element.element_type == "or"
                     out += " " + element.element_type

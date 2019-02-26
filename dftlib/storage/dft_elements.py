@@ -5,7 +5,7 @@ def create_from_json(json):
     :return: DFT element.
     """
     assert json['group'] == "nodes"
-    # Parse data from json 
+    # Parse data from json
     data = json['data']
     element_id = int(data['id'])
     name = data['name']
@@ -45,6 +45,9 @@ def create_from_json(json):
     elif element_type == "spare":
         # SPARE gate
         return DftSpareGate(element_id, name, [], position)
+    elif element_type == "seq":
+        # Sequence enforcer
+        return DftSeqGate(element_id, name, [], position)
     else:
         # Gate
         return DftGate(element_id, name, element_type, [], position)
@@ -270,3 +273,9 @@ class DftDependency(DftGate):
 
     def __str__(self):
         return super().__str__() + ", trigger: {} , first dependent element: {}".format(self.trigger.element_id, self.dependent[0].element_id)
+
+
+class DftSeqGate(DftGate):
+    def __init__(self, element_id, name, children, position):
+        DftGate.__init__(self, element_id, name, "seq", children, position)
+        self.isDynamic = True
