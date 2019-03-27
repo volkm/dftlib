@@ -1,4 +1,4 @@
-from dftlib.storage.dft_elements import create_from_json, DftBe, DftGate, DftDependency, DftPandGate, DftPorGate, DftSpareGate
+import dftlib.storage.dft_elements as dft_elements
 
 
 class Dft:
@@ -22,7 +22,7 @@ class Dft:
         """
         # Parse nodes
         for node in json['nodes']:
-            element = create_from_json(node)
+            element = dft_elements.create_from_json(node)
             self.add(element)
 
         # Set children
@@ -35,7 +35,7 @@ class Dft:
 
         # Set trigger for dependencies
         for (_, element) in self.elements.items():
-            if isinstance(element, DftDependency):
+            if isinstance(element, dft_elements.DftDependency):
                 element.trigger = element.outgoing[0]
 
         # Set top level element
@@ -81,23 +81,23 @@ class Dft:
         self.position_bounds[3] = max(element.position[1], self.position_bounds[3])
 
     def new_be(self, name, rate, dorm, repair, pos):
-        element = DftBe(self.max_id + 1, name, rate, dorm, repair, pos)
+        element = dft_elements.DftBe(self.max_id + 1, name, rate, dorm, repair, pos)
         self.add(element)
         return element
 
     def new_gate(self, name, gate_type, children, pos):
         if gate_type == "pand":
-            element = DftPandGate(self.max_id + 1, name, children, pos)
+            element = dft_elements.DftPandGate(self.max_id + 1, name, children, pos)
         elif gate_type == "por":
-            element = DftPorGate(self.max_id + 1, name, children, pos)
+            element = dft_elements.DftPorGate(self.max_id + 1, name, children, pos)
         elif gate_type == "spare":
-            element = DftSpareGate(self.max_id + 1, name, children, pos)
+            element = dft_elements.DftSpareGate(self.max_id + 1, name, children, pos)
         elif gate_type == "fdep":
-            element = DftDependency(self.max_id + 1, name, children, pos)
+            element = dft_elements.DftDependency(self.max_id + 1, name, children, pos)
         elif gate_type == "seq":
-            element = DftSeqGate(self.max_id + 1, name, children, pos)
+            element = dft_elements.DftSeqGate(self.max_id + 1, name, children, pos)
         else:
-            element = DftGate(self.max_id + 1, name, gate_type, children, pos)
+            element = dft_elements.DftGate(self.max_id + 1, name, gate_type, children, pos)
         self.add(element)
         return element
 
