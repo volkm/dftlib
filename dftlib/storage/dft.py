@@ -122,9 +122,7 @@ class Dft:
 
     def __str__(self):
         no_be, no_dynamic, no_elements = self.statistics()
-        return "Dft with {} elements ({} failable BEs, {} dynamic elements), top element: {}".format(no_elements, no_be,
-                                                                                                     no_dynamic,
-                                                                                                     self.top_level_element.name)
+        return "Dft with {} elements ({} failable BEs, {} dynamic elements), top element: {}".format(no_elements, no_be, no_dynamic, self.top_level_element.name)
 
     def get_dynamics(self):
         dynamic_elements = []
@@ -138,14 +136,10 @@ class Dft:
 
     def compare(self, other):
         if not self.top_level_element.compare(other.top_level_element):
-            raise Exception(
-                "Top level elements {} and {} not equal.".format(self.top_level_element, other.top_level_element))
-            return False
+            raise Exception("Top level elements {} and {} not equal.".format(self.top_level_element, other.top_level_element))
 
         if len(self.elements) != len(other.elements):
-            raise Exception(
-                "Different number of elements: {} and {}.".format(len(self.elements), len(other.elements)))
-            return False
+            raise Exception("Different number of elements: {} and {}.".format(len(self.elements), len(other.elements)))
 
         maximal = max(self.max_id, other.max_id)
         for i in range(0, maximal):
@@ -158,14 +152,10 @@ class Dft:
             if element is None:
                 if other_element is not None:
                     raise Exception("Element with id {} only exists in one.".format(i))
-                    return False
             elif other_element is None:
                 raise Exception("Element with id {} only exists in one.".format(i))
-                return False
             else:
                 if not element.compare(other_element):
-                    raise Exception(
-                        "Elements with id {} are different: {} and {}.".format(i, element, other_element))
-                    return False
+                    raise Exception("Elements with id {} are different: {} and {}.".format(i, element, other_element))
 
         return True
