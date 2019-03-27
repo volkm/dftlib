@@ -80,8 +80,8 @@ class Dft:
         self.position_bounds[2] = max(element.position[0], self.position_bounds[2])
         self.position_bounds[3] = max(element.position[1], self.position_bounds[3])
 
-    def new_be(self, name, rate, dorm, pos):
-        element = DftBe(self.max_id + 1, name, rate, dorm, pos)
+    def new_be(self, name, rate, dorm, repair, pos):
+        element = DftBe(self.max_id + 1, name, rate, dorm, repair, pos)
         self.add(element)
         return element
 
