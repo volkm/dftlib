@@ -244,9 +244,9 @@ class DftSpareGate(DftGate):
 
 class DftDependency(DftGate):
     def __init__(self, element_id, name, probability, children, position):
-        DftGate.__init__(self, element_id, name, "fdep" if probability == 1 else "pdep", children, position)
         self.trigger = None
         self.dependent = []
+        DftGate.__init__(self, element_id, name, "fdep" if probability == 1 else "pdep", children, position)
         self.probability = probability
 
     def get_json(self):

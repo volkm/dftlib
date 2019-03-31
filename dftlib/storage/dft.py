@@ -93,7 +93,7 @@ class Dft:
         elif gate_type == "spare":
             element = dft_elements.DftSpareGate(self.max_id + 1, name, children, pos)
         elif gate_type == "fdep":
-            element = dft_elements.DftDependency(self.max_id + 1, name, children, pos)
+            element = dft_elements.DftDependency(self.max_id + 1, name, 1, children, pos)
         elif gate_type == "seq":
             element = dft_elements.DftSeqGate(self.max_id + 1, name, children, pos)
         else:
