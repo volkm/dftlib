@@ -24,7 +24,7 @@ def trim(dft):
         if current.is_be():
             # Add possible SEQ or FDEP gates
             for parent in current.ingoing:
-                if parent.element_type == "fdep" or parent.element_type == "seq" or parent.element_type == "pdep":
+                if parent.element_type == "fdep" or parent.element_type == "seq" or parent.element_type == "mutex" or parent.element_type == "pdep":
                     if parent not in visited:
                         queue.append(parent)
         elif current.is_gate():
