@@ -1,4 +1,5 @@
 import dftlib.storage.dft_elements as dft_elements
+from dftlib.exceptions.exceptions import DftTypeNotKnownException, DftTypeNotSupportedException
 
 
 class Dft:
@@ -86,18 +87,26 @@ class Dft:
         return element
 
     def new_gate(self, name, gate_type, children, pos):
-        if gate_type == "pand":
-            element = dft_elements.DftPandGate(self.max_id + 1, name, children, pos)
+        if gate_type == "and":
+            element = dft_elements.DftAnd(self.max_id + 1, name, children, pos)
+        elif gate_type == "or":
+            element = dft_elements.DftAnd(self.max_id + 1, name, children, pos)
+        elif gate_type == "vot":
+            raise DftTypeNotSupportedException("VOTing gate not supported.")
+        elif gate_type == "pand":
+            element = dft_elements.DftPand(self.max_id + 1, name, children, pos)
         elif gate_type == "por":
-            element = dft_elements.DftPorGate(self.max_id + 1, name, children, pos)
+            element = dft_elements.DftPor(self.max_id + 1, name, children, pos)
         elif gate_type == "spare":
-            element = dft_elements.DftSpareGate(self.max_id + 1, name, children, pos)
+            element = dft_elements.DftSpare(self.max_id + 1, name, children, pos)
         elif gate_type == "fdep":
             element = dft_elements.DftDependency(self.max_id + 1, name, 1, children, pos)
         elif gate_type == "seq":
-            element = dft_elements.DftSeqGate(self.max_id + 1, name, children, pos)
+            element = dft_elements.DftSeq(self.max_id + 1, name, children, pos)
+        elif gate_type == "mutex":
+            element = dft_elements.DftMutex(self.max_id + 1, name, children, pos)
         else:
-            element = dft_elements.DftGate(self.max_id + 1, name, gate_type, children, pos)
+            raise DftTypeNotKnownException("Type '{}' not known.".format(gate_type))
         self.add(element)
         return element
 

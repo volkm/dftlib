@@ -65,7 +65,7 @@ def export_dft_galileo(dft, file):
                 assert element.is_gate()
                 if isinstance(element, DftVotingGate):
                     out += " vot{}".format(element.votingThreshold)
-                elif isinstance(element, DftSpareGate):
+                elif isinstance(element, DftSpare):
                     assert element.element_type == "spare"
                     out += " wsp"
                 elif isinstance(element, DftDependency):
@@ -74,11 +74,11 @@ def export_dft_galileo(dft, file):
                     else:
                         out += " pdep={}".format(element.probability)
                 else:
-                    if isinstance(element, DftPandGate):
+                    if isinstance(element, DftPand):
                         assert element.element_type == "pand"
-                    elif isinstance(element, DftPorGate):
+                    elif isinstance(element, DftPor):
                         assert element.element_type == "por"
-                    elif isinstance(element, DftSeqGate):
+                    elif isinstance(element, DftSeq):
                         assert element.element_type == "seq"
                     else:
                         assert element.element_type == "and" or element.element_type == "or"

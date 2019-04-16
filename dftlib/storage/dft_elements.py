@@ -1,3 +1,6 @@
+from dftlib.exceptions.exceptions import DftTypeNotKnownException
+
+
 def create_from_json(json):
     """
     Create DFT element from json.
@@ -24,33 +27,41 @@ def create_from_json(json):
         else:
             repair = 0
         return DftBe(element_id, name, rate, dorm, repair, position)
+    elif element_type == "and":
+        # AND
+        return DftAnd(element_id, name, [], position)
+    elif element_type == "or":
+        # OR
+        return DftOr(element_id, name, [], position)
     elif element_type == "vot":
-        # Voting gate
+        # VOTing gate
         threshold = int(data['voting'])
         return DftVotingGate(element_id, name, threshold, [], position)
     elif element_type == "fdep":
-        # Functional dependency
+        # Functional dependency (FDEP)
         return DftDependency(element_id, name, 1, [], position)
     elif element_type == "pdep":
-        # Dependency with probability
+        # PDEP (dependency with probability)
         assert 'probability' in data
         prob = float(data['probability'])
         return DftDependency(element_id, name, prob, [], position)
     elif element_type == "pand":
-        # PAND gate
-        return DftPandGate(element_id, name, [], position)
+        # PAND
+        return DftPand(element_id, name, [], position)
     elif element_type == "por":
-        # POR gate
-        return DftPorGate(element_id, name, [], position)
+        # POR
+        return DftPor(element_id, name, [], position)
     elif element_type == "spare":
-        # SPARE gate
-        return DftSpareGate(element_id, name, [], position)
+        # SPARE
+        return DftSpare(element_id, name, [], position)
     elif element_type == "seq":
         # Sequence enforcer
-        return DftSeqGate(element_id, name, [], position)
+        return DftSeq(element_id, name, [], position)
+    elif element_type == "mutex":
+        # Mutex
+        return DftMutex(element_id, name, [], position)
     else:
-        # Gate
-        return DftGate(element_id, name, element_type, [], position)
+        raise DftTypeNotKnownException("Type '{}' not known.".format(element_type))
 
 
 class DftElement:
@@ -200,6 +211,16 @@ class DftGate(DftElement):
         return super().__str__() + " with children: " + ", ".join([str(child.name) for child in self.outgoing])
 
 
+class DftAnd(DftGate):
+    def __init__(self, element_id, name, children, position):
+        DftGate.__init__(self, element_id, name, "and", children, position)
+
+
+class DftOr(DftGate):
+    def __init__(self, element_id, name, children, position):
+        DftGate.__init__(self, element_id, name, "or", children, position)
+
+
 class DftVotingGate(DftGate):
     def __init__(self, element_id, name, voting_threshold, children, position):
         DftGate.__init__(self, element_id, name, "vot", children, position)
@@ -224,19 +245,19 @@ class DftVotingGate(DftGate):
         return True
 
 
-class DftPandGate(DftGate):
+class DftPand(DftGate):
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "pand", children, position)
         self.isDynamic = True
 
 
-class DftPorGate(DftGate):
+class DftPor(DftGate):
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "por", children, position)
         self.isDynamic = True
 
 
-class DftSpareGate(DftGate):
+class DftSpare(DftGate):
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "spare", children, position)
         self.isDynamic = True
@@ -275,7 +296,13 @@ class DftDependency(DftGate):
         return super().__str__() + ", trigger: {} , first dependent element: {}".format(self.trigger.element_id, self.dependent[0].element_id)
 
 
-class DftSeqGate(DftGate):
+class DftSeq(DftGate):
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "seq", children, position)
+        self.isDynamic = True
+
+
+class DftMutex(DftGate):
+    def __init__(self, element_id, name, children, position):
+        DftGate.__init__(self, element_id, name, "mutex", children, position)
         self.isDynamic = True
