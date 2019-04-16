@@ -125,17 +125,23 @@ class Dft:
 
     def statistics(self):
         no_be = 0
+        no_static = 0
         no_dynamic = 0
         for (_, element) in self.elements.items():
-            if element.is_be() and element.rate != "0" and element.rate != "0.0":
-                no_be += 1
-            if element.is_gate() and element.is_dynamic():
-                no_dynamic += 1
-        return no_be, no_dynamic, len(self.elements)
+            if element.is_be():
+                if element.rate != "0" and element.rate != "0.0":
+                    no_be += 1
+            else:
+                assert element.is_gate()
+                if element.is_dynamic():
+                    no_dynamic += 1
+                else:
+                    no_static += 1
+        return no_be, no_static, no_dynamic, len(self.elements)
 
     def __str__(self):
-        no_be, no_dynamic, no_elements = self.statistics()
-        return "Dft with {} elements ({} failable BEs, {} dynamic elements), top element: {}".format(no_elements, no_be, no_dynamic, self.top_level_element.name)
+        no_be, no_static, no_dynamic, no_elements = self.statistics()
+        return "Dft with {} elements ({} failable BEs, {} static elements, {} dynamic elements), top element: {}".format(no_elements, no_be, no_static, no_dynamic, self.top_level_element.name)
 
     def get_dynamics(self):
         dynamic_elements = []
