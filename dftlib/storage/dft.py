@@ -94,7 +94,7 @@ class Dft:
         if gate_type == "and":
             element = dft_elements.DftAnd(self.max_id + 1, name, children, pos)
         elif gate_type == "or":
-            element = dft_elements.DftAnd(self.max_id + 1, name, children, pos)
+            element = dft_elements.DftOr(self.max_id + 1, name, children, pos)
         elif gate_type == "vot":
             raise DftTypeNotSupportedException("VOTing gate not supported.")
         elif gate_type == "pand":
