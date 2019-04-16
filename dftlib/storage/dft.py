@@ -69,10 +69,14 @@ class Dft:
 
     def remove(self, element):
         assert element.element_id in self.elements
-        for parent in element.ingoing:
-            parent.remove_child(element)
-        for child in element.outgoing:
-            child.remove_parent(element)
+        # Remember ids for iteration
+        # Otherwise we are iterating over the list we are also removing from
+        parent_ids = [element.element_id for element in element.ingoing]
+        child_ids = [element.element_id for element in element.outgoing]
+        for parent_id in parent_ids:
+            self.get_element(parent_id).remove_child(element)
+        for child_id in child_ids:
+            self.get_element(child_id).remove_parent(element)
         del self.elements[element.element_id]
 
     def update_bounds(self, element):

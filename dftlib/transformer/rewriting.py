@@ -264,11 +264,16 @@ def try_remove_gates_with_one_successor(dft, gate):
     child = gate.outgoing[0]
 
     # Add child to parents
+    parents = []
     for parent in gate.ingoing:
-        if not child in parent.outgoing:
+        parents.append(parent)
+        if child not in parent.outgoing:
             parent.add_child(child)
 
     dft.remove(gate)
+
+    for parent in parents:
+        assert gate not in parent.outgoing
 
     # Add removed child to transformer
     if gate.element_type == 'and':
