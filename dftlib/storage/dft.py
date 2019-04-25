@@ -1,5 +1,5 @@
 import dftlib.storage.dft_elements as dft_elements
-from dftlib.exceptions.exceptions import DftTypeNotKnownException, DftTypeNotSupportedException
+from dftlib.exceptions.exceptions import DftTypeNotKnownException, DftInvalidArgumentException
 
 
 class Dft:
@@ -95,8 +95,13 @@ class Dft:
             element = dft_elements.DftAnd(self.max_id + 1, name, children, pos)
         elif gate_type == "or":
             element = dft_elements.DftOr(self.max_id + 1, name, children, pos)
-        elif gate_type == "vot":
-            raise DftTypeNotSupportedException("VOTing gate not supported.")
+        elif gate_type.startswith("vot"):
+            threshold = gate_type[3:]
+            try:
+                threshold = int(threshold)
+            except ValueError:
+                raise DftInvalidArgumentException("Voting threshold {} invalid.".format(threshold))
+            element = dft_elements.DftVotingGate(self.max_id + 1, name, threshold, children, pos)
         elif gate_type == "pand":
             element = dft_elements.DftPand(self.max_id + 1, name, children, pos)
         elif gate_type == "por":
@@ -141,7 +146,8 @@ class Dft:
 
     def __str__(self):
         no_be, no_static, no_dynamic, no_elements = self.statistics()
-        return "Dft with {} elements ({} failable BEs, {} static elements, {} dynamic elements), top element: {}".format(no_elements, no_be, no_static, no_dynamic, self.top_level_element.name)
+        return "Dft with {} elements ({} failable BEs, {} static elements, {} dynamic elements), top element: {}".format(no_elements, no_be, no_static, no_dynamic,
+                                                                                                                         self.top_level_element.name)
 
     def get_dynamics(self):
         dynamic_elements = []

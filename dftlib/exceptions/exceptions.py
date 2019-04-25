@@ -1,12 +1,18 @@
 class DftTypeNotKnownException(Exception):
     """
-    Exception when the type of the DFT element is not known
+    Exception when the type of the DFT element is not known.
     """
     pass
 
 
 class DftTypeNotSupportedException(Exception):
     """
-    Exception when the type of the DFT element is not supported
+    Exception when the type of the DFT element is not supported.
     """
     pass
+
+
+class DftInvalidArgumentException(Exception):
+    """
+    Exception when the argument in a DFT is invalid.
+    """
