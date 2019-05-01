@@ -106,7 +106,7 @@ def try_merge_bes_in_or(dft, or_gate):
 
     child_bes = []
     for child in or_gate.outgoing:
-        if child.is_be() and len(child.ingoing) <= 1 and child.dorm == 1:
+        if child.is_be() and len(child.ingoing) <= 1 and child.dorm == 1 and not child.relevant:
             child_bes.append(child)
 
     if len(child_bes) <= 1:
@@ -137,6 +137,9 @@ def try_merge_or(dft, or_gate):
         return False
 
     if len(or_gate.ingoing) != 1:
+        return False
+
+    if or_gate.relevant:
         return False
 
     parent = or_gate.ingoing[0]

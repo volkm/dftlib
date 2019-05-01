@@ -26,42 +26,46 @@ def create_from_json(json):
             repair = float(data['repair'])
         else:
             repair = 0
-        return DftBe(element_id, name, rate, dorm, repair, position)
+        element = DftBe(element_id, name, rate, dorm, repair, position)
     elif element_type == "and":
         # AND
-        return DftAnd(element_id, name, [], position)
+        element = DftAnd(element_id, name, [], position)
     elif element_type == "or":
         # OR
-        return DftOr(element_id, name, [], position)
+        element = DftOr(element_id, name, [], position)
     elif element_type == "vot":
         # VOTing gate
         threshold = int(data['voting'])
-        return DftVotingGate(element_id, name, threshold, [], position)
+        element = DftVotingGate(element_id, name, threshold, [], position)
     elif element_type == "fdep":
         # Functional dependency (FDEP)
-        return DftDependency(element_id, name, 1, [], position)
+        element = DftDependency(element_id, name, 1, [], position)
     elif element_type == "pdep":
         # PDEP (dependency with probability)
         assert 'probability' in data
         prob = float(data['probability'])
-        return DftDependency(element_id, name, prob, [], position)
+        element = DftDependency(element_id, name, prob, [], position)
     elif element_type == "pand":
         # PAND
-        return DftPand(element_id, name, [], position)
+        element = DftPand(element_id, name, [], position)
     elif element_type == "por":
         # POR
-        return DftPor(element_id, name, [], position)
+        element = DftPor(element_id, name, [], position)
     elif element_type == "spare":
         # SPARE
-        return DftSpare(element_id, name, [], position)
+        element = DftSpare(element_id, name, [], position)
     elif element_type == "seq":
         # Sequence enforcer
-        return DftSeq(element_id, name, [], position)
+        element = DftSeq(element_id, name, [], position)
     elif element_type == "mutex":
         # Mutex
-        return DftMutex(element_id, name, [], position)
+        element = DftMutex(element_id, name, [], position)
     else:
         raise DftTypeNotKnownException("Type '{}' not known.".format(element_type))
+
+    if 'relevant' in data:
+        element.relevant = data['relevant']
+    return element
 
 
 class DftElement:
@@ -77,6 +81,7 @@ class DftElement:
         self.ingoing = []
         self.outgoing = []
         self.isDynamic = False
+        self.relevant = False
 
     def is_dynamic(self):
         return self.isDynamic
@@ -91,11 +96,16 @@ class DftElement:
         assert element in self.ingoing
         self.ingoing.remove(element)
 
+    def set_relevant(self, relevant=True):
+        self.relevant = relevant
+
     def get_json(self):
         data = dict()
         data['id'] = str(self.element_id)
         data['name'] = str(self.name)
         data['type'] = self.element_type
+        if self.relevant:
+            data['relevant'] = True
         position = dict()
         position["x"] = self.position[0]
         position["y"] = self.position[1]
