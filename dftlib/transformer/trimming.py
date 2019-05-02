@@ -39,4 +39,5 @@ def trim(dft):
     print("Removing {} unnecessary elements.".format(len(unused)))
 
     for element_id, element in unused.items():
-        dft.remove(element)
+        if not element.relevant:
+            dft.remove(element)
