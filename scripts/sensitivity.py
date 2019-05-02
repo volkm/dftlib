@@ -16,10 +16,11 @@ class StormRunResult:
     """
 
     def __init__(self):
-        self.results = None
+        self.results = []
         self.total_time = None
         self.building_time = None
         self.modelchecking_time = None
+
 
 class SensitivityResult:
     def __init__(self, name):
@@ -40,6 +41,7 @@ class SensitivityResult:
 
     def property_string(self):
         return ";".join(self.properties)
+
 
 def run_storm_dft(filename, arguments, quiet, storm_path):
     """
@@ -82,6 +84,7 @@ def run_storm_dft(filename, arguments, quiet, storm_path):
 
     return result
 
+
 def run_storm(filename, arguments, quiet, storm_path):
     """
     Run Storm on the given file and return the result.
@@ -97,31 +100,29 @@ def run_storm(filename, arguments, quiet, storm_path):
 
     output = run_tool(run_args, quiet)
 
-    result = StormRunResult()
+    run_result = StormRunResult()
     # Parse result
-    match = re.search(r'Result: \[(.*)\]', output)
-    if match:
-        result.results = match.group(1)
-        result.results = result.results.split(', ')
-        result.results = [float(res) for res in result.results]
+    regex = re.compile(r'Result \(for initial states\): (.*)')
+    for match in regex.finditer(output):
+        run_result.results.append(float(match.group(1)))
 
     # Parse timings
     match = re.search(r'Exploration:\s*(.*)s', output)
     if match:
-        result.building_time = match.group(1)
-        result.building_time = float(result.building_time)
+        run_result.building_time = match.group(1)
+        run_result.building_time = float(run_result.building_time)
 
     match = re.search(r'Modelchecking:\s*(.*)s', output)
     if match:
-        result.modelchecking_time = match.group(1)
-        result.modelchecking_time = float(result.modelchecking_time)
+        run_result.modelchecking_time = match.group(1)
+        run_result.modelchecking_time = float(run_result.modelchecking_time)
 
     Match = re.search(r'Total:\s*(.*)s', output)
     if match:
-        result.total_time = match.group(1)
-        result.total_time = float(result.total_time)
+        run_result.total_time = match.group(1)
+        run_result.total_time = float(run_result.total_time)
 
-    return result
+    return run_result
 
 
 def run_tool(tool_arguments, quiet=False):
@@ -183,7 +184,7 @@ if __name__ == "__main__":
     components = args.comp.split(",")
 
     # Gather properties
-    for comp in args.components:
+    for comp in components:
         result = SensitivityResult(comp)
         # Label to indentify failure of the component
         comp_label = "\"{}_failed\"".format(comp)
@@ -213,12 +214,12 @@ if __name__ == "__main__":
     assert len(results) == len(components)
 
     # Run Storm
-    property_str = ";".join([res.property_string for res in results])
+    property_str = ";".join([res.property_string() for res in results])
     arguments = cli_args + ["--prop", property_str]
     if args.debuglevel > 0:
         print("Running '{}' with arguments '{}'".format(args.file, arguments))
     storm_result = run_storm(args.file, arguments, args.debuglevel < 2, args.location)
-    if storm_result.results is None:
+    if not storm_result.results:
         print("Error occurred on example '{}' with arguments '{}'".format(args.file_isolation, arguments))
         exit(1)
 
@@ -229,13 +230,12 @@ if __name__ == "__main__":
 
     # Get individual results
     i = 0
-    results = []
     for res in results:
-        res.comp_failed, res.comp_operational, res.comp_failed_sys_failed, res.comp_operational_sys_failed = storm_result.results[i:i+4]
-        i+=4
+        res.comp_failed, res.comp_operational, res.comp_failed_sys_failed, res.comp_operational_sys_failed = storm_result.results[i:i + 4]
+        i += 4
         if args.debuglevel > 0:
-            res.sys_failed, res.sys_operational, res.comp_failed_sys_operational, res.comp_operational_sys_operational = storm_result.results[i:i+4]
-            i+=4
+            res.sys_failed, res.sys_operational, res.comp_failed_sys_operational, res.comp_operational_sys_operational = storm_result.results[i:i + 4]
+            i += 4
 
     # Get timings
     time_total = storm_result.total_time
@@ -246,10 +246,10 @@ if __name__ == "__main__":
         # Check component failure in isolation
         if args.file_isolation is None:
             if args.value_isolation is not None:
-                res.comp_failed_isolation = args.value_isolation
+                res.comp_failed_isolation = float(args.value_isolation)
             else:
                 # Assume individual component failure
-                res.comp_failed_isolation = comp_failed
+                res.comp_failed_isolation = res.comp_failed
                 print("WARN: Component is assumed to have individual failure.")
         else:
             # Run Storm again
@@ -298,7 +298,7 @@ if __name__ == "__main__":
         if args.debuglevel > 0:
             print("Intermediate result (via unrel.):\t{:.7e}".format(inter_fail))
         res.result_sens = res.factor * inter_fail
-        print("Result (via unrel.):\t{:.7e}".format(res.result_sens))
+        print("Result for {} (via unrel.):\t{:.7e}".format(res.name, res.result_sens))
 
         if args.debuglevel > 0:
             # Compute via reliability as well
@@ -307,11 +307,14 @@ if __name__ == "__main__":
             inter_op = first_op - second_op
             if args.debuglevel > 0:
                 print("Intermediate result (via rel.):\t{:.7e}".format(inter_op))
-            result_op = factor * inter_op
+            result_op = res.factor * inter_op
             print("Result (via rel.):\t{:.7e}".format(result_op))
 
     # Timings
-    print("Time Building:\t\t{:.2f}s".format(time_building))
-    print("Time Model Checking:\t{:.2f}s".format(time_model_checking))
-    print("Time Storm (Total):\t{:.2f}s".format(time_total))
+    if time_building is not None:
+        print("Time Building:\t\t{:.2f}s".format(time_building))
+    if time_model_checking is not None:
+        print("Time Model Checking:\t{:.2f}s".format(time_model_checking))
+    if time_total is not None:
+        print("Time Storm (Total):\t{:.2f}s".format(time_total))
     print("Total Time:\t\t{:.2f}s".format(time.time() - start_time))
