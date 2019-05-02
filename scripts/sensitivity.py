@@ -58,31 +58,31 @@ def run_storm_dft(filename, arguments, quiet, storm_path):
 
     output = run_tool(run_args, quiet)
 
-    result = StormRunResult()
+    run_result = StormRunResult()
     # Parse result
     match = re.search(r'Result: \[(.*)\]', output)
     if match:
-        result.results = match.group(1)
-        result.results = result.results.split(', ')
-        result.results = [float(res) for res in result.results]
+        run_result.results = match.group(1)
+        run_result.results = run_result.results.split(', ')
+        run_result.results = [float(res) for res in run_result.results]
 
     # Parse timings
     match = re.search(r'Exploration:\s*(.*)s', output)
     if match:
-        result.building_time = match.group(1)
-        result.building_time = float(result.building_time)
+        run_result.building_time = match.group(1)
+        run_result.building_time = float(run_result.building_time)
 
     match = re.search(r'Modelchecking:\s*(.*)s', output)
     if match:
-        result.modelchecking_time = match.group(1)
-        result.modelchecking_time = float(result.modelchecking_time)
+        run_result.modelchecking_time = match.group(1)
+        run_result.modelchecking_time = float(run_result.modelchecking_time)
 
     match = re.search(r'Total:\s*(.*)s', output)
     if match:
-        result.total_time = match.group(1)
-        result.total_time = float(result.total_time)
+        run_result.total_time = match.group(1)
+        run_result.total_time = float(run_result.total_time)
 
-    return result
+    return run_result
 
 
 def run_storm(filename, arguments, quiet, storm_path):
@@ -218,7 +218,7 @@ if __name__ == "__main__":
     arguments = cli_args + ["--prop", property_str]
     if args.debuglevel > 0:
         print("Running '{}' with arguments '{}'".format(args.file, arguments))
-    storm_result = run_storm(args.file, arguments, args.debuglevel < 2, args.location)
+    storm_result = run_storm_dft(args.file, arguments, args.debuglevel < 2, args.location)
     if not storm_result.results:
         print("Error occurred on example '{}' with arguments '{}'".format(args.file_isolation, arguments))
         exit(1)
