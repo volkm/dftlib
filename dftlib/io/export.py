@@ -1,5 +1,6 @@
 import json
 
+from dftlib.exceptions.exceptions import DftTypeNotKnownException, DftInvalidArgumentException
 from dftlib.storage.dft_elements import *
 
 
@@ -17,7 +18,7 @@ def galileo_name(element):
     """
     Get name in Galileo format.
     :param element: Element.
-    :return: Name as "Name_Id"
+    :return: Name in quotation marks.
     """
     return '"{}"'.format(element.name)
 
@@ -50,7 +51,8 @@ def export_dft_galileo(dft, file):
     # Assert unique names
     names = dict()
     for element in elements:
-        assert element.name not in names
+        if element.name in names:
+            raise DftInvalidArgumentException("Element name '{}' used twice.".format(element.name))
         names[element.name] = element
 
     with open(file, 'w') as out_file:
@@ -60,11 +62,19 @@ def export_dft_galileo(dft, file):
             if element.is_be():
                 out += " lambda={}".format(element.rate)
                 out += " dorm={}".format(element.dorm)
-                out_file.write(out + ";\n")
             else:
                 assert element.is_gate()
-                if isinstance(element, DftVotingGate):
+                # Handle gate type
+                if isinstance(element, DftAnd):
+                    out += " and"
+                elif isinstance(element, DftOr):
+                    out += " or"
+                elif isinstance(element, DftVotingGate):
                     out += " vot{}".format(element.votingThreshold)
+                elif isinstance(element, DftPand):
+                    out += " pand"
+                elif isinstance(element, DftPor):
+                    out += " por"
                 elif isinstance(element, DftSpare):
                     assert element.element_type == "spare"
                     out += " wsp"
@@ -73,16 +83,10 @@ def export_dft_galileo(dft, file):
                         out += " fdep"
                     else:
                         out += " pdep={}".format(element.probability)
+                elif isinstance(element, DftSeq):
+                    out += " seq"
                 else:
-                    if isinstance(element, DftPand):
-                        assert element.element_type == "pand"
-                    elif isinstance(element, DftPor):
-                        assert element.element_type == "por"
-                    elif isinstance(element, DftSeq):
-                        assert element.element_type == "seq"
-                    else:
-                        assert element.element_type == "and" or element.element_type == "or"
-                    out += " " + element.element_type
+                    raise DftTypeNotKnownException("Type '{}' not known.".format(element.element_type))
                 for child in element.outgoing:
                     out += " " + galileo_name(child)
-                out_file.write(out + ";\n")
+            out_file.write(out + ";\n")

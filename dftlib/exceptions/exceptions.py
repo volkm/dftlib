@@ -16,3 +16,9 @@ class DftInvalidArgumentException(Exception):
     """
     Exception when the argument in a DFT is invalid.
     """
+
+
+class ToolNotFound(Exception):
+    """
+    Exception when the required tool was not found.
+    """

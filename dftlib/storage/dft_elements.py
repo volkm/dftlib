@@ -279,6 +279,7 @@ class DftDependency(DftGate):
         self.dependent = []
         DftGate.__init__(self, element_id, name, "fdep" if probability == 1 else "pdep", children, position)
         self.probability = probability
+        self.isDynamic = True
 
     def get_json(self):
         json = DftGate.get_json(self)
