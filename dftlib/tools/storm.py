@@ -1,7 +1,6 @@
 import os
 import re
 import math
-from pathlib import Path
 
 import dftlib._config as config
 from dftlib.utility.os_functions import run_tool
@@ -32,12 +31,15 @@ class Storm:
         args = [self.binary, '-dft', file, '--export-json', out_file]
         run_tool(args, True)
 
-    def analyse_with_smt(self, file, outfile):
-        args = [self.binary, '-dft', file, '--dft:smt']
-        _ = run_tool(args, True)
-
-        smt_file = Path("test.smt2")
-        assert smt_file.is_file()
+    def analyse_with_smt(self, file, smt_file):
+        """
+        Analyse DFT via SMT.
+        :param file: Input file.
+        :param smt_file: Output SMT file.
+        :return: Tuple (lower bound, upper bound, number of failable BEs)
+        """
+        args = [self.binary, '-dft', file, '--export-smt', smt_file]
+        run_tool(args, True)
 
         with open(smt_file, "r") as f:
             smtlib = f.read()
@@ -51,12 +53,12 @@ class Storm:
 
         lines = ["(set-logic QF_UFIDL)", "(set-option :smt.arith.solver 3)"] + lines
 
-        with open(outfile, 'w') as fout:
+        with open(smt_file, 'w') as fout:
             fout.write("\n".join(lines[:-2]))
 
         # Check upper bound
         # All basic failures should lead to complete failure
-        sat = self.check_threshold(lines[:-2], length, length, toplevel, outfile)
+        sat = self.check_threshold(lines[:-2], length, length, toplevel, smt_file)
         if sat:
             print("IS FAILSAFE")
             upper = length
@@ -65,7 +67,7 @@ class Storm:
             l, u = 0, length
             while l != u:
                 threshold = math.ceil((l + u) / 2)
-                sat = self.check_threshold(lines[:-2], threshold, u, toplevel, outfile)
+                sat = self.check_threshold(lines[:-2], threshold, u, toplevel, smt_file)
                 if sat:
                     l = threshold
                 else:
@@ -74,14 +76,14 @@ class Storm:
 
         # Check lower bound
         # No basic failures should lead to no failure
-        sat = self.check_threshold(lines[0:-2], 0, 0, toplevel, outfile)
+        sat = self.check_threshold(lines[0:-2], 0, 0, toplevel, smt_file)
         assert not sat
 
         # Refine
         l, u = 0, upper
         while l != u:
             threshold = math.floor((l + u) / 2)
-            sat = self.check_threshold(lines[:-2], l, threshold, toplevel, outfile)
+            sat = self.check_threshold(lines[:-2], l, threshold, toplevel, smt_file)
             if sat:
                 u = threshold
             else:

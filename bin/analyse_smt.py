@@ -9,11 +9,6 @@ if __name__ == "__main__":
 
     args = argument_parser.parse_args()
 
-    # Read DFT file
-    # print("Reading {}".format(args.dft))
-    # dft = parser.parse_dft(args.dft)
-    # print(dft)
-
     # Analyse DFT
     smt = SMTAnalysis()
     lower, upper, length = smt.check_eventually_fail(args.dft, args.out)
