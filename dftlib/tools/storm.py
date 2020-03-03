@@ -1,9 +1,11 @@
-from pathlib import Path
 import os
 import re
 import math
+from pathlib import Path
 
+import dftlib._config as config
 from dftlib.utility.os_functions import run_tool
+from dftlib.exceptions.exceptions import ToolNotFound
 
 
 class Storm:
@@ -11,17 +13,24 @@ class Storm:
     Class wrapping the storm model checker CLI.
     """
 
-    def __init__(self, binary):
+    def __init__(self):
         """
         Constructor.
-        :param binary: Path to storm-dft binary.
         """
-        self.binary = binary
+        if config.has_storm_dft:
+            self.binary = config.storm_path
+        else:
+            raise ToolNotFound("Path of binary 'storm-dft' not specified.")
 
-    def convert_to_json(self, file, tmpjson):
-        args = [self.binary, '-dft', file, '--export-json', tmpjson]
-        outputstr = run_tool(args, True)
-        return outputstr
+    def convert_to_json(self, file, out_file):
+        """
+        Convert galileo file to json file.
+        :param file: File.
+        :param out_file: Output file.
+        :return: JSON string of the DFT.
+        """
+        args = [self.binary, '-dft', file, '--export-json', out_file]
+        run_tool(args, True)
 
     def analyse_with_smt(self, file, outfile):
         args = [self.binary, '-dft', file, '--dft:smt']

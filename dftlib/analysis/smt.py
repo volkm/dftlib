@@ -1,5 +1,4 @@
 from dftlib.tools.storm import Storm
-from dftlib._config import storm_path
 
 
 class SMTAnalysis:
@@ -13,5 +12,5 @@ class SMTAnalysis:
         :param file: File.
         :return: True iff the DFT will fail eventually.
         """
-        storm = Storm(storm_path)
+        storm = Storm()
         return storm.analyse_with_smt(file, outfile)

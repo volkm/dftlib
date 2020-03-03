@@ -1,7 +1,7 @@
 import json
 
 from dftlib.exceptions.exceptions import DftTypeNotKnownException, DftInvalidArgumentException
-from dftlib.storage.dft_elements import *
+import dftlib.storage.dft_elements as dft_elements
 
 
 def export_dft_json(dft, file):
@@ -65,25 +65,25 @@ def export_dft_galileo(dft, file):
             else:
                 assert element.is_gate()
                 # Handle gate type
-                if isinstance(element, DftAnd):
+                if isinstance(element, dft_elements.DftAnd):
                     out += " and"
-                elif isinstance(element, DftOr):
+                elif isinstance(element, dft_elements.DftOr):
                     out += " or"
-                elif isinstance(element, DftVotingGate):
+                elif isinstance(element, dft_elements.DftVotingGate):
                     out += " vot{}".format(element.votingThreshold)
-                elif isinstance(element, DftPand):
+                elif isinstance(element, dft_elements.DftPand):
                     out += " pand"
-                elif isinstance(element, DftPor):
+                elif isinstance(element, dft_elements.DftPor):
                     out += " por"
-                elif isinstance(element, DftSpare):
+                elif isinstance(element, dft_elements.DftSpare):
                     assert element.element_type == "spare"
                     out += " wsp"
-                elif isinstance(element, DftDependency):
+                elif isinstance(element, dft_elements.DftDependency):
                     if element.probability == 1:
                         out += " fdep"
                     else:
                         out += " pdep={}".format(element.probability)
-                elif isinstance(element, DftSeq):
+                elif isinstance(element, dft_elements.DftSeq):
                     out += " seq"
                 else:
                     raise DftTypeNotKnownException("Type '{}' not known.".format(element.element_type))
