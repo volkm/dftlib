@@ -3,8 +3,8 @@ from dftlib.exceptions.exceptions import DftTypeNotKnownException
 
 def create_from_json(json):
     """
-    Create DFT element from json.
-    :param json: Json.
+    Create DFT element from JSON string.
+    :param json: JSON string.
     :return: DFT element.
     """
     assert json['group'] == "nodes"
@@ -18,7 +18,7 @@ def create_from_json(json):
     else:
         position = (0, 0)
 
-    if element_type == "be":
+    if element_type == "be" or element_type == "be_exp":
         # BE
         rate = float(data['rate'])
         dorm = float(data['dorm'])
@@ -84,22 +84,46 @@ class DftElement:
         self.relevant = False
 
     def is_dynamic(self):
+        """
+        Get whether the element is dynamic.
+        :return: True iff element is dynamic.
+        """
         return self.isDynamic
 
     def is_be(self):
+        """
+        Get whether the element is a BE.
+        :return: True iff element is a BE.
+        """
         return self.element_type == "be"
 
     def is_gate(self):
+        """
+        Get whether the element is a gate.
+        :return: True iff element is a gate.
+        """
         return not self.is_be()
 
     def remove_parent(self, element):
+        """
+        Remove parent.
+        :param element: Parent to remove.
+        """
         assert element in self.ingoing
         self.ingoing.remove(element)
 
     def set_relevant(self, relevant=True):
+        """
+        Set whether the element is relevant (and will not be set to 'Don't Care' for example).
+        :param relevant: Whether the element is relevant.
+        """
         self.relevant = relevant
 
     def get_json(self):
+        """
+        Get JSON string.
+        :return: JSON string.
+        """
         data = dict()
         data['id'] = str(self.element_id)
         data['name'] = str(self.name)
@@ -120,6 +144,11 @@ class DftElement:
         return "{} - '{}' ({})".format(self.element_type, self.name, self.element_id)
 
     def compare(self, other):
+        """
+        Compare elements.
+        :param other: Other element.
+        :return: True iff both elements are equal.
+        """
         if self.element_id != other.element_id:
             # raise Exception("Ids are not equal: {} and {}".format(self.element_id, other.element_id))
             return False
@@ -142,6 +171,10 @@ class DftElement:
 
 
 class DftBe(DftElement):
+    """
+    Basic element (BE).
+    """
+
     def __init__(self, element_id, name, rate, dorm, repair, position):
         DftElement.__init__(self, element_id, name, "be", position)
         assert self.is_be()
@@ -181,6 +214,10 @@ class DftBe(DftElement):
 
 
 class DftGate(DftElement):
+    """
+    General class for DFT gates.
+    """
+
     def __init__(self, element_id, name, element_type, children, position):
         DftElement.__init__(self, element_id, name, element_type, position)
         assert self.is_gate()
@@ -188,15 +225,28 @@ class DftGate(DftElement):
             self.add_child(child)
 
     def add_child(self, element):
+        """
+        Add child.
+        :param element: Child to add.
+        """
         self.outgoing.append(element)
         element.ingoing.append(self)
 
     def remove_child(self, element):
+        """
+        Remove child.
+        :param element: Child to remove.
+        """
         assert element in self.outgoing
         self.outgoing.remove(element)
         element.remove_parent(self)
 
-    def compareSucc(self, other):
+    def compare_successors(self, other):
+        """
+        Check whether two gates have the same successors.
+        :param other: Other gate.
+        :return: True iff both gates have the same successors.
+        """
         if self.element_id == other.element_id:
             return True
         if self.element_type != other.element_type:
@@ -222,16 +272,28 @@ class DftGate(DftElement):
 
 
 class DftAnd(DftGate):
+    """
+    AND gate.
+    """
+
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "and", children, position)
 
 
 class DftOr(DftGate):
+    """
+    OR gate.
+    """
+
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "or", children, position)
 
 
 class DftVotingGate(DftGate):
+    """
+    VOTing gate.
+    """
+
     def __init__(self, element_id, name, voting_threshold, children, position):
         DftGate.__init__(self, element_id, name, "vot", children, position)
         self.votingThreshold = int(voting_threshold)
@@ -256,24 +318,40 @@ class DftVotingGate(DftGate):
 
 
 class DftPand(DftGate):
+    """
+    Priority AND gate (PAND).
+    """
+
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "pand", children, position)
         self.isDynamic = True
 
 
 class DftPor(DftGate):
+    """
+    Priority OR gate (POR).
+    """
+
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "por", children, position)
         self.isDynamic = True
 
 
 class DftSpare(DftGate):
+    """
+    SPARE gate.
+    """
+
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "spare", children, position)
         self.isDynamic = True
 
 
 class DftDependency(DftGate):
+    """
+    General class for dependencies (FDEP and PDEP).
+    """
+
     def __init__(self, element_id, name, probability, children, position):
         self.trigger = None
         self.dependent = []
@@ -297,6 +375,10 @@ class DftDependency(DftGate):
         element.ingoing.append(self)
 
     def remove_last_dep(self):
+        """
+        Remove the last dependency.
+        :return: True iff removal was successful.
+        """
         if len(self.dependent) > 1:
             self.dependent.pop()
             return True
@@ -308,12 +390,20 @@ class DftDependency(DftGate):
 
 
 class DftSeq(DftGate):
+    """
+    SEQuence enforcer.
+    """
+
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "seq", children, position)
         self.isDynamic = True
 
 
 class DftMutex(DftGate):
+    """
+    MUTEX restrictor.
+    """
+
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "mutex", children, position)
         self.isDynamic = True

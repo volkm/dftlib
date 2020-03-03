@@ -42,32 +42,58 @@ class Dft:
         # Set top level element
         top_level_id = int(json['toplevel'])
         if top_level_id < 0:
-            raise Exception("Top level element not defined")
+            raise DftInvalidArgumentException("Top level element not defined")
         self.set_top_level_element(top_level_id)
 
-    def count_elements(self):
+    def size_elements(self):
+        """
+        Get number of elements (gates + BEs)
+        :return: Number of elements.
+        """
         return len(self.elements)
 
     def get_element(self, element_id):
+        """
+        Get element by id.
+        :param element_id: Id.
+        :return: Element.
+        """
         assert element_id in self.elements
         return self.elements[element_id]
 
     def get_element_by_name(self, name):
+        """
+        Get element by name.
+        :param name: Name.
+        :return: Element.
+        """
         for (_, element) in self.elements.items():
             if name == element.name:
                 return element
-        raise Exception("Element {} not known.".format(name))
+        raise DftInvalidArgumentException("Element {} not known.".format(name))
 
     def set_top_level_element(self, element_id):
+        """
+        Set top level element.
+        :param element_id: Id.
+        """
         self.top_level_element = self.get_element(element_id)
 
     def add(self, element):
+        """
+        Add element.
+        :param element: Element.
+        """
         assert element.element_id not in self.elements
         self.elements[element.element_id] = element
         self.max_id = max(self.max_id, element.element_id)
         self.update_bounds(element)
 
     def remove(self, element):
+        """
+        Remove element.
+        :param element: Element.
+        """
         assert element.element_id in self.elements
         # Remember ids for iteration
         # Otherwise we are iterating over the list we are also removing from
@@ -80,17 +106,38 @@ class Dft:
         del self.elements[element.element_id]
 
     def update_bounds(self, element):
+        """
+        Update position bounds by also including bounds of given element.
+        :param element: Element.
+        """
         self.position_bounds[0] = min(element.position[0], self.position_bounds[0])
         self.position_bounds[1] = min(element.position[1], self.position_bounds[1])
         self.position_bounds[2] = max(element.position[0], self.position_bounds[2])
         self.position_bounds[3] = max(element.position[1], self.position_bounds[3])
 
     def new_be(self, name, rate, dorm, repair, pos):
+        """
+        Create new BE.
+        :param name: Name.
+        :param rate: Failure rate.
+        :param dorm: Dormancy factor in [0, 1]
+        :param repair: Repair rate.
+        :param pos: Position bounds.
+        :return: New BE.
+        """
         element = dft_elements.DftBe(self.max_id + 1, name, rate, dorm, repair, pos)
         self.add(element)
         return element
 
     def new_gate(self, name, gate_type, children, pos):
+        """
+        Create new gate.
+        :param name: Name.
+        :param gate_type: Type of gate as string according to Galileo format (e.g. 'and', 'vot3', etc.)
+        :param children: List of children.
+        :param pos: Postion bounds.
+        :return: New gate.
+        """
         if gate_type == "and":
             element = dft_elements.DftAnd(self.max_id + 1, name, children, pos)
         elif gate_type == "or":
@@ -120,6 +167,10 @@ class Dft:
         return element
 
     def json(self):
+        """
+        Get JSON string for DFT.
+        :return: JSON string.
+        """
         data = dict()
         data['toplevel'] = str(self.top_level_element.element_id)
         nodes = []
@@ -129,6 +180,10 @@ class Dft:
         return data
 
     def statistics(self):
+        """
+        Get general statistics about DFT.
+        :return: Tuple (number of BEs, number of static gates, number of dynamic gates, number of elements)
+        """
         no_be = 0
         no_static = 0
         no_dynamic = 0
@@ -150,6 +205,10 @@ class Dft:
                                                                                                                          self.top_level_element.name)
 
     def get_dynamics(self):
+        """
+        Get list of dynamic gates.
+        :return: List of dynamic gates.
+        """
         dynamic_elements = []
         for (_, element) in self.elements.items():
             if element.is_dynamic():
@@ -157,9 +216,18 @@ class Dft:
         return dynamic_elements
 
     def verbose_str(self):
+        """
+        Get verbose string containing information about all elements.
+        :return: Verbose string.
+        """
         return "{}\n".format(self) + "\n".join([str(element) for (_, element) in self.elements.items()])
 
     def compare(self, other):
+        """
+        Compare two DFT.
+        :param other: Other DFT.
+        :return: True iff all elements, the top-level element and the structure are equal between the two DFTs.
+        """
         if not self.top_level_element.compare(other.top_level_element):
             raise Exception("Top level elements {} and {} not equal.".format(self.top_level_element, other.top_level_element))
 
