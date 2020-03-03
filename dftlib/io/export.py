@@ -29,24 +29,7 @@ def export_dft_galileo(dft, file):
     :param dft: DFT.
     :param file: File.
     """
-
-    # Generate element list in top-down approach
-    # TODO make efficient
-    elements = []
-    queue = [dft.top_level_element]
-    while len(queue) > 0:
-        element = queue[0]
-        queue = queue[1:]
-        if element not in elements:
-            elements.append(element)
-            for child in element.outgoing:
-                queue.append(child)
-
-    # Add remaining elements
-    for _, element in dft.elements.items():
-        if element not in elements:
-            elements.append(element)
-    assert len(elements) == len(dft.elements)
+    elements = dft.topological_sort()
 
     # Assert unique names
     names = dict()

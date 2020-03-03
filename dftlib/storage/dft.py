@@ -78,6 +78,7 @@ class Dft:
         :param element_id: Id.
         """
         self.top_level_element = self.get_element(element_id)
+        self.top_level_element.set_relevant(True)
 
     def add(self, element):
         """
@@ -252,3 +253,26 @@ class Dft:
                     raise Exception("Elements with id {} are different: {} and {}.".format(i, element, other_element))
 
         return True
+
+    def topological_sort(self):
+        """
+        Return the elements in topological sorting from top to bottom.
+        :return: List of elements.
+        """
+        # TODO make efficient
+        elements = []
+        queue = [self.top_level_element]
+        while len(queue) > 0:
+            element = queue[0]
+            queue = queue[1:]
+            if element not in elements:
+                elements.append(element)
+                for child in element.outgoing:
+                    queue.append(child)
+
+        # Add remaining elements
+        for _, element in self.elements.items():
+            if element not in elements:
+                elements.append(element)
+        assert len(elements) == len(self.elements)
+        return elements
