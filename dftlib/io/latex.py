@@ -33,6 +33,8 @@ def generate_tikz_node(element, is_tle=False):
     label_node = ""
     if isinstance(element, dft_elements.DftVotingGate):
         label_node = "\\rotatebox{{270}}{{${}$}}".format(element.votingThreshold)
+    elif isinstance(element, dft_elements.DftSeq):
+        label_node = "$\\rightarrow$"
     s += "\\node[{}] ({}) at {} {{{}}};\n".format(node_type, name, position, label_node)
 
     # Add triangles for PAND or POR
@@ -70,7 +72,8 @@ def generate_tikz_edges(element):
         assert not element.outgoing
     else:
         assert element.is_gate()
-        assert len(element.outgoing) <= 6
+        no_children = len(element.outgoing)
+        assert no_children <= 6
         # Handle gate type
 
         i = 1
@@ -81,13 +84,23 @@ def generate_tikz_edges(element):
                 s += "\\draw[-]({}.input {}) -- ({}_label.north);\n".format(element.name, i, child.name)
                 i += 1
             elif isinstance(element, dft_elements.DftSpare):
-                s += "\\draw[-]({}.input {}) -- ({}_label.north);\n".format(element.name, SPARE_CHILDREN[i], child.name)
+                s += "\\draw[-]({}.{}) -- ({}_label.north);\n".format(element.name, SPARE_CHILDREN[i], child.name)
                 i += 1
             elif isinstance(element, dft_elements.DftDependency):
-                s += "\\draw[-]({}.input {}) -- ({}_label.north);\n".format(element.name, FDEP_CHILDREN[i], child.name)
+                s += "\\draw[-]({}.{}) -- ({}_label.north);\n".format(element.name, FDEP_CHILDREN[i], child.name)
                 i += 1
             elif isinstance(element, dft_elements.DftSeq):
-                s += "\\draw[-]({}.input {}) -- ({}_label.north);\n".format(element.name, i, child.name)
+                if no_children == 2:
+                    seq_children = {1: 250, 2: 290}
+                elif no_children == 3:
+                    seq_children = {1: 250, 2: 270, 3: 290}
+                elif no_children == 4:
+                    seq_children = {1: 250, 2: 265, 3: 275, 4: 290}
+                elif no_children == 5:
+                    seq_children = {1: 250, 2: 260, 3: 270, 4: 280, 5: 290}
+                else:
+                    raise DftTypeNotSupportedException("{} children (for element '{}') are currently not supported for tikz export.".format(no_children, element.name))
+                s += "\\draw[-]({}.{}) -- ({}_label.north);\n".format(element.name, seq_children[i], child.name)
                 i += 1
             else:
                 raise DftTypeNotKnownException("Type '{}' not known.".format(element.element_type))
