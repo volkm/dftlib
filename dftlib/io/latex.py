@@ -35,13 +35,13 @@ def generate_tikz_node(element, is_tle=False):
         label_node = "\\rotatebox{{270}}{{${}$}}".format(element.votingThreshold)
     elif isinstance(element, dft_elements.DftSeq):
         label_node = "$\\rightarrow$"
-    s += "\\node[{}] ({}) at {} {{{}}};\n".format(node_type, name, position, label_node)
+    s += "\t\\node[{}] ({}) at {} {{{}}};\n".format(node_type, name, position, label_node)
 
     # Add triangles for PAND or POR
     if isinstance(element, dft_elements.DftPand):
-        s += "\\node[triangle, scale = 1.62, yshift = -3.5, xscale = 0.80] (triangle_{0}) at({0}) {{}};\n".format(name)
+        s += "\t\\node[triangle, scale = 1.62, yshift = -3.5, xscale = 0.80] (triangle_{0}) at({0}) {{}};\n".format(name)
     elif isinstance(element, dft_elements.DftPor):
-        s += "\\node[btriangle, scale = 1.62, yscale = 0.915, xshift = -0.113cm] (triangle_{0}) at({0}) {{}};\n".format(name)
+        s += "\t\\node[btriangle, scale = 1.62, yscale = 0.915, xshift = -0.113cm] (triangle_{0}) at({0}) {{}};\n".format(name)
 
     # Add labelbox
     label_anchor = "north"
@@ -52,7 +52,7 @@ def generate_tikz_node(element, is_tle=False):
     label = name
     if is_tle:
         label = "\\underline{{{}}}".format(name)
-    s += "\\node[labelbox] ({0}_label) at ({0}.{1}) {{{2}}};\n".format(name, label_anchor, label)
+    s += "\t\\node[labelbox] ({0}_label) at ({0}.{1}) {{{2}}};\n".format(name, label_anchor, label)
 
     return s
 
@@ -81,13 +81,13 @@ def generate_tikz_edges(element):
             if isinstance(element, dft_elements.DftAnd) or isinstance(element, dft_elements.DftOr) \
                     or isinstance(element, dft_elements.DftVotingGate) or isinstance(element, dft_elements.DftPand) \
                     or isinstance(element, dft_elements.DftPor):
-                s += "\\draw[-]({}.input {}) -- ({}_label.north);\n".format(element.name, i, child.name)
+                s += "\t\\draw[-]({}.input {}) -- ({}_label.north);\n".format(element.name, i, child.name)
                 i += 1
             elif isinstance(element, dft_elements.DftSpare):
-                s += "\\draw[-]({}.{}) -- ({}_label.north);\n".format(element.name, SPARE_CHILDREN[i], child.name)
+                s += "\t\\draw[-]({}.{}) -- ({}_label.north);\n".format(element.name, SPARE_CHILDREN[i], child.name)
                 i += 1
             elif isinstance(element, dft_elements.DftDependency):
-                s += "\\draw[-]({}.{}) -- ({}_label.north);\n".format(element.name, FDEP_CHILDREN[i], child.name)
+                s += "\t\\draw[-]({}.{}) -- ({}_label.north);\n".format(element.name, FDEP_CHILDREN[i], child.name)
                 i += 1
             elif isinstance(element, dft_elements.DftSeq):
                 if no_children == 2:
@@ -100,7 +100,7 @@ def generate_tikz_edges(element):
                     seq_children = {1: 250, 2: 260, 3: 270, 4: 280, 5: 290}
                 else:
                     raise DftTypeNotSupportedException("{} children (for element '{}') are currently not supported for tikz export.".format(no_children, element.name))
-                s += "\\draw[-]({}.{}) -- ({}_label.north);\n".format(element.name, seq_children[i], child.name)
+                s += "\t\\draw[-]({}.{}) -- ({}_label.north);\n".format(element.name, seq_children[i], child.name)
                 i += 1
             else:
                 raise DftTypeNotKnownException("Type '{}' not known.".format(element.element_type))
@@ -123,6 +123,8 @@ def generate_tikz(dft, file):
         # Draw nodes
         for elem in elements:
             f.write(generate_tikz_node(elem, tle_id == elem.element_id))
+
+        f.write("\n")
 
         # Draw edges
         for elem in elements:
