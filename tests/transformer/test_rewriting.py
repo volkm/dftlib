@@ -13,7 +13,7 @@ def test_rewrite_small():
     assert no_dynamic == 0
     assert no_elements == 5
 
-    dftlib.transformer.rewriting.simplify_dft(dft)
+    dft = dftlib.transformer.rewriting.simplify_dft(dft)
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
     assert no_be == 2
     assert no_static == 1
