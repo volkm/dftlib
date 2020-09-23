@@ -68,6 +68,8 @@ def export_dft_galileo(dft, file):
                         out += " pdep={}".format(element.probability)
                 elif isinstance(element, dft_elements.DftSeq):
                     out += " seq"
+                elif isinstance(element, dft_elements.DftMutex):
+                    out += " mutex"
                 else:
                     raise DftTypeNotKnownException("Type '{}' not known.".format(element.element_type))
                 for child in element.outgoing:
