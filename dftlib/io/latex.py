@@ -33,15 +33,13 @@ def generate_tikz_node(element, is_tle=False):
     label_node = ""
     if isinstance(element, dft_elements.DftVotingGate):
         label_node = "\\rotatebox{{270}}{{${}$}}".format(element.votingThreshold)
-    elif isinstance(element, dft_elements.DftSeq):
-        label_node = "$\\rightarrow$"
     s += "\t\\node[{}] ({}) at {} {{{}}};\n".format(node_type, name, position, label_node)
 
     # Add triangles for PAND or POR
     if isinstance(element, dft_elements.DftPand):
-        s += "\t\\node[triangle, scale = 1.62, yshift = -3.5, xscale = 0.80] (triangle_{0}) at({0}) {{}};\n".format(name)
+        s += "\t\\node[triangle_pand] (triangle_{0}) at({0}) {{}};\n".format(name)
     elif isinstance(element, dft_elements.DftPor):
-        s += "\t\\node[btriangle, scale = 1.62, yscale = 0.915, xshift = -0.113cm] (triangle_{0}) at({0}) {{}};\n".format(name)
+        s += "\t\\node[triangle_por] (triangle_{0}) at({0}) {{}};\n".format(name)
 
     # Add labelbox
     label_anchor = "north"
