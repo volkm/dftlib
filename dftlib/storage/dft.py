@@ -23,11 +23,18 @@ class Dft:
         """
         # Parse nodes
         for node in json['nodes']:
+            if node['data']['type'] == "compound":
+                # Compound nodes are ignored
+                continue
             element = dft_elements.create_from_json(node)
-            self.add(element)
+            if element:
+                self.add(element)
 
         # Set children
         for node in json['nodes']:
+            if node['data']['type'] == "compound":
+                # Compound nodes are ignored
+                continue
             node_id = node['data']['id']
             element = self.get_element(int(node_id))
             if element.is_gate():
