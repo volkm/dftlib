@@ -5,7 +5,10 @@ import dftlib.storage.dft_elements as dft_elements
 def generate_tikz_node(element, is_tle=False):
     s = ""
     name = element.name
-    position = "({}, {})".format(element.position[0] / 75, -element.position[1] / 75)
+    # Set position information
+    pos_x, pos_y = element.position[0] / 75, -element.position[1] / 75
+    pos_x, pos_y = round(pos_x, 1), round(pos_y, 1)
+    position = "({}, {})".format(pos_x, pos_y)
 
     # Set node type
     if not element.is_be():
