@@ -44,7 +44,7 @@ def generate_tikz_node(element, is_tle=False):
     elif isinstance(element, dft_elements.DftPor):
         s += "\t\\node[triangle_por] (triangle_{0}) at({0}) {{}};\n".format(name)
 
-    # Add labelbox
+    # Add labelbox for all elements
     label_anchor = "north"
     if isinstance(element, dft_elements.DftAnd) or isinstance(element, dft_elements.DftOr) \
             or isinstance(element, dft_elements.DftVotingGate) or isinstance(element, dft_elements.DftPand) \
@@ -54,6 +54,15 @@ def generate_tikz_node(element, is_tle=False):
     if is_tle:
         label = "\\underline{{{}}}".format(name)
     s += "\t\\node[labelbox] ({0}_label) at ({0}.{1}) {{{2}}};\n".format(name, label_anchor, label)
+
+    # Add ratebox for BEs
+    if element.is_be() and element.rate > 0:
+        label = "\\ratelabel{{{0}}}{{{1}}}{{{2}}}".format(name, element.rate, element.rate * element.dorm)
+        s += "\t\\node[ratebox] ({0}_rate) at ({0}.south) {{{1}}};\n".format(name, label)
+
+    # Add probability for PDEP
+    if isinstance(element, dft_elements.DftDependency) and element.probability < 1:
+        s += "\t\\node[above=0cm of {0}.center] ({0}_p) {{${1}$}};\n".format(name, element.probability)
 
     return s
 
