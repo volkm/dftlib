@@ -1,7 +1,7 @@
-DFT Tool - Dynamic Fault Tree Analysis
-======================================
+dftlib - Python library for dynamic fault tree analysis
+=======================================================
 
 ### Authors:
 
-- Dustin Jungen
 - Matthias Volk
+- Dustin Jungen

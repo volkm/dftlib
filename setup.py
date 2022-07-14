@@ -19,12 +19,12 @@ class PyTest(test):
 
 setup(
     name='dftlib',
-    version='0.1',
+    version='0.5',
     author='M. Volk',
-    author_email='matthias.volk@cs.rwth-aachen.de',
+    author_email='m.volk@utwente.nl',
     maintainer='M. Volk',
-    maintainer_email='matthias.volk@cs.rwth-aachen.de',
-    url='http://moves.rwth-aachen.de',
+    maintainer_email='m.volk@utwente.nl',
+    url='https://github.com/volkm/dftlib',
     description='dftlib - Python library for dynamic fault tree analysis',
     long_description=long_description,
     long_description_content_type='text/markdown',
