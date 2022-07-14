@@ -36,29 +36,27 @@ def parse_dft_galileo(file):
     with tempfile.TemporaryDirectory() as tmp_dir_name:
         tmp_file = os.path.join(tmp_dir_name, 'tmp.json')
         storm.convert_to_json(file, tmp_file)
-        dft = parse_dft_json(tmp_file)
+        dft = parse_dft_jso_filen(tmp_file)
     return dft
 
-
-def parse_dft_json_string(string):
+def parse_dft_json(json_obj):
     """
-    Parse DFT from JSON string.
-    :param string: Json string.
+    Parse DFT from JSON object.
+    :param json_obj: JSON object.
     :return: DFT.
     """
-    dft = Dft(string)
-    return dft
+    return Dft(json_obj)
 
 
-def parse_dft_json(file):
+def parse_dft_json_file(file):
     """
     Parse DFT from JSON file.
     :param file: File.
     :return: DFT.
     """
     with open(file) as jsonFile:
-        json_string = json.load(jsonFile)
-    return parse_dft_json_string(json_string)
+        json_obj = json.load(jsonFile)
+    return parse_dft_json(json_obj)
 
 
 def parse_dft(file):
@@ -71,6 +69,6 @@ def parse_dft(file):
     if is_galileo_file(file):
         return parse_dft_galileo(file)
     elif is_json_file(file):
-        return parse_dft_json(file)
+        return parse_dft_json_file(file)
     else:
         raise DftInvalidArgumentException("File type of '{}' not known.".format(file))

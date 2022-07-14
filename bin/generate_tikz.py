@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
     # Read DFT file
     print("Reading {}".format(args.dft))
-    dft = dftlib.io.parser.parse_dft_json(args.dft)
+    dft = dftlib.io.parser.parse_dft_json_file(args.dft)
     print(dft)
 
     # Generate tikz file

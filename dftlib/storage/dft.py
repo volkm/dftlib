@@ -18,8 +18,8 @@ class Dft:
 
     def from_json(self, json):
         """
-        Initialize from Json.
-        :param json: Json string.
+        Initialize from JSON.
+        :param json: JSON object.
         """
         # Parse nodes
         for node in json['nodes']:

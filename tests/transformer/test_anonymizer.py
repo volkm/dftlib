@@ -6,7 +6,7 @@ import dftlib.transformer.anonymizer
 
 def test_anonymize_small():
     file = get_example_path("simplify", "small.json")
-    dft = dftlib.io.parser.parse_dft_json(file)
+    dft = dftlib.io.parser.parse_dft_json_file(file)
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
     assert no_be == 3
     assert no_static == 2
