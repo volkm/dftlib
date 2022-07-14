@@ -1,10 +1,10 @@
 import json
-import tempfile
 import os
+import tempfile
 
+from dftlib.exceptions.exceptions import DftInvalidArgumentException
 from dftlib.storage.dft import Dft
 from dftlib.tools.storm import Storm
-from dftlib.exceptions.exceptions import DftInvalidArgumentException
 
 
 def is_galileo_file(file):

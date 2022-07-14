@@ -1,10 +1,11 @@
+import math
 import os
 import re
-import math
 
 import dftlib._config as config
-from dftlib.utility.os_functions import run_tool
+
 from dftlib.exceptions.exceptions import ToolNotFound
+from dftlib.utility.os_functions import run_tool
 
 
 class Storm:

@@ -1,5 +1,3 @@
-from helpers.helper import get_example_path
-
 import dftlib.storage.dft as dfts
 
 

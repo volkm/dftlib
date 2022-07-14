@@ -1,9 +1,9 @@
-from helpers.helper import get_example_path
-
 import os
 
-import dftlib.io.parser
+from helpers.helper import get_example_path
+
 import dftlib.io.latex
+import dftlib.io.parser
 
 
 def test_export_tikz(tmpdir):

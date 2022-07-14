@@ -1,9 +1,8 @@
 import argparse
 
-import dftlib.io.parser
 import dftlib.io.export
+import dftlib.io.parser
 import dftlib.transformer.anonymizer
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Transform the given DFT into an anonymized DFT.')

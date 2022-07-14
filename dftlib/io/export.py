@@ -1,7 +1,7 @@
 import json
 
-from dftlib.exceptions.exceptions import DftTypeNotKnownException, DftInvalidArgumentException
 import dftlib.storage.dft_elements as dft_elements
+from dftlib.exceptions.exceptions import DftTypeNotKnownException, DftInvalidArgumentException
 
 
 def export_dft_json(dft, file):

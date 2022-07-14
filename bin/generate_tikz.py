@@ -1,7 +1,7 @@
 import argparse
 
-import dftlib.io.parser
 import dftlib.io.latex
+import dftlib.io.parser
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate tikz file visualizing the given DFT.')
@@ -17,4 +17,3 @@ if __name__ == "__main__":
 
     # Generate tikz file
     dftlib.io.latex.generate_tikz(dft, args.out)
-

@@ -1,7 +1,7 @@
 import argparse
 
-import dftlib.io.parser
 import dftlib.io.export
+import dftlib.io.parser
 import dftlib.transformer.rewriting
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 from helpers.helper import get_example_path
 
-import dftlib.io.parser
 import dftlib.io.export
+import dftlib.io.parser
 
 
 def test_load_json():

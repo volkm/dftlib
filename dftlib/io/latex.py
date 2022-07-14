@@ -1,5 +1,5 @@
-from dftlib.exceptions.exceptions import DftTypeNotKnownException, DftInvalidArgumentException, DftTypeNotSupportedException
 import dftlib.storage.dft_elements as dft_elements
+from dftlib.exceptions.exceptions import DftTypeNotKnownException, DftTypeNotSupportedException
 
 
 def generate_tikz_node(element, is_tle=False):
