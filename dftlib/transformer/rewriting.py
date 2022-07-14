@@ -106,7 +106,8 @@ def try_merge_bes_in_or(dft, or_gate):
 
     child_bes = []
     for child in or_gate.outgoing:
-        if child.is_be() and len(child.ingoing) <= 1 and child.dorm == 1 and not child.relevant:
+        # TODO: only applicable for BE with exponential failure distribution.
+        if child.is_be() and len(child.ingoing) <= 1 and not child.relevant:
             child_bes.append(child)
 
     if len(child_bes) <= 1:
@@ -114,14 +115,17 @@ def try_merge_bes_in_or(dft, or_gate):
 
     # Merge BEs into one
     first_child = child_bes[0]
+    passive_rate = first_child.dorm * first_child.rate
     for element in child_bes[1:]:
         first_child.name += "_{}".format(element.name)
+        # Update rates
         first_child.rate += element.rate
-        # TODO: combine dormancy factors as well
+        passive_rate += element.dorm * element.rate
         dft.remove(element)
         # Add removed element to transformer
         transformer.addBe()
 
+    first_child.dorm = passive_rate / first_child.rate
     return True
 
 
