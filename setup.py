@@ -35,7 +35,7 @@ setup(
     zip_safe=False,
     install_requires=[],
     extras_require={
-        'with_smt': ['z3'],
+        'with_smt': ['z3-solver'],
         'with_stormpy': ['stormpy']
     },
     setup_requires=['pytest-runner'],
