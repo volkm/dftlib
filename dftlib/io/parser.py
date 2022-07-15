@@ -1,10 +1,8 @@
 import json
-import os
-import tempfile
 
+import dftlib.tools.stormpy as stormpy
 from dftlib.exceptions.exceptions import DftInvalidArgumentException
 from dftlib.storage.dft import Dft
-from dftlib.tools.storm import Storm
 
 
 def is_galileo_file(file):
@@ -31,13 +29,10 @@ def parse_dft_galileo(file):
     :param file: File.
     :return: DFT.
     """
-    storm = Storm()
+    # Generate JSON format by converting from Galileo file
+    json_obj = stormpy.convert_to_json(file)
+    return parse_dft_json(json.loads(json_obj))
 
-    with tempfile.TemporaryDirectory() as tmp_dir_name:
-        tmp_file = os.path.join(tmp_dir_name, 'tmp.json')
-        storm.convert_to_json(file, tmp_file)
-        dft = parse_dft_jso_filen(tmp_file)
-    return dft
 
 def parse_dft_json(json_obj):
     """
