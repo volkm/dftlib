@@ -32,6 +32,8 @@ if __name__ == "__main__":
 
         no_elements_after = len(dft.elements)
         changed = (no_elements_before != no_elements_after)
+    print("Simplified DFT")
+    print(dft)
 
     # Save DFT again
     dftlib.io.export.export_dft_json(dft, args.out)

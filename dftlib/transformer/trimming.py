@@ -36,8 +36,6 @@ def trim(dft):
     assert len(unused) == len(dft.elements) - len(visited)
 
     # Remove unused elements
-    print("Removing {} unnecessary elements.".format(len(unused)))
-
     for element_id, element in unused.items():
         if not element.relevant:
             dft.remove(element)
