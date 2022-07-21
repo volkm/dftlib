@@ -1,0 +1,188 @@
+{
+    "toplevel": 7,
+    "nodes": [
+        {
+            "data": {
+                "distribution": "const",
+                "failed": true,
+                "id": "0",
+                "name": "A",
+                "type": "be",
+                "label": "A"
+            },
+            "position": {
+                "x": 22,
+                "y": 173.65000000000003
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        },
+        {
+            "data": {
+                "distribution": "const",
+                "failed": false,
+                "id": "1",
+                "name": "B",
+                "type": "be",
+                "label": "B"
+            },
+            "position": {
+                "x": 116,
+                "y": 173.65000000000003
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        },
+        {
+            "data": {
+                "distribution": "probability",
+                "dorm": "1",
+                "id": "2",
+                "name": "C",
+                "prob": "0.4",
+                "type": "be",
+                "label": "C"
+            },
+            "position": {
+                "x": 210,
+                "y": 173.65000000000003
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        },
+        {
+            "data": {
+                "distribution": "exponential",
+                "dorm": "1",
+                "id": "3",
+                "name": "D",
+                "rate": "4",
+                "transient": false,
+                "type": "be",
+                "label": "D"
+            },
+            "position": {
+                "x": 304,
+                "y": 173.65000000000003
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "distribution": "erlang",
+                "dorm": "1",
+                "id": "4",
+                "name": "E",
+                "phases": 3,
+                "rate": "4",
+                "type": "be",
+                "label": "E"
+            },
+            "position": {
+                "x": 398,
+                "y": 173.65000000000003
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        },
+        {
+            "data": {
+                "distribution": "lognormal",
+                "id": "5",
+                "mean": "0.5",
+                "name": "F",
+                "stddev": "1",
+                "type": "be",
+                "label": "F"
+            },
+            "position": {
+                "x": 492,
+                "y": 173.65000000000003
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        },
+        {
+            "data": {
+                "distribution": "weibull",
+                "id": "6",
+                "name": "G",
+                "rate": "4",
+                "shape": "4",
+                "type": "be",
+                "label": "G"
+            },
+            "position": {
+                "x": 586,
+                "y": 173.65000000000003
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        },
+        {
+            "data": {
+                "children": [
+                    "0",
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                    "6"
+                ],
+                "voting": "3",
+                "id": "7",
+                "name": "T",
+                "type": "vot",
+                "label": "T (3/7)"
+            },
+            "position": {
+                "x": 304,
+                "y": 46.82500000000002
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "vot toplevel"
+        }
+    ]
+}

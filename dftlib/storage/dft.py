@@ -1,5 +1,7 @@
-import dftlib.storage.dft_elements as dft_elements
+import dftlib.storage.dft_be as dft_be
+import dftlib.storage.dft_gates as dft_gates
 from dftlib.exceptions.exceptions import DftInvalidArgumentException
+from dftlib.storage.dft_element import DftElement
 
 
 class Dft:
@@ -23,12 +25,14 @@ class Dft:
         """
         # Parse nodes
         for node in json['nodes']:
-            if node['data']['type'] == "compound":
+            element_type = node['data']['type']
+            if element_type == "compound":
                 # Compound nodes are ignored
                 continue
-            element = dft_elements.create_from_json(node)
-            if element:
-                self.add(element)
+            elif element_type == "be" or element_type == "be_exp":
+                self.add(dft_be.create_from_json(node))
+            else:
+                self.add(dft_gates.create_from_json(node))
 
         # Set children
         for node in json['nodes']:
@@ -88,7 +92,7 @@ class Dft:
         Add element.
         :param element: Element.
         """
-        assert isinstance(element, dft_elements.DftElement)
+        assert isinstance(element, DftElement)
         assert element.element_id not in self.elements
         self.elements[element.element_id] = element
         self.max_id = max(self.max_id, element.element_id)
@@ -143,8 +147,7 @@ class Dft:
         no_dynamic = 0
         for (_, element) in self.elements.items():
             if element.is_be():
-                if element.rate != "0" and element.rate != "0.0":
-                    no_be += 1
+                no_be += 1
             else:
                 assert element.is_gate()
                 if element.is_dynamic():

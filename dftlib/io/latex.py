@@ -1,4 +1,4 @@
-import dftlib.storage.dft_elements as dft_elements
+import dftlib.storage.dft_gates as dft_gates
 from dftlib.exceptions.exceptions import DftTypeNotKnownException, DftTypeNotSupportedException
 
 
@@ -19,38 +19,38 @@ def generate_tikz_node(element, is_tle=False):
 
     if element.is_be():
         node_type = "be"
-    elif isinstance(element, dft_elements.DftAnd) or isinstance(element, dft_elements.DftVotingGate) or isinstance(element, dft_elements.DftPand):
+    elif isinstance(element, dft_gates.DftAnd) or isinstance(element, dft_gates.DftVotingGate) or isinstance(element, dft_gates.DftPand):
         node_type = "and" + no_children
-    elif isinstance(element, dft_elements.DftOr) or isinstance(element, dft_elements.DftPor):
+    elif isinstance(element, dft_gates.DftOr) or isinstance(element, dft_gates.DftPor):
         node_type = "or" + no_children
-    elif isinstance(element, dft_elements.DftSpare):
+    elif isinstance(element, dft_gates.DftSpare):
         node_type = "spare"
-    elif isinstance(element, dft_elements.DftDependency):
+    elif isinstance(element, dft_gates.DftDependency):
         node_type = "fdep"
-    elif isinstance(element, dft_elements.DftSeq):
+    elif isinstance(element, dft_gates.DftSeq):
         node_type = "seq"
-    elif isinstance(element, dft_elements.DftMutex):
+    elif isinstance(element, dft_gates.DftMutex):
         node_type = "mutex"
     else:
         raise DftTypeNotKnownException("Type '{}' not known.".format(element.element_type))
 
     # Add node
     label_node = ""
-    if isinstance(element, dft_elements.DftVotingGate):
+    if isinstance(element, dft_gates.DftVotingGate):
         label_node = "\\rotatebox{{270}}{{${}$}}".format(element.voting_threshold)
     s += "\t\\node[{}] ({}) at {} {{{}}};\n".format(node_type, name, position, label_node)
 
     # Add triangles for PAND or POR
-    if isinstance(element, dft_elements.DftPand):
+    if isinstance(element, dft_gates.DftPand):
         s += "\t\\node[triangle_pand] (triangle_{0}) at({0}) {{}};\n".format(name)
-    elif isinstance(element, dft_elements.DftPor):
+    elif isinstance(element, dft_gates.DftPor):
         s += "\t\\node[triangle_por] (triangle_{0}) at({0}) {{}};\n".format(name)
 
     # Add labelbox for all elements
     label_anchor = "north"
-    if isinstance(element, dft_elements.DftAnd) or isinstance(element, dft_elements.DftOr) \
-            or isinstance(element, dft_elements.DftVotingGate) or isinstance(element, dft_elements.DftPand) \
-            or isinstance(element, dft_elements.DftPor):
+    if isinstance(element, dft_gates.DftAnd) or isinstance(element, dft_gates.DftOr) or isinstance(element, dft_gates.DftVotingGate) or isinstance(element,
+                                                                                                                                                   dft_gates.DftPand) or isinstance(
+        element, dft_gates.DftPor):
         label_anchor = "east"
     label = name
     if is_tle:
@@ -63,7 +63,7 @@ def generate_tikz_node(element, is_tle=False):
         s += "\t\\node[ratebox] ({0}_rate) at ({0}.south) {{{1}}};\n".format(name, label)
 
     # Add probability for PDEP
-    if isinstance(element, dft_elements.DftDependency) and element.probability < 1:
+    if isinstance(element, dft_gates.DftDependency) and element.probability < 1:
         s += "\t\\node[above=0cm of {0}.center] ({0}_p) {{${1}$}};\n".format(name, element.probability)
 
     return s
@@ -90,18 +90,18 @@ def generate_tikz_edges(element):
 
         i = 1
         for child in element.outgoing:
-            if isinstance(element, dft_elements.DftAnd) or isinstance(element, dft_elements.DftOr) \
-                    or isinstance(element, dft_elements.DftVotingGate) or isinstance(element, dft_elements.DftPand) \
-                    or isinstance(element, dft_elements.DftPor):
+            if isinstance(element, dft_gates.DftAnd) or isinstance(element, dft_gates.DftOr) \
+                    or isinstance(element, dft_gates.DftVotingGate) or isinstance(element, dft_gates.DftPand) \
+                    or isinstance(element, dft_gates.DftPor):
                 s += "\t\\draw[-]({}.input {}) -- ({}_label.north);\n".format(element.name, i, child.name)
                 i += 1
-            elif isinstance(element, dft_elements.DftSpare):
+            elif isinstance(element, dft_gates.DftSpare):
                 s += "\t\\draw[-]({}.{}) -- ({}_label.north);\n".format(element.name, SPARE_CHILDREN[i], child.name)
                 i += 1
-            elif isinstance(element, dft_elements.DftDependency):
+            elif isinstance(element, dft_gates.DftDependency):
                 s += "\t\\draw[-]({}.{}) -- ({}_label.north);\n".format(element.name, FDEP_CHILDREN[i], child.name)
                 i += 1
-            elif isinstance(element, dft_elements.DftSeq) or isinstance(element, dft_elements.DftMutex):
+            elif isinstance(element, dft_gates.DftSeq) or isinstance(element, dft_gates.DftMutex):
                 if no_children == 2:
                     seq_children = {1: 250, 2: 290}
                 elif no_children == 3:

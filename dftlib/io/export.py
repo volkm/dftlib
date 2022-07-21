@@ -1,6 +1,6 @@
 import json
 
-import dftlib.storage.dft_elements as dft_elements
+import dftlib.storage.dft_gates as dft_gates
 from dftlib.exceptions.exceptions import DftTypeNotKnownException, DftInvalidArgumentException
 
 
@@ -48,27 +48,27 @@ def export_dft_galileo(dft, file):
             else:
                 assert element.is_gate()
                 # Handle gate type
-                if isinstance(element, dft_elements.DftAnd):
+                if isinstance(element, dft_gates.DftAnd):
                     out += " and"
-                elif isinstance(element, dft_elements.DftOr):
+                elif isinstance(element, dft_gates.DftOr):
                     out += " or"
-                elif isinstance(element, dft_elements.DftVotingGate):
+                elif isinstance(element, dft_gates.DftVotingGate):
                     out += " vot{}".format(element.voting_threshold)
-                elif isinstance(element, dft_elements.DftPand):
+                elif isinstance(element, dft_gates.DftPand):
                     out += " pand" + ("" if element.inclusive else "excl")
-                elif isinstance(element, dft_elements.DftPor):
+                elif isinstance(element, dft_gates.DftPor):
                     out += " por" + ("" if element.inclusive else "excl")
-                elif isinstance(element, dft_elements.DftSpare):
+                elif isinstance(element, dft_gates.DftSpare):
                     assert element.element_type == "spare"
                     out += " wsp"
-                elif isinstance(element, dft_elements.DftDependency):
+                elif isinstance(element, dft_gates.DftDependency):
                     if element.probability == 1:
                         out += " fdep"
                     else:
                         out += " pdep={}".format(element.probability)
-                elif isinstance(element, dft_elements.DftSeq):
+                elif isinstance(element, dft_gates.DftSeq):
                     out += " seq"
-                elif isinstance(element, dft_elements.DftMutex):
+                elif isinstance(element, dft_gates.DftMutex):
                     out += " mutex"
                 else:
                     raise DftTypeNotKnownException("Type '{}' not known.".format(element.element_type))

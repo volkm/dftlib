@@ -3,6 +3,7 @@ from helpers.helper import get_example_path
 
 import dftlib.io.export
 import dftlib.io.parser
+import dftlib.storage.dft_be as dft_be
 
 
 def test_load_json():
@@ -34,3 +35,20 @@ def test_all_gates_types():
     assert no_static == 5
     assert no_dynamic == 18
     assert no_elements == 42
+
+
+def test_all_be_types():
+    file = get_example_path("json", "all_be_distributions.json")
+    dft = dftlib.io.parser.parse_dft_json_file(file)
+    no_be, no_static, no_dynamic, no_elements = dft.statistics()
+    assert no_be == 7
+    assert no_static == 1
+    assert no_dynamic == 0
+    assert no_elements == 8
+    assert isinstance(dft.get_element_by_name("A"), dft_be.BeConstant)
+    assert isinstance(dft.get_element_by_name("B"), dft_be.BeConstant)
+    assert isinstance(dft.get_element_by_name("C"), dft_be.BeProbability)
+    assert isinstance(dft.get_element_by_name("D"), dft_be.BeExponential)
+    assert isinstance(dft.get_element_by_name("E"), dft_be.BeErlang)
+    assert isinstance(dft.get_element_by_name("F"), dft_be.BeLognormal)
+    assert isinstance(dft.get_element_by_name("G"), dft_be.BeWeibull)
