@@ -184,11 +184,11 @@ class DftPriorityGate(DftGate):
 
     def get_json(self):
         json = DftGate.get_json(self)
-        json['data']['inclusive'] = str(self.inclusive())
+        json['data']['inclusive'] = self.inclusive
         return json
 
     def __str__(self):
-        return super().__str__() + ", {}".format("inclusive" if self.inclusive() else "exclusive")
+        return super().__str__() + ", {}".format("inclusive" if self.inclusive else "exclusive")
 
     def compare(self, other):
         if not super().compare(other):

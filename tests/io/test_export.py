@@ -42,3 +42,25 @@ def test_export_galileo(tmpdir):
     tmp_file = open(tmp_path, 'r').read().splitlines()
     for i in range(0, len(tmp_file)):
         assert tmp_file[i] == expected_lines[i]
+
+
+def test_export_json_all_gates(tmpdir):
+    file = get_example_path("json", "all_gates.json")
+    dft = dftlib.io.parser.parse_dft_json_file(file)
+
+    tmp_path = os.path.join(tmpdir, "all_gates.json")
+    dftlib.io.export.export_dft_json(dft, tmp_path)
+    dft2 = dftlib.io.parser.parse_dft_json_file(tmp_path)
+
+    assert dft.compare(dft2)
+
+
+def test_export_json_all_be(tmpdir):
+    file = get_example_path("json", "all_be_distributions.json")
+    dft = dftlib.io.parser.parse_dft_json_file(file)
+
+    tmp_path = os.path.join(tmpdir, "all_be_distributions.json")
+    dftlib.io.export.export_dft_json(dft, tmp_path)
+    dft2 = dftlib.io.parser.parse_dft_json_file(tmp_path)
+
+    assert dft.compare(dft2)

@@ -71,7 +71,7 @@ class DftBe(DftElement):
 
     def get_json(self):
         json = DftElement.get_json(self)
-        json['distribution'] = self.distribution
+        json['data']['distribution'] = self.distribution
         return json
 
     def compare(self, other):
@@ -91,7 +91,7 @@ class BeConstant(DftBe):
 
     def get_json(self):
         json = DftBe.get_json(self)
-        json['data']['failed'] = str(self.failed)
+        json['data']['failed'] = self.failed
         return json
 
     def __str__(self):
@@ -117,7 +117,7 @@ class BeProbability(DftBe):
 
     def get_json(self):
         json = DftBe.get_json(self)
-        json['data']['probability'] = str(self.probability)
+        json['data']['prob'] = str(self.probability)
         json['data']['dorm'] = str(self.dorm)
         return json
 
