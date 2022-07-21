@@ -370,9 +370,10 @@ def try_elim_fdeps_with_new_or(dft, fdep):
             return False
 
     # Check if B has some dynamic elements in the predecessor closure
-    for dyn in dft.get_dynamics():
-        if dependent in dyn.outgoing:
-            return False
+    for (_, element) in dft.elements.items():
+        if element.is_dynamic():
+            if dependent in element.outgoing:
+                return False
 
     # Check if B has only one predecessor
     if (len(dependent.ingoing) - 1) != 1:
@@ -585,7 +586,7 @@ def simplify_dft(dft, rules=["1", "2", "3", "4", "5", "6", "7"]):
 
 
 def prepareTransformer(dft):
-    transformer.setNumberOfElements(dft.size_elements())
+    transformer.setNumberOfElements(dft.size())
     staticNum = transformer.sumStatic()
     dynamicNum = transformer.sumDynamic()
     beNum = transformer.sumBEs()
@@ -626,13 +627,13 @@ def prepareTransformer(dft):
             simpLogger.add_message(Message('Info', 'Added {} OR Gates while simplifying.'.format(transformer.getOrsAdd())))
 
     # Check for percentage of optimisation
-    simpLogger.add_message(Message('Debug', 'Alt: {} Neu: {}'.format(transformer.getNumberOfElements(), dft.size_elements())))
-    count = transformer.getNumberOfElements() - dft.size_elements()
+    simpLogger.add_message(Message('Debug', 'Alt: {} Neu: {}'.format(transformer.getNumberOfElements(), dft.size())))
+    count = transformer.getNumberOfElements() - dft.size()
     if count == 1:
-        simpLogger.add_message(Message('Info', 'Optimisation removes 1 Element (-{}%).'.format(transformer.getPercentage(dft.size_elements()))))
+        simpLogger.add_message(Message('Info', 'Optimisation removes 1 Element (-{}%).'.format(transformer.getPercentage(dft.size()))))
     elif count == -1:
-        simpLogger.add_message(Message('Info', 'Optimisation adds 1 Element (+{}%).'.format(transformer.getPercentage(dft.size_elements()))))
+        simpLogger.add_message(Message('Info', 'Optimisation adds 1 Element (+{}%).'.format(transformer.getPercentage(dft.size()))))
     elif count < -1:
-        simpLogger.add_message(Message('Info', 'Optimisation adds {} Elements (+{}%).'.format(count * -1, transformer.getPercentage(dft.size_elements()))))
+        simpLogger.add_message(Message('Info', 'Optimisation adds {} Elements (+{}%).'.format(count * -1, transformer.getPercentage(dft.size()))))
     else:
-        simpLogger.add_message(Message('Info', 'Optimisation removes {} Elements (-{}%).'.format(count, transformer.getPercentage(dft.size_elements()))))
+        simpLogger.add_message(Message('Info', 'Optimisation removes {} Elements (-{}%).'.format(count, transformer.getPercentage(dft.size()))))

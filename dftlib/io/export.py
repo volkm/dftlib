@@ -53,11 +53,11 @@ def export_dft_galileo(dft, file):
                 elif isinstance(element, dft_elements.DftOr):
                     out += " or"
                 elif isinstance(element, dft_elements.DftVotingGate):
-                    out += " vot{}".format(element.votingThreshold)
+                    out += " vot{}".format(element.voting_threshold)
                 elif isinstance(element, dft_elements.DftPand):
-                    out += " pand"
+                    out += " pand" + ("" if element.inclusive else "excl")
                 elif isinstance(element, dft_elements.DftPor):
-                    out += " por"
+                    out += " por" + ("" if element.inclusive else "excl")
                 elif isinstance(element, dft_elements.DftSpare):
                     assert element.element_type == "spare"
                     out += " wsp"

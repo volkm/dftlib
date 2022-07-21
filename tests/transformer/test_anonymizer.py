@@ -12,7 +12,7 @@ def test_anonymize_small():
     assert no_static == 2
     assert no_dynamic == 0
     assert no_elements == 5
-    assert dft.size_elements() == 5
+    assert dft.size() == 5
     names = ["A", "B", "C", "D", "E"]
     for i in range(0, 5):
         assert dft.get_element(i).name == names[i]
@@ -23,6 +23,6 @@ def test_anonymize_small():
     assert no_static == 2
     assert no_dynamic == 0
     assert no_elements == 5
-    assert dft.size_elements() == 5
+    assert dft.size() == 5
     for i in range(0, 5):
         assert dft.get_element(i).name == "A" + str(i)

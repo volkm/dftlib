@@ -29,13 +29,15 @@ def generate_tikz_node(element, is_tle=False):
         node_type = "fdep"
     elif isinstance(element, dft_elements.DftSeq):
         node_type = "seq"
+    elif isinstance(element, dft_elements.DftMutex):
+        node_type = "mutex"
     else:
         raise DftTypeNotKnownException("Type '{}' not known.".format(element.element_type))
 
     # Add node
     label_node = ""
     if isinstance(element, dft_elements.DftVotingGate):
-        label_node = "\\rotatebox{{270}}{{${}$}}".format(element.votingThreshold)
+        label_node = "\\rotatebox{{270}}{{${}$}}".format(element.voting_threshold)
     s += "\t\\node[{}] ({}) at {} {{{}}};\n".format(node_type, name, position, label_node)
 
     # Add triangles for PAND or POR
@@ -99,7 +101,7 @@ def generate_tikz_edges(element):
             elif isinstance(element, dft_elements.DftDependency):
                 s += "\t\\draw[-]({}.{}) -- ({}_label.north);\n".format(element.name, FDEP_CHILDREN[i], child.name)
                 i += 1
-            elif isinstance(element, dft_elements.DftSeq):
+            elif isinstance(element, dft_elements.DftSeq) or isinstance(element, dft_elements.DftMutex):
                 if no_children == 2:
                     seq_children = {1: 250, 2: 290}
                 elif no_children == 3:

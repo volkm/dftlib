@@ -4,6 +4,7 @@ from dftlib.exceptions.exceptions import DftTypeNotKnownException
 def create_from_json(json):
     """
     Create DFT element from JSON string.
+    Possible children are ignored and must be explicitly set afterwards.
     :param json: JSON string.
     :return: DFT element.
     """
@@ -35,6 +36,7 @@ def create_from_json(json):
         element = DftOr(element_id, name, [], position)
     elif element_type == "vot":
         # VOTing gate
+        assert 'voting' in data
         threshold = int(data['voting'])
         element = DftVotingGate(element_id, name, threshold, [], position)
     elif element_type == "fdep":
@@ -47,10 +49,18 @@ def create_from_json(json):
         element = DftDependency(element_id, name, prob, [], position)
     elif element_type == "pand":
         # PAND
-        element = DftPand(element_id, name, [], position)
+        if 'inclusive' in data:
+            inclusive = bool(data['inclusive'])
+        else:
+            inclusive = True
+        element = DftPand(element_id, name, inclusive, [], position)
     elif element_type == "por":
         # POR
-        element = DftPor(element_id, name, [], position)
+        if 'inclusive' in data:
+            inclusive = bool(data['inclusive'])
+        else:
+            inclusive = True
+        element = DftPor(element_id, name, inclusive, [], position)
     elif element_type == "spare":
         # SPARE
         element = DftSpare(element_id, name, [], position)
@@ -80,7 +90,6 @@ class DftElement:
         self.position = position
         self.ingoing = []
         self.outgoing = []
-        self.isDynamic = False
         self.relevant = False
 
     def is_dynamic(self):
@@ -88,7 +97,7 @@ class DftElement:
         Get whether the element is dynamic.
         :return: True iff element is dynamic.
         """
-        return self.isDynamic
+        return self.element_type not in ["and", "or", "vot"]
 
     def is_be(self):
         """
@@ -153,18 +162,7 @@ class DftElement:
             # raise Exception("Ids are not equal: {} and {}".format(self.element_id, other.element_id))
             return False
         if self.element_type != other.element_type:
-            # raise Exception(
-            #    "Element types are not equal for {}: {} and {}".format(self, self.element_type, other.element_type))
-            return False
-        list_outgoing = [elem.element_id for elem in other.outgoing]
-        for element in self.outgoing:
-            if element.element_id in list_outgoing:
-                list_outgoing.remove(element.element_id)
-            else:
-                # raise Exception("Element {} is not contained in other for {}.".format(element, self))
-                return False
-        if len(list_outgoing) > 0:
-            # raise Exception("Some elements are not contained in {}.".format(self))
+            # raise Exception("Element types are not equal for {}: {} and {}".format(self, self.element_type, other.element_type))
             return False
 
         return True
@@ -199,13 +197,11 @@ class DftBe(DftElement):
         return s
 
     def compare(self, other):
-        if not super(DftBe, self).compare(other):
+        if not super().compare(other):
             return False
         if self.rate != other.rate:
-            # raise Exception("Rates are different {} and {} for {}".format(self.rate, other.rate, self))
             return False
         if self.dorm != other.dorm:
-            # raise Exception("Dormancy factors are different {} and {} for {}".format(self.dorm, other.dorm, self))
             return False
         if self.repair != other.repair:
             return False
@@ -247,20 +243,24 @@ class DftGate(DftElement):
         :param other: Other gate.
         :return: True iff both gates have the same successors.
         """
-        if self.element_id == other.element_id:
-            return True
-        if self.element_type != other.element_type:
-            return False
         list_outgoing = [elem.element_id for elem in other.outgoing]
         for element in self.outgoing:
             if element.element_id in list_outgoing:
                 list_outgoing.remove(element.element_id)
             else:
+                # Found successor of self which is not present in other
                 return False
         if len(list_outgoing) > 0:
+            # Some successors of other are not present in self
             return False
 
         return True
+
+    def compare(self, other):
+        if not super().compare(other):
+            return False
+
+        return self.compare_successors(other)
 
     def get_json(self):
         json = DftElement.get_json(self)
@@ -296,45 +296,61 @@ class DftVotingGate(DftGate):
 
     def __init__(self, element_id, name, voting_threshold, children, position):
         DftGate.__init__(self, element_id, name, "vot", children, position)
-        self.votingThreshold = int(voting_threshold)
+        self.voting_threshold = int(voting_threshold)
 
     def get_json(self):
         json = DftGate.get_json(self)
-        json['data']['voting'] = str(self.votingThreshold)
+        json['data']['voting'] = str(self.voting_threshold)
         return json
 
     def __str__(self):
-        return super().__str__() + ", threshold: {}".format(self.votingThreshold)
+        return super().__str__() + ", threshold: {}".format(self.voting_threshold)
 
     def compare(self, other):
-        if not super(DftVotingGate, self).compare(other):
+        if not super().compare(other):
             return False
-        if self.votingThreshold != other.votingThreshold:
-            # raise Exception(
-            #    "Threshold are different {} and {} for {}".format(self.votingThreshold, other.votingThreshold, self))
+        return self.voting_threshold == other.voting_threshold
+
+
+class DftPriorityGate(DftGate):
+    """
+    Abstract class for priority gates.
+    """
+
+    def __init__(self, element_id, name, element_type, inclusive, children, position):
+        DftGate.__init__(self, element_id, name, element_type, children, position)
+        self.inclusive = inclusive
+
+    def get_json(self):
+        json = DftGate.get_json(self)
+        json['data']['inclusive'] = str(self.inclusive())
+        return json
+
+    def __str__(self):
+        return super().__str__() + ", {}".format("inclusive" if self.inclusive() else "exclusive")
+
+    def compare(self, other):
+        if not super().compare(other):
             return False
+        return self.inclusive == other.inclusive
 
-        return True
 
-
-class DftPand(DftGate):
+class DftPand(DftPriorityGate):
     """
     Priority AND gate (PAND).
     """
 
-    def __init__(self, element_id, name, children, position):
-        DftGate.__init__(self, element_id, name, "pand", children, position)
-        self.isDynamic = True
+    def __init__(self, element_id, name, inclusive, children, position):
+        DftPriorityGate.__init__(self, element_id, name, "pand", inclusive, children, position)
 
 
-class DftPor(DftGate):
+class DftPor(DftPriorityGate):
     """
     Priority OR gate (POR).
     """
 
-    def __init__(self, element_id, name, children, position):
-        DftGate.__init__(self, element_id, name, "por", children, position)
-        self.isDynamic = True
+    def __init__(self, element_id, name, inclusive, children, position):
+        DftPriorityGate.__init__(self, element_id, name, "por", inclusive, children, position)
 
 
 class DftSpare(DftGate):
@@ -344,7 +360,6 @@ class DftSpare(DftGate):
 
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "spare", children, position)
-        self.isDynamic = True
 
 
 class DftDependency(DftGate):
@@ -353,11 +368,8 @@ class DftDependency(DftGate):
     """
 
     def __init__(self, element_id, name, probability, children, position):
-        self.trigger = None
-        self.dependent = []
         DftGate.__init__(self, element_id, name, "fdep" if probability == 1 else "pdep", children, position)
         self.probability = probability
-        self.isDynamic = True
 
     def get_json(self):
         json = DftGate.get_json(self)
@@ -365,28 +377,22 @@ class DftDependency(DftGate):
             json['data']['probability'] = str(self.probability)
         return json
 
-    def add_child(self, element):
-        if self.trigger is None:
-            self.trigger = element
+    def get_trigger(self):
+        if self.outgoing:
+            return self.outgoing[0]
         else:
-            self.dependent.append(element)
+            return None
 
-        self.outgoing.append(element)
-        element.ingoing.append(self)
+    def get_dependent(self):
+        return self.outgoing[1:]
 
-    def remove_last_dep(self):
-        """
-        Remove the last dependency.
-        :return: True iff removal was successful.
-        """
-        if len(self.dependent) > 1:
-            self.dependent.pop()
-            return True
-        else:
+    def compare(self, other):
+        if not super().compare(other):
             return False
+        return self.probability == other.probability
 
     def __str__(self):
-        return super().__str__() + ", trigger: {} , first dependent element: {}".format(self.trigger.element_id, self.dependent[0].element_id)
+        return super().__str__() + (", probability: {}".format(self.probability) if self.probability != 1 else "")
 
 
 class DftSeq(DftGate):
@@ -396,7 +402,6 @@ class DftSeq(DftGate):
 
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "seq", children, position)
-        self.isDynamic = True
 
 
 class DftMutex(DftGate):
@@ -406,4 +411,3 @@ class DftMutex(DftGate):
 
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "mutex", children, position)
-        self.isDynamic = True

@@ -1,0 +1,1014 @@
+{
+    "toplevel": 37,
+    "nodes": [
+        {
+            "data": {
+                "distribution": "exponential",
+                "dorm": "1",
+                "id": "0",
+                "name": "K",
+                "rate": "2",
+                "transient": false,
+                "type": "be_exp",
+                "label": "K"
+            },
+            "position": {
+                "x": 22,
+                "y": 442.95
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "distribution": "exponential",
+                "dorm": "1",
+                "id": "1",
+                "name": "L",
+                "rate": "2",
+                "transient": false,
+                "type": "be_exp",
+                "label": "L"
+            },
+            "position": {
+                "x": 286,
+                "y": 442.95
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "distribution": "exponential",
+                "dorm": "1",
+                "id": "2",
+                "name": "M",
+                "rate": "2",
+                "transient": false,
+                "type": "be_exp",
+                "label": "M"
+            },
+            "position": {
+                "x": 550,
+                "y": 442.95
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "children": [
+                    "0",
+                    "1",
+                    "2"
+                ],
+                "id": "3",
+                "name": "A1",
+                "type": "pand",
+                "label": "A1"
+            },
+            "position": {
+                "x": 32,
+                "y": 320.625
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "pand"
+        },
+        {
+            "data": {
+                "children": [
+                    "0",
+                    "1",
+                    "2"
+                ],
+                "id": "4",
+                "inclusive": true,
+                "name": "A2",
+                "type": "pand",
+                "label": "A2"
+            },
+            "position": {
+                "x": 134,
+                "y": 320.625
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "pand"
+        },
+        {
+            "data": {
+                "children": [
+                    "0",
+                    "1",
+                    "2"
+                ],
+                "id": "5",
+                "inclusive": true,
+                "name": "A3",
+                "type": "pand",
+                "label": "A3"
+            },
+            "position": {
+                "x": 236,
+                "y": 320.625
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "pand"
+        },
+        {
+            "data": {
+                "children": [
+                    "0",
+                    "1",
+                    "2"
+                ],
+                "id": "6",
+                "inclusive": false,
+                "name": "A4",
+                "type": "pand",
+                "label": "A4"
+            },
+            "position": {
+                "x": 338,
+                "y": 320.625
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "pand"
+        },
+        {
+            "data": {
+                "children": [
+                    "0",
+                    "1",
+                    "2"
+                ],
+                "id": "7",
+                "inclusive": false,
+                "name": "A5",
+                "type": "pand",
+                "label": "A5"
+            },
+            "position": {
+                "x": 440,
+                "y": 320.625
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "pand"
+        },
+        {
+            "data": {
+                "children": [
+                    "3",
+                    "4",
+                    "5",
+                    "6",
+                    "7"
+                ],
+                "id": "8",
+                "name": "Pand",
+                "type": "or",
+                "label": "Pand"
+            },
+            "position": {
+                "x": 231,
+                "y": 185.97499999999997
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "or"
+        },
+        {
+            "data": {
+                "distribution": "exponential",
+                "dorm": "0",
+                "id": "9",
+                "name": "N",
+                "rate": "3",
+                "transient": false,
+                "type": "be_exp",
+                "label": "N"
+            },
+            "position": {
+                "x": 650,
+                "y": 442.95
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "distribution": "exponential",
+                "dorm": "0",
+                "id": "10",
+                "name": "O",
+                "rate": "3",
+                "transient": false,
+                "type": "be_exp",
+                "label": "O"
+            },
+            "position": {
+                "x": 914,
+                "y": 442.95
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "distribution": "exponential",
+                "dorm": "0",
+                "id": "11",
+                "name": "P",
+                "rate": "3",
+                "transient": false,
+                "type": "be_exp",
+                "label": "P"
+            },
+            "position": {
+                "x": 1178,
+                "y": 442.95
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "children": [
+                    "9",
+                    "10",
+                    "11"
+                ],
+                "id": "12",
+                "inclusive": true,
+                "name": "B1",
+                "type": "por",
+                "label": "B1"
+            },
+            "position": {
+                "x": 660,
+                "y": 320.625
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "por"
+        },
+        {
+            "data": {
+                "children": [
+                    "9",
+                    "10",
+                    "11"
+                ],
+                "id": "13",
+                "inclusive": true,
+                "name": "B2",
+                "type": "por",
+                "label": "B2"
+            },
+            "position": {
+                "x": 762,
+                "y": 320.625
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "por"
+        },
+        {
+            "data": {
+                "children": [
+                    "9",
+                    "10",
+                    "11"
+                ],
+                "id": "14",
+                "inclusive": true,
+                "name": "B3",
+                "type": "por",
+                "label": "B3"
+            },
+            "position": {
+                "x": 864,
+                "y": 320.625
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "por"
+        },
+        {
+            "data": {
+                "children": [
+                    "9",
+                    "10",
+                    "11"
+                ],
+                "id": "15",
+                "inclusive": false,
+                "name": "B4",
+                "type": "por",
+                "label": "B4"
+            },
+            "position": {
+                "x": 966,
+                "y": 320.625
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "por"
+        },
+        {
+            "data": {
+                "children": [
+                    "9",
+                    "10",
+                    "11"
+                ],
+                "id": "16",
+                "inclusive": false,
+                "name": "B5",
+                "type": "por",
+                "label": "B5"
+            },
+            "position": {
+                "x": 1068,
+                "y": 320.625
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "por"
+        },
+        {
+            "data": {
+                "children": [
+                    "12",
+                    "13",
+                    "14",
+                    "15",
+                    "16"
+                ],
+                "id": "17",
+                "name": "Por",
+                "type": "vot",
+                "voting": 3,
+                "label": "Por (3/5)"
+            },
+            "position": {
+                "x": 859,
+                "y": 185.97499999999997
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "vot"
+        },
+        {
+            "data": {
+                "distribution": "exponential",
+                "dorm": "0.4",
+                "id": "18",
+                "name": "Q1",
+                "rate": "4",
+                "transient": false,
+                "type": "be_exp",
+                "label": "Q1"
+            },
+            "position": {
+                "x": 1362.7749165283424,
+                "y": 435.9975313640916
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "distribution": "exponential",
+                "dorm": "0.4",
+                "id": "19",
+                "name": "R",
+                "rate": "4",
+                "transient": false,
+                "type": "be_exp",
+                "label": "R"
+            },
+            "position": {
+                "x": 1242.1174473946735,
+                "y": 502.0459834052205
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "distribution": "exponential",
+                "dorm": "0.4",
+                "id": "20",
+                "name": "S",
+                "rate": "4",
+                "transient": false,
+                "type": "be_exp",
+                "label": "S"
+            },
+            "position": {
+                "x": 1366.1514847329274,
+                "y": 498.5697490872663
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "children": [
+                    "18",
+                    "19",
+                    "20"
+                ],
+                "id": "21",
+                "name": "C1",
+                "type": "spare",
+                "label": "C1"
+            },
+            "position": {
+                "x": 1302,
+                "y": 320.625
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "spare"
+        },
+        {
+            "data": {
+                "distribution": "exponential",
+                "dorm": "0.4",
+                "id": "22",
+                "name": "Q2",
+                "rate": "4",
+                "transient": false,
+                "type": "be_exp",
+                "label": "Q2"
+            },
+            "position": {
+                "x": 1466.0904593429982,
+                "y": 431.65223846664907
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "children": [
+                    "22",
+                    "19",
+                    "20"
+                ],
+                "id": "23",
+                "name": "C2",
+                "type": "spare",
+                "label": "C2"
+            },
+            "position": {
+                "x": 1454,
+                "y": 320.625
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "spare"
+        },
+        {
+            "data": {
+                "distribution": "exponential",
+                "dorm": "0.4",
+                "id": "24",
+                "name": "Q3",
+                "rate": "4",
+                "transient": false,
+                "type": "be_exp",
+                "label": "Q3"
+            },
+            "position": {
+                "x": 1626.138911384127,
+                "y": 431.652238466649
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "children": [
+                    "24",
+                    "19",
+                    "20"
+                ],
+                "id": "25",
+                "name": "C3",
+                "type": "spare",
+                "label": "C3"
+            },
+            "position": {
+                "x": 1606,
+                "y": 320.625
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "spare"
+        },
+        {
+            "data": {
+                "distribution": "exponential",
+                "dorm": "0.4",
+                "id": "26",
+                "name": "Q4",
+                "rate": "4",
+                "transient": false,
+                "type": "be_exp",
+                "label": "Q4"
+            },
+            "position": {
+                "x": 1788.7945391637213,
+                "y": 429.0450627281834
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "children": [
+                    "26",
+                    "19",
+                    "20"
+                ],
+                "id": "27",
+                "name": "C4",
+                "type": "spare",
+                "label": "C4"
+            },
+            "position": {
+                "x": 1758,
+                "y": 320.625
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "spare"
+        },
+        {
+            "data": {
+                "children": [
+                    "21",
+                    "23",
+                    "25",
+                    "27"
+                ],
+                "id": "28",
+                "name": "Spare",
+                "type": "vot",
+                "voting": 2,
+                "label": "Spare (2/4)"
+            },
+            "position": {
+                "x": 1525,
+                "y": 185.97499999999997
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "vot"
+        },
+        {
+            "data": {
+                "distribution": "exponential",
+                "dorm": "1",
+                "id": "29",
+                "name": "D1",
+                "rate": "1",
+                "transient": false,
+                "type": "be_exp",
+                "label": "D1"
+            },
+            "position": {
+                "x": 1881,
+                "y": 320.625
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "distribution": "exponential",
+                "dorm": "1",
+                "id": "30",
+                "name": "D2",
+                "rate": "1",
+                "transient": false,
+                "type": "be_exp",
+                "label": "D2"
+            },
+            "position": {
+                "x": 2072.8569455692063,
+                "y": 426.65014669760143
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "distribution": "exponential",
+                "dorm": "1",
+                "id": "31",
+                "name": "D3",
+                "rate": "1",
+                "transient": false,
+                "type": "be_exp",
+                "label": "D3"
+            },
+            "position": {
+                "x": 2046.0578030203003,
+                "y": 311.06535562562607
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "distribution": "exponential",
+                "dorm": "1",
+                "id": "32",
+                "name": "D4",
+                "rate": "1",
+                "transient": false,
+                "type": "be_exp",
+                "label": "D4"
+            },
+            "position": {
+                "x": 2128.760041486949,
+                "y": 318.0178242615344
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "distribution": "exponential",
+                "dorm": "1",
+                "id": "33",
+                "name": "D5",
+                "rate": "1",
+                "transient": false,
+                "type": "be_exp",
+                "label": "D5"
+            },
+            "position": {
+                "x": 2197.557342681781,
+                "y": 314.5415899435802
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "distribution": "exponential",
+                "dorm": "1",
+                "id": "34",
+                "name": "D6",
+                "rate": "1",
+                "transient": false,
+                "type": "be_exp",
+                "label": "D6"
+            },
+            "position": {
+                "x": 2390.6300207434742,
+                "y": 318.01782426153443
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "distribution": "exponential",
+                "dorm": "1",
+                "id": "35",
+                "name": "D7",
+                "rate": "1",
+                "transient": false,
+                "type": "be_exp",
+                "label": "D7"
+            },
+            "position": {
+                "x": 2536.3448325589243,
+                "y": 330.1846443743739
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "children": [
+                    "29",
+                    "30",
+                    "31",
+                    "32",
+                    "34",
+                    "35"
+                ],
+                "id": "36",
+                "name": "Other",
+                "type": "vot",
+                "voting": 3,
+                "label": "Other (3/7)"
+            },
+            "position": {
+                "x": 2249.704540159242,
+                "y": 191.1893514769312
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "vot"
+        },
+        {
+            "data": {
+                "children": [
+                    "8",
+                    "17",
+                    "28",
+                    "36"
+                ],
+                "id": "37",
+                "name": "T",
+                "type": "and",
+                "label": "T"
+            },
+            "position": {
+                "x": 1275,
+                "y": 46.82499999999999
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "and toplevel"
+        },
+        {
+            "data": {
+                "children": [
+                    "29",
+                    "30",
+                    "31"
+                ],
+                "id": "38",
+                "name": "Seq-enforcer",
+                "type": "seq",
+                "label": "Seq-enforcer"
+            },
+            "position": {
+                "x": 1956.7632638565785,
+                "y": 192.92746863590827
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "seq"
+        },
+        {
+            "data": {
+                "children": [
+                    "31",
+                    "32",
+                    "33"
+                ],
+                "id": "39",
+                "name": "Mutex",
+                "type": "mutex",
+                "label": "Mutex"
+            },
+            "position": {
+                "x": 2088.139371722645,
+                "y": 179.02253136409166
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "mutex"
+        },
+        {
+            "data": {
+                "children": [
+                    "30",
+                    "34"
+                ],
+                "id": "40",
+                "name": "F",
+                "type": "fdep",
+                "label": "F"
+            },
+            "position": {
+                "x": 2380.144895784868,
+                "y": 190.32029289744267
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "pdep fdep"
+        },
+        {
+            "data": {
+                "children": [
+                    "34",
+                    "35"
+                ],
+                "id": "41",
+                "name": "F'",
+                "probability": "0.4",
+                "type": "pdep",
+                "label": "F' (P: 0.4)"
+            },
+            "position": {
+                "x": 2540.6901254563663,
+                "y": 191.1893514769312
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "pdep"
+        }
+    ]
+}

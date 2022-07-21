@@ -1,5 +1,5 @@
 import dftlib.storage.dft_elements as dft_elements
-from dftlib.exceptions.exceptions import DftTypeNotKnownException, DftInvalidArgumentException
+from dftlib.exceptions.exceptions import DftInvalidArgumentException
 
 
 class Dft:
@@ -41,18 +41,13 @@ class Dft:
                 for child_id in node['data']['children']:
                     element.add_child(self.get_element(int(child_id)))
 
-        # Set trigger for dependencies
-        for (_, element) in self.elements.items():
-            if isinstance(element, dft_elements.DftDependency):
-                element.trigger = element.outgoing[0]
-
         # Set top level element
         top_level_id = int(json['toplevel'])
         if top_level_id < 0:
             raise DftInvalidArgumentException("Top level element not defined")
         self.set_top_level_element(top_level_id)
 
-    def size_elements(self):
+    def size(self):
         """
         Get number of elements (gates + BEs)
         :return: Number of elements.
@@ -65,7 +60,8 @@ class Dft:
         :param element_id: Id.
         :return: Element.
         """
-        assert element_id in self.elements
+        if element_id not in self.elements:
+            raise DftInvalidArgumentException("Element with id {} not known.".format(element_id))
         return self.elements[element_id]
 
     def get_element_by_name(self, name):
@@ -92,6 +88,7 @@ class Dft:
         Add element.
         :param element: Element.
         """
+        assert isinstance(element, dft_elements.DftElement)
         assert element.element_id not in self.elements
         self.elements[element.element_id] = element
         self.max_id = max(self.max_id, element.element_id)
@@ -122,57 +119,6 @@ class Dft:
         self.position_bounds[1] = min(element.position[1], self.position_bounds[1])
         self.position_bounds[2] = max(element.position[0], self.position_bounds[2])
         self.position_bounds[3] = max(element.position[1], self.position_bounds[3])
-
-    def new_be(self, name, rate, dorm, repair, pos):
-        """
-        Create new BE.
-        :param name: Name.
-        :param rate: Failure rate.
-        :param dorm: Dormancy factor in [0, 1]
-        :param repair: Repair rate.
-        :param pos: Position bounds.
-        :return: New BE.
-        """
-        element = dft_elements.DftBe(self.max_id + 1, name, rate, dorm, repair, pos)
-        self.add(element)
-        return element
-
-    def new_gate(self, name, gate_type, children, pos):
-        """
-        Create new gate.
-        :param name: Name.
-        :param gate_type: Type of gate as string according to Galileo format (e.g. 'and', 'vot3', etc.)
-        :param children: List of children.
-        :param pos: Postion bounds.
-        :return: New gate.
-        """
-        if gate_type == "and":
-            element = dft_elements.DftAnd(self.max_id + 1, name, children, pos)
-        elif gate_type == "or":
-            element = dft_elements.DftOr(self.max_id + 1, name, children, pos)
-        elif gate_type.startswith("vot"):
-            threshold = gate_type[3:]
-            try:
-                threshold = int(threshold)
-            except ValueError:
-                raise DftInvalidArgumentException("Voting threshold {} invalid.".format(threshold))
-            element = dft_elements.DftVotingGate(self.max_id + 1, name, threshold, children, pos)
-        elif gate_type == "pand":
-            element = dft_elements.DftPand(self.max_id + 1, name, children, pos)
-        elif gate_type == "por":
-            element = dft_elements.DftPor(self.max_id + 1, name, children, pos)
-        elif gate_type == "spare":
-            element = dft_elements.DftSpare(self.max_id + 1, name, children, pos)
-        elif gate_type == "fdep":
-            element = dft_elements.DftDependency(self.max_id + 1, name, 1, children, pos)
-        elif gate_type == "seq":
-            element = dft_elements.DftSeq(self.max_id + 1, name, children, pos)
-        elif gate_type == "mutex":
-            element = dft_elements.DftMutex(self.max_id + 1, name, children, pos)
-        else:
-            raise DftTypeNotKnownException("Type '{}' not known.".format(gate_type))
-        self.add(element)
-        return element
 
     def json(self):
         """
@@ -205,23 +151,13 @@ class Dft:
                     no_dynamic += 1
                 else:
                     no_static += 1
+        assert no_static + no_dynamic + no_be == len(self.elements)
         return no_be, no_static, no_dynamic, len(self.elements)
 
     def __str__(self):
         no_be, no_static, no_dynamic, no_elements = self.statistics()
-        return "Dft with {} elements ({} failable BEs, {} static elements, {} dynamic elements), top element: {}".format(no_elements, no_be, no_static, no_dynamic,
-                                                                                                                         self.top_level_element.name)
-
-    def get_dynamics(self):
-        """
-        Get list of dynamic gates.
-        :return: List of dynamic gates.
-        """
-        dynamic_elements = []
-        for (_, element) in self.elements.items():
-            if element.is_dynamic():
-                dynamic_elements.append(element)
-        return dynamic_elements
+        return "Dft with {} elements ({} BEs, {} static elements, {} dynamic elements), top element: {}".format(no_elements, no_be, no_static, no_dynamic,
+                                                                                                                self.top_level_element.name)
 
     def verbose_str(self):
         """

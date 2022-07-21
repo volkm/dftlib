@@ -26,11 +26,11 @@ def test_load_galileo():
     assert no_elements == 21
 
 
-def test_all_types():
-    file = get_example_path("json", "all_types.json")
+def test_all_gates_types():
+    file = get_example_path("json", "all_gates.json")
     dft = dftlib.io.parser.parse_dft_json_file(file)
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
-    assert no_be == 7
-    assert no_static == 3
-    assert no_dynamic == 6
-    assert no_elements == 16
+    assert no_be == 19
+    assert no_static == 5
+    assert no_dynamic == 18
+    assert no_elements == 42
