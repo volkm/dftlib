@@ -1,3 +1,5 @@
+from collections import deque
+
 import dftlib.storage.dft_be as dft_be
 import dftlib.storage.dft_gates as dft_gates
 from dftlib.exceptions.exceptions import DftInvalidArgumentException
@@ -205,20 +207,22 @@ class Dft:
         Return the elements in topological sorting from top to bottom.
         :return: List of elements.
         """
-        # TODO make efficient
         elements = []
-        queue = [self.top_level_element]
+        visited = set()
+        queue = deque()
+        queue.append(self.top_level_element)
+        visited.add(self.top_level_element.element_id)
         while len(queue) > 0:
-            element = queue[0]
-            queue = queue[1:]
-            if element not in elements:
-                elements.append(element)
-                for child in element.outgoing:
+            element = queue.popleft()
+            elements.append(element)
+            for child in element.outgoing:
+                if child.element_id not in visited:
                     queue.append(child)
+                    visited.add(child.element_id)
 
         # Add remaining elements
         for _, element in self.elements.items():
-            if element not in elements:
+            if element.element_id not in visited:
                 elements.append(element)
         assert len(elements) == len(self.elements)
         return elements

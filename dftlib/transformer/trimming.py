@@ -16,9 +16,9 @@ def trim(dft):
     # Perform breadth-first search to find all necessary elements
     queue = deque()
     queue.append(dft.top_level_element)
+    visited.add(dft.top_level_element.element_id)
     while len(queue) > 0:
         current = queue.popleft()
-        visited.add(current)
 
         if current.element_id in unused:
             # Element is necessary
@@ -29,13 +29,15 @@ def trim(dft):
             # Add possible SEQ or FDEP gates
             for parent in current.ingoing:
                 if isinstance(parent, dft_gates.DftDependency) or isinstance(parent, dft_gates.DftSeq) or isinstance(parent, dft_gates.DftMutex):
-                    if parent not in visited:
+                    if parent.element_id not in visited:
                         queue.append(parent)
+                        visited.add(parent.element_id)
         elif current.is_gate():
             # Add children of gate
             for child in current.outgoing:
-                if child not in visited:
+                if child.element_id not in visited:
                     queue.append(child)
+                    visited.add(child.element_id)
 
     assert len(unused) == len(dft.elements) - len(visited)
 
