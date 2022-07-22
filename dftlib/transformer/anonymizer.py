@@ -7,12 +7,11 @@ def make_anonymous(dft, grid_layout=False):
     :return: Anonymous DFT.
     """
     counter = 0
-    if grid_layout:
-        x = 0
-        y = 0
-        dist_x = 200
-        dist_y = 200
-        end_x = 10 * dist_x
+    x = 0
+    y = 0
+    dist_x = 200
+    dist_y = 200
+    end_x = 10 * dist_x
     # Make all elements anonymous
     for _, element in dft.elements.items():
         element.element_id = counter
