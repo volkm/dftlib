@@ -22,3 +22,9 @@ class ToolNotFound(Exception):
     """
     Exception when the required tool was not found.
     """
+
+
+class ToolError(Exception):
+    """
+    Exception when running the tool lead to an error.
+    """

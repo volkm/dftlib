@@ -139,6 +139,17 @@ class Dft:
         data['nodes'] = nodes
         return data
 
+    def number_of_be(self):
+        """
+        Get number of BEs.
+        :return: Number of BEs.
+        """
+        no_be = 0
+        for (_, element) in self.elements.items():
+            if element.is_be():
+                no_be += 1
+        return no_be
+
     def statistics(self):
         """
         Get general statistics about DFT.

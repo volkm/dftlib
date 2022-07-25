@@ -1,5 +1,7 @@
 import subprocess
 
+from dftlib.exceptions.exceptions import ToolError
+
 
 def run_tool(args, quiet=False):
     """
@@ -8,14 +10,10 @@ def run_tool(args, quiet=False):
     :param quiet: Flag indicating whether the output should be printed.
     :return: The 'stdout'.
     """
-    pipe = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    result = ""
-    for line in iter(pipe.stdout.readline, ""):
-        if not line and pipe.poll() is not None:
-            break
-        output = line.decode(encoding='UTF-8').rstrip()
-        if output != "":
-            if not quiet:
-                print("\t * " + output)
-            result = output
-    return result
+    try:
+        proc = subprocess.check_output(args, stderr=subprocess.STDOUT)
+        if not quiet:
+            print("\t * " + proc)
+        return proc
+    except subprocess.CalledProcessError as e:
+        raise ToolError("Tool encountered an error: {}".format(e))

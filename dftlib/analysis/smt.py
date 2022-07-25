@@ -1,5 +1,6 @@
 import math
 
+from dftlib.io.parser import parse_dft_galileo
 from dftlib.tools.storm import Storm
 from dftlib.tools.z3 import Z3
 
@@ -24,12 +25,12 @@ class SMTAnalysis:
         smt_encoding = self.storm.export_smt(file)
         lines = smt_encoding.splitlines()
         assert lines[-1] == "(check-sat)"
-        toplevel = "n4"
-        length = 12
-        # match = re.search(r"\(assert \(= t_(.*) (.*)\)\)", lines[-2])
-        # assert match
-        # toplevel = match.group(1)
-        # length = int(match.group(2))
+        # Get top level event by converting to JSON
+        dft = parse_dft_galileo(file)
+        assert dft.top_level_element
+        toplevel = dft.top_level_element.name
+        # Get maximal length as number of BEs
+        length = dft.number_of_be()
 
         lines = ["(set-logic QF_UFIDL)", "(set-option :smt.arith.solver 3)"] + lines
         # base_encoding = lines[:-2]
