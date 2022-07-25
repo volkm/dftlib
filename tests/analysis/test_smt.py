@@ -1,11 +1,12 @@
 import tempfile
 
-from conftest import z3
+from conftest import storm, z3
 from helpers.helper import get_example_path
 
 from dftlib.analysis.smt import SMTAnalysis
 
 
+@storm
 @z3
 def test_smt_bounds():
     file = get_example_path("galileo", "mcs.dft")

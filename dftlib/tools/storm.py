@@ -2,7 +2,29 @@ import tempfile
 
 from dftlib.utility.os_functions import run_tool
 
+storm_path = ""
 
+if storm_path:
+    _has_storm = True
+else:
+    _has_storm = False
+
+
+def requires_storm(func):
+    """
+    Decorator to check whether storm is available
+    """
+
+    def wrapper(*args, **kwargs):
+        if _has_storm:
+            return func(*args, **kwargs)
+        else:
+            raise ToolNotFound("Storm is required for this functionality.")
+
+    return wrapper
+
+
+@requires_storm
 class Storm:
     """
     Class wrapping the storm model checker CLI.
@@ -12,7 +34,7 @@ class Storm:
         """
         Constructor.
         """
-        self.binary = ""
+        self.binary = storm_path
 
     def export_smt(self, file):
         # TODO replace by stormpy binding
