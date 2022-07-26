@@ -1,4 +1,5 @@
 import argparse
+import logging
 
 import dftlib.io.export
 import dftlib.io.parser
@@ -11,10 +12,13 @@ if __name__ == "__main__":
     parser.add_argument('--out', '-o', help='The path for the saved dft file in Galileo format', required=True)
     args = parser.parse_args()
 
+    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+
     # Read DFT file
-    print("Reading {}".format(args.dft))
+    logging.info("Reading {}".format(args.dft))
     dft = dftlib.io.parser.parse_dft_json_file(args.dft)
-    print(dft)
+    logging.info(dft)
 
     # Save DFT again
     dftlib.io.export.export_dft_galileo(dft, args.out)
+    logging.info("Exported DFT in Galileo format.")

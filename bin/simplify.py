@@ -1,4 +1,5 @@
 import argparse
+import logging
 
 import dftlib.io.export
 import dftlib.io.parser
@@ -10,12 +11,15 @@ if __name__ == "__main__":
 
     parser.add_argument('--dft', '-i', help='The path for the dft file in JSON encoding', required=True)
     parser.add_argument('--out', '-o', help='The path for the saved dft file in JSON encoding', required=True)
+    parser.add_argument('--verbose', '-v', help='print more output', action="store_true")
     args = parser.parse_args()
 
+    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG if args.verbose else logging.INFO)
+
     # Read DFT file
-    print("Reading {}".format(args.dft))
+    logging.info("Reading {}".format(args.dft))
     dft = dftlib.io.parser.parse_dft_json_file(args.dft)
-    print(dft)
+    logging.info(dft)
 
     # Split FDEPs in DFT
     dftlib.transformer.rewriting.split_fdeps(dft)
@@ -25,15 +29,15 @@ if __name__ == "__main__":
         no_elements_before = len(dft.elements)
         # Simplify DFT
         dftlib.transformer.rewriting.simplify_dft(dft, rules=["1", "2", "5"])
-        print(dft)
+        logging.debug(dft)
 
         dftlib.transformer.trimming.trim(dft)
-        print(dft)
+        logging.debug(dft)
 
         no_elements_after = len(dft.elements)
         changed = (no_elements_before != no_elements_after)
-    print("Simplified DFT")
-    print(dft)
+    logging.info("Simplified DFT")
+    logging.info(dft)
 
     # Save DFT again
     dftlib.io.export.export_dft_json(dft, args.out)
