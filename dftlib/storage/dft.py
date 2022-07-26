@@ -12,7 +12,7 @@ class Dft:
     """
 
     def __init__(self, json=""):
-        self.max_id = 0
+        self.max_id = -1
         self.position_bounds = [0, 0, 0, 0]  # Left, Top, Right, Bottom
         self.top_level_element = None
         self.elements = {}
@@ -52,6 +52,9 @@ class Dft:
         if top_level_id < 0:
             raise DftInvalidArgumentException("Top level element not defined")
         self.set_top_level_element(top_level_id)
+
+    def next_id(self):
+        return self.max_id + 1
 
     def size(self):
         """

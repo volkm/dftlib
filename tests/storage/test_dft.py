@@ -6,11 +6,11 @@ import dftlib.storage.dft_gates as dft_gates
 def test_create_dft():
     dft = dfts.Dft()
 
-    be_a = dft_be.BeExponential(0, "A", 5.0, 1, 0, (0, 0, 0, 0))
+    be_a = dft_be.BeExponential(dft.next_id(), "A", 5.0, 1, 0, (0, 0, 0, 0))
     dft.add(be_a)
-    be_b = dft_be.BeExponential(1, "B", 3.0, 1, 0, (2, 2, 2, 2))
+    be_b = dft_be.BeExponential(dft.next_id(), "B", 3.0, 1, 0, (2, 2, 2, 2))
     dft.add(be_b)
-    and_t = dft_gates.DftAnd(2, "T", [be_a, be_b], (10, 10, 10, 10))
+    and_t = dft_gates.DftAnd(dft.next_id(), "T", [be_a, be_b], (10, 10, 10, 10))
     dft.add(and_t)
     dft.set_top_level_element(and_t.element_id)
 
