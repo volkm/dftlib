@@ -74,8 +74,8 @@ class DftBe(DftElement):
         json['data']['distribution'] = self.distribution
         return json
 
-    def compare(self, other):
-        if not super().compare(other):
+    def compare(self, other, respect_ids):
+        if not super().compare(other, respect_ids):
             return False
         return self.distribution == other.distribution
 
@@ -99,8 +99,8 @@ class BeConstant(DftBe):
         s += " constant, {}".format("failed" if self.failed else "failsafe")
         return s
 
-    def compare(self, other):
-        if not super().compare(other):
+    def compare(self, other, respect_ids):
+        if not super().compare(other, respect_ids):
             return False
         return self.failed == other.failed
 
@@ -128,8 +128,8 @@ class BeProbability(DftBe):
             s += ", dormancy {}".format(self.dorm)
         return s
 
-    def compare(self, other):
-        if not super().compare(other):
+    def compare(self, other, respect_ids):
+        if not super().compare(other, respect_ids):
             return False
         if self.probability != other.probability:
             return False
@@ -166,8 +166,8 @@ class BeExponential(DftBe):
             s += ", dormancy {}".format(self.dorm)
         return s
 
-    def compare(self, other):
-        if not super().compare(other):
+    def compare(self, other, respect_ids):
+        if not super().compare(other, respect_ids):
             return False
         if self.rate != other.rate:
             return False
@@ -204,8 +204,8 @@ class BeErlang(DftBe):
             s += ", dormancy {}".format(self.dorm)
         return s
 
-    def compare(self, other):
-        if not super().compare(other):
+    def compare(self, other, respect_ids):
+        if not super().compare(other, respect_ids):
             return False
         if self.rate != other.rate:
             return False
@@ -238,8 +238,8 @@ class BeWeibull(DftBe):
         s += " weibull, shape {}, rate {}".format(self.shape, self.rate)
         return s
 
-    def compare(self, other):
-        if not super().compare(other):
+    def compare(self, other, respect_ids):
+        if not super().compare(other, respect_ids):
             return False
         if self.shape != other.shape:
             return False
@@ -270,8 +270,8 @@ class BeLognormal(DftBe):
         s += " lognormal, mean {}, stddev {}".format(self.mean, self.stddev)
         return s
 
-    def compare(self, other):
-        if not super().compare(other):
+    def compare(self, other, respect_ids):
+        if not super().compare(other, respect_ids):
             return False
         if self.mean != other.mean:
             return False

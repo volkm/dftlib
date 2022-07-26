@@ -98,30 +98,41 @@ class DftGate(DftElement):
         self.outgoing.remove(element)
         element.remove_parent(self)
 
-    def compare_successors(self, other):
+    def compare_successors(self, other, ordered, respect_ids):
         """
         Check whether two gates have the same successors.
         :param other: Other gate.
+        :param ordered: Whether the order of successors should be respected.
+        :param respect_ids: Whether the ids of the successors must be equal.
         :return: True iff both gates have the same successors.
         """
-        list_outgoing = [elem.element_id for elem in other.outgoing]
-        for element in self.outgoing:
-            if element.element_id in list_outgoing:
-                list_outgoing.remove(element.element_id)
-            else:
-                # Found successor of self which is not present in other
+        if len(self.outgoing) != len(other.outgoing):
+            return False
+
+        if ordered:
+            for i in range(len(self.outgoing)):
+                if not self.outgoing[i].compare(other.outgoing[i], respect_ids):
+                    return False
+            return True
+        else:
+            map_outgoing = {elem.element_id: elem for elem in other.outgoing}
+            for element in self.outgoing:
+                elem_id = element.element_id
+                if elem_id in map_outgoing:
+                    if element.compare(map_outgoing[elem_id], respect_ids):
+                        # Found matching successor
+                        del map_outgoing[elem_id]
+                    else:
+                        # Not matching
+                        return False
+                else:
+                    # Found no matching successor in other
+                    return False
+            if len(map_outgoing) > 0:
+                # Some successors of other are not present in self
                 return False
-        if len(list_outgoing) > 0:
-            # Some successors of other are not present in self
-            return False
 
-        return True
-
-    def compare(self, other):
-        if not super().compare(other):
-            return False
-
-        return self.compare_successors(other)
+            return True
 
     def get_json(self):
         json = DftElement.get_json(self)
@@ -140,6 +151,12 @@ class DftAnd(DftGate):
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "and", children, position)
 
+    def compare(self, other, respect_ids):
+        if not super().compare(other, respect_ids):
+            return False
+
+        return self.compare_successors(other, ordered=False, respect_ids=respect_ids)
+
 
 class DftOr(DftGate):
     """
@@ -148,6 +165,12 @@ class DftOr(DftGate):
 
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "or", children, position)
+
+    def compare(self, other, respect_ids):
+        if not super().compare(other, respect_ids):
+            return False
+
+        return self.compare_successors(other, ordered=False, respect_ids=respect_ids)
 
 
 class DftVotingGate(DftGate):
@@ -167,9 +190,13 @@ class DftVotingGate(DftGate):
     def __str__(self):
         return super().__str__() + ", threshold: {}".format(self.voting_threshold)
 
-    def compare(self, other):
-        if not super().compare(other):
+    def compare(self, other, respect_ids):
+        if not super().compare(other, respect_ids):
             return False
+
+        if not self.compare_successors(other, ordered=False, respect_ids=respect_ids):
+            return False
+
         return self.voting_threshold == other.voting_threshold
 
 
@@ -190,9 +217,13 @@ class DftPriorityGate(DftGate):
     def __str__(self):
         return super().__str__() + ", {}".format("inclusive" if self.inclusive else "exclusive")
 
-    def compare(self, other):
-        if not super().compare(other):
+    def compare(self, other, respect_ids):
+        if not super().compare(other, respect_ids):
             return False
+
+        if not self.compare_successors(other, ordered=True, respect_ids=respect_ids):
+            return False
+
         return self.inclusive == other.inclusive
 
 
@@ -222,6 +253,12 @@ class DftSpare(DftGate):
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "spare", children, position)
 
+    def compare(self, other, respect_ids):
+        if not super().compare(other, respect_ids):
+            return False
+
+        return self.compare_successors(other, ordered=True, respect_ids=respect_ids)
+
 
 class DftDependency(DftGate):
     """
@@ -247,9 +284,16 @@ class DftDependency(DftGate):
     def get_dependent(self):
         return self.outgoing[1:]
 
-    def compare(self, other):
-        if not super().compare(other):
+    def compare(self, other, respect_ids):
+        if not super().compare(other, respect_ids):
             return False
+
+        if not self.compare_successors(other, ordered=False, respect_ids=respect_ids):
+            return False
+        # Compare trigger
+        if not self.outgoing[0].compare(other.outgoing[0], respect_ids):
+            return False
+
         return self.probability == other.probability
 
     def __str__(self):
@@ -264,6 +308,12 @@ class DftSeq(DftGate):
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "seq", children, position)
 
+    def compare(self, other, respect_ids):
+        if not super().compare(other, respect_ids):
+            return False
+
+        return self.compare_successors(other, ordered=True, respect_ids=respect_ids)
+
 
 class DftMutex(DftGate):
     """
@@ -272,3 +322,9 @@ class DftMutex(DftGate):
 
     def __init__(self, element_id, name, children, position):
         DftGate.__init__(self, element_id, name, "mutex", children, position)
+
+    def compare(self, other, respect_ids):
+        if not super().compare(other, respect_ids):
+            return False
+
+        return self.compare_successors(other, ordered=False, respect_ids=respect_ids)

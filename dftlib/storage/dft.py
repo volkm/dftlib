@@ -185,13 +185,14 @@ class Dft:
         """
         return "{}\n".format(self) + "\n".join([str(element) for (_, element) in self.elements.items()])
 
-    def compare(self, other):
+    def compare(self, other, respect_ids):
         """
         Compare two DFT.
         :param other: Other DFT.
+        :param respect_ids: Whether the ids must be equal.
         :return: True iff all elements, the top-level element and the structure are equal between the two DFTs.
         """
-        if not self.top_level_element.compare(other.top_level_element):
+        if not self.top_level_element.compare(other.top_level_element, respect_ids):
             raise Exception("Top level elements {} and {} not equal.".format(self.top_level_element, other.top_level_element))
 
         if len(self.elements) != len(other.elements):
@@ -211,7 +212,7 @@ class Dft:
             elif other_element is None:
                 raise Exception("Element with id {} only exists in one.".format(i))
             else:
-                if not element.compare(other_element):
+                if not element.compare(other_element, respect_ids):
                     raise Exception("Elements with id {} are different: {} and {}.".format(i, element, other_element))
 
         return True

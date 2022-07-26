@@ -52,7 +52,7 @@ def test_export_json_all_gates(tmpdir):
     dftlib.io.export.export_dft_json(dft, tmp_path)
     dft2 = dftlib.io.parser.parse_dft_json_file(tmp_path)
 
-    assert dft.compare(dft2)
+    assert dft.compare(dft2, respect_ids=True)
 
 
 def test_export_json_all_be(tmpdir):
@@ -63,4 +63,4 @@ def test_export_json_all_be(tmpdir):
     dftlib.io.export.export_dft_json(dft, tmp_path)
     dft2 = dftlib.io.parser.parse_dft_json_file(tmp_path)
 
-    assert dft.compare(dft2)
+    assert dft.compare(dft2, respect_ids=True)

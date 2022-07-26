@@ -72,17 +72,17 @@ class DftElement:
     def __str__(self):
         return "{} - '{}' ({})".format(self.element_type, self.name, self.element_id)
 
-    def compare(self, other):
+    def compare(self, other, respect_ids):
         """
         Compare elements.
         :param other: Other element.
+        :param respect_ids: Whether the ids must be equal.
         :return: True iff both elements are equal.
         """
-        if self.element_id != other.element_id:
-            # raise Exception("Ids are not equal: {} and {}".format(self.element_id, other.element_id))
-            return False
+        if respect_ids:
+            if self.element_id != other.element_id:
+                return False
         if self.element_type != other.element_type:
-            # raise Exception("Element types are not equal for {}: {} and {}".format(self, self.element_type, other.element_type))
             return False
 
         return True
