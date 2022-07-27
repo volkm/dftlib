@@ -182,7 +182,7 @@ def try_remove_gates_with_one_successor(dft, gate):
     These gates will fail together with this child, so they can directly be eliminated.
     :param dft: DFT.
     :param gate: Gate to remove.
-    :return: True if gate has been removed.
+    :return: True iff gate has been removed.
     """
     # Check if rule is applicable.
     if not (isinstance(gate, dft_gates.DftOr) or isinstance(gate, dft_gates.DftAnd) or isinstance(gate, dft_gates.DftVotingGate) or isinstance(gate, dft_gates.DftPriorityGate)):
@@ -204,6 +204,54 @@ def try_remove_gates_with_one_successor(dft, gate):
         if child not in parent.outgoing:
             parent.add_child(child)
     # Remove gate
+    dft.remove(gate)
+    return True
+
+
+def try_flatten_gate(dft, gate):
+    """
+    (Rule #5): Flattening of AND-/OR-/PAND-gates.
+    :param dft: DFT.
+    :param gate: Gate to remove.
+    :return: True iff gate has been removed.
+    """
+    # Check if rule is applicable.
+    if not (isinstance(gate, dft_gates.DftOr) or isinstance(gate, dft_gates.DftAnd) or isinstance(gate, dft_gates.DftPand)):
+        return False
+
+    if gate.relevant:
+        return False
+
+    if len(gate.ingoing) != 1:
+        return False
+    parent = gate.ingoing[0]
+    if gate.element_type != parent.element_type:
+        return False
+
+    if isinstance(parent, dft_gates.DftPand):
+        if parent.inclusive != gate.inclusive:
+            return False
+        # Flattening for PAND only works if it is the left-most child
+        if parent.outgoing[0] != gate:
+            return False
+
+        # Add children of PAND as first children of parent gate
+        # First remove existing children and then later add them again
+        existing_children = [child for child in parent.outgoing]
+        for child in existing_children:
+            parent.remove_child(child)
+        for child in gate.outgoing:
+            parent.add_child(child)
+        for child in existing_children:
+            parent.add_child(child)
+    else:
+        # Add children of AND or OR to parent gate
+        # The order is irrelevant here
+        for child in gate.outgoing:
+            if child not in parent.outgoing:
+                parent.add_child(child)
+
+    # Delete gate
     dft.remove(gate)
     return True
 

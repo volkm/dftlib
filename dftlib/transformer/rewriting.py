@@ -24,6 +24,7 @@ class RewriteRules(Enum):
     MERGE_IDENTICAL_GATES = 2
     REMOVE_SINGLE_SUCCESSOR = 3
     ADD_SINGLE_OR = 4
+    FLATTEN_GATE = 5
     REPLACE_FDEP_BY_OR = 24
     REMOVE_SUPERFLUOUS_FDEP = 25  # also 26
     REMOVE_SUPERFLUOUS_FDEP_SUCCESSORS = 27  # also 28
@@ -43,6 +44,7 @@ def simplify_dft_all_rules(dft):
         RewriteRules.MERGE_IDENTICAL_GATES,
         RewriteRules.REMOVE_SINGLE_SUCCESSOR,
         RewriteRules.ADD_SINGLE_OR,
+        RewriteRules.FLATTEN_GATE,
         RewriteRules.REPLACE_FDEP_BY_OR,
         RewriteRules.REMOVE_SUPERFLUOUS_FDEP,
         RewriteRules.REMOVE_SUPERFLUOUS_FDEP_SUCCESSORS
@@ -85,26 +87,21 @@ def simplify_dft_rules(dft, rules):
     while True:
         changed = False
         for _, element in dft.elements.items():
-            if RewriteRules.MERGE_ORS in rules:
-                changed = rewrite_rules.try_merge_or(dft, element)
-                if changed:
-                    logging.debug("Merged OR: {}".format(element))
-                    break
             if RewriteRules.MERGE_BES in rules:
                 changed = rewrite_rules.try_merge_bes_in_or(dft, element)
                 if changed:
                     logging.debug("Merged BEs under OR: {}".format(element))
+                    break
+            if RewriteRules.MERGE_ORS in rules:
+                changed = rewrite_rules.try_merge_or(dft, element)
+                if changed:
+                    logging.debug("Merged OR: {}".format(element))
                     break
             if RewriteRules.REMOVE_DEPENDENCIES_TLE in rules:
                 changed = rewrite_rules.try_remove_dependencies(dft, element)
                 if changed:
                     logging.debug("Removed dependency: {}".format(element))
                     break
-            # This rule could always be applied
-            # if RewriteRules.ADD_SINGLE_OR in rules:
-            #    changed = rewrite_rules.add_or_as_predecessor(dft, element)
-            #    if changed:
-            #        break
             if RewriteRules.MERGE_IDENTICAL_GATES in rules:
                 for _, element2 in dft.elements.items():
                     changed = rewrite_rules.try_merge_identical_gates(dft, element, element2)
@@ -117,6 +114,16 @@ def simplify_dft_rules(dft, rules):
                 changed = rewrite_rules.try_remove_gates_with_one_successor(dft, element)
                 if changed:
                     logging.debug("Removed gate with single successor: {}".format(element))
+                    break
+                # This rule could always be applied
+                # if RewriteRules.ADD_SINGLE_OR in rules:
+                #    changed = rewrite_rules.add_or_as_predecessor(dft, element)
+                #    if changed:
+                #        break
+            if RewriteRules.FLATTEN_GATE in rules:
+                changed = rewrite_rules.try_flatten_gate(dft, element)
+                if changed:
+                    logging.debug("Flattened gate: {}".format(element))
                     break
             if RewriteRules.REPLACE_FDEP_BY_OR in rules:
                 changed = rewrite_rules.try_replace_fdep_by_or(dft, element)

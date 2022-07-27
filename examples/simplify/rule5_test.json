@@ -1,0 +1,147 @@
+{
+    "toplevel": 0,
+    "parameters": {},
+    "nodes": [
+        {
+            "data": {
+                "id": "0",
+                "name": "A",
+                "type": "pand",
+                "repairable": false,
+                "children": [
+                    "1",
+                    "2"
+                ],
+                "label": "A"
+            },
+            "position": {
+                "x": 773.277590907798,
+                "y": 155.59435537244937
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "pand toplevel"
+        },
+        {
+            "data": {
+                "id": "2",
+                "name": "B2",
+                "type": "and",
+                "repairable": false,
+                "children": [
+                    "4",
+                    "5"
+                ],
+                "label": "B2"
+            },
+            "position": {
+                "x": 832.6630165269665,
+                "y": 254.93934297485396
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "and"
+        },
+        {
+            "data": {
+                "id": "3",
+                "name": "C",
+                "type": "be_exp",
+                "repairable": false,
+                "rate": 2,
+                "repair": 0,
+                "dorm": 0,
+                "label": "C"
+            },
+            "position": {
+                "x": 637.0214834682924,
+                "y": 402.459561983236
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "id": "4",
+                "name": "D",
+                "type": "be_exp",
+                "repairable": false,
+                "rate": 3,
+                "repair": 0,
+                "dorm": 0,
+                "label": "D"
+            },
+            "position": {
+                "x": 752.5417024766745,
+                "y": 396.44608264431463
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "id": "1",
+                "name": "B1",
+                "type": "pand",
+                "repairable": false,
+                "children": [
+                    "3",
+                    "4"
+                ],
+                "label": "B1"
+            },
+            "position": {
+                "x": 699,
+                "y": 272.5
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "pand"
+        },
+        {
+            "data": {
+                "id": "5",
+                "name": "E",
+                "type": "be_exp",
+                "repairable": false,
+                "rate": 1,
+                "repair": 0,
+                "dorm": 0,
+                "label": "E (λ: 1)"
+            },
+            "position": {
+                "x": 891.8302438035729,
+                "y": 393.4448181844042
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be_exp"
+        }
+    ]
+}
