@@ -76,10 +76,10 @@ def try_merge_or(dft, or_gate):
     if not isinstance(or_gate, dft_gates.DftOr):
         return False
 
-    if len(or_gate.ingoing) != 1:
+    if or_gate.relevant:
         return False
 
-    if or_gate.relevant:
+    if len(or_gate.ingoing) != 1:
         return False
 
     parent = or_gate.ingoing[0]
@@ -148,12 +148,20 @@ def try_merge_identical_gates(dft, gate1, gate2):
     # The same gate cannot be merged
     if gate1 == gate2:
         return False
+
     # Check if rule is applicable.
     if not gate1.compare(gate2, respect_ids=False):
         return False
+
     # Check if both gates are of type AND, OR, VOT, PAND, POR. As both gates have the same type it suffices to check gate1.
     if not (isinstance(gate1, dft_gates.DftAnd) or isinstance(gate1, dft_gates.DftOr) or isinstance(gate1, dft_gates.DftVotingGate) or isinstance(gate1,
                                                                                                                                                   dft_gates.DftPriorityGate)):
+        return False
+
+    if gate2.element_id == dft.top_level_element.element_id:
+        return False
+
+    if gate2.relevant:
         return False
 
     # Gates can be merged
@@ -179,8 +187,10 @@ def try_remove_gates_with_one_successor(dft, gate):
     # Check if rule is applicable.
     if not (isinstance(gate, dft_gates.DftOr) or isinstance(gate, dft_gates.DftAnd) or isinstance(gate, dft_gates.DftVotingGate) or isinstance(gate, dft_gates.DftPriorityGate)):
         return False
+
     if gate.element_id == dft.top_level_element.element_id:
         return False
+
     if gate.relevant:
         return False
 
