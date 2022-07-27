@@ -241,3 +241,36 @@ class Dft:
                 elements.append(element)
         assert len(elements) == len(self.elements)
         return elements
+
+    def get_module(self, module_repr):
+        """
+        Compute module of module_repr.
+        :param module_repr: Module representative.
+        :return: List of element ids which form the module for module_repr.
+        """
+        # Check if module_repr is a valid module representative (either top level element or SPARE-gate)
+        if module_repr.element_id != self.top_level_element.element_id and not isinstance(module_repr, dft_gates.DftSpare):
+            return []
+
+        # Compute module
+        module = []
+        visited = set()
+        queue = deque()
+        queue.append(module_repr)
+        visited.add(module_repr.element_id)
+        while len(queue) > 0:
+            elem = queue.popleft()
+            module.append(elem.element_id)
+            # Go "downwards" and only stop when encountering a SPARE
+            if not isinstance(elem, dft_gates.DftSpare):
+                for child in elem.outgoing:
+                    if child.element_id not in visited:
+                        queue.append(child)
+                        visited.add(child.element_id)
+            # Go "sideways" for dependencies and SEQ/MUTEX
+            for parent in elem.ingoing:
+                if parent.element_id not in visited:
+                    if isinstance(elem, dft_gates.DftDependency) or isinstance(elem, dft_gates.DftSeq) or isinstance(elem, dft_gates.DftMutex):
+                        queue.append(parent)
+                        visited.add(parent)
+        return module
