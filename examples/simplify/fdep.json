@@ -146,7 +146,7 @@
         {
             "data": {
                 "id": "6",
-                "name": "Eins",
+                "name": "G",
                 "type": "fdep",
                 "repairable": false,
                 "children": [
@@ -155,7 +155,7 @@
                     "4",
                     "5"
                 ],
-                "label": "Eins"
+                "label": "G"
             },
             "position": {
                 "x": 511,

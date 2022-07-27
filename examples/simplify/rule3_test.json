@@ -1,21 +1,20 @@
 {
     "toplevel": 0,
-    "parameters": {},
     "nodes": [
         {
             "data": {
-                "id": "0",
                 "name": "A",
-                "type": "and",
-                "repairable": false,
+                "id": "0",
                 "children": [
-                    "1"
+                    "3"
                 ],
-                "label": "A"
+                "type": "and",
+                "label": "A",
+                "repairable": false
             },
             "position": {
-                "x": 774,
-                "y": 136.5
+                "x": 763.3321694238298,
+                "y": 74.8636455599055
             },
             "group": "nodes",
             "removed": false,
@@ -27,18 +26,39 @@
         },
         {
             "data": {
-                "id": "1",
-                "name": "B",
+                "dorm": "0.0",
+                "name": "C",
+                "rate": "0.0",
+                "id": "2",
+                "type": "be",
+                "label": "C (λ: 0.0, r: undefined)"
+            },
+            "position": {
+                "x": 756.7027984407565,
+                "y": 570.8076767447751
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        },
+        {
+            "data": {
+                "id": "3",
+                "name": "and_3",
                 "type": "and",
                 "repairable": false,
                 "children": [
-                    "2"
+                    "4"
                 ],
-                "label": "B"
+                "label": "and_3"
             },
             "position": {
-                "x": 766,
-                "y": 297.5
+                "x": 759.0314761360756,
+                "y": 247.44408176435027
             },
             "group": "nodes",
             "removed": false,
@@ -50,18 +70,18 @@
         },
         {
             "data": {
-                "id": "2",
-                "name": "C",
-                "type": "be",
+                "id": "4",
+                "name": "and_4",
+                "type": "and",
                 "repairable": false,
-                "rate": 0,
-                "repair": 0,
-                "dorm": 0,
-                "label": "C (λ: 0)"
+                "children": [
+                    "2"
+                ],
+                "label": "and_4"
             },
             "position": {
-                "x": 765,
-                "y": 466.5
+                "x": 761.4021051530025,
+                "y": 411.01748393229315
             },
             "group": "nodes",
             "removed": false,
@@ -69,7 +89,7 @@
             "selectable": true,
             "locked": false,
             "grabbable": true,
-            "classes": "be"
+            "classes": "and"
         }
     ]
 }

@@ -97,39 +97,15 @@
         },
         {
             "data": {
-                "id": "4",
-                "name": "da",
-                "type": "fdep",
-                "repairable": false,
-                "children": [
-                    "2",
-                    "3"
-                ],
-                "label": "da"
-            },
-            "position": {
-                "x": 784.5,
-                "y": 406.5
-            },
-            "group": "nodes",
-            "removed": false,
-            "selected": false,
-            "selectable": true,
-            "locked": false,
-            "grabbable": true,
-            "classes": "fdep"
-        },
-        {
-            "data": {
                 "id": "5",
-                "name": "weg",
+                "name": "F",
                 "type": "fdep",
                 "repairable": false,
                 "children": [
                     "3",
                     "2"
                 ],
-                "label": "weg"
+                "label": "F"
             },
             "position": {
                 "x": 1238.5,
@@ -146,13 +122,13 @@
         {
             "data": {
                 "id": "6",
-                "name": "Weg2",
+                "name": "G",
                 "type": "and",
                 "repairable": false,
                 "children": [
                     "1"
                 ],
-                "label": "Weg2"
+                "label": "G"
             },
             "position": {
                 "x": 1015.4647519639977,
