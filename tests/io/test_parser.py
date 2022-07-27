@@ -7,7 +7,7 @@ import dftlib.storage.dft_be as dft_be
 
 
 def test_load_json():
-    file = get_example_path("simplify", "HECS_re.json")
+    file = get_example_path("json", "hecs.json")
     dft = dftlib.io.parser.parse_dft_json_file(file)
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
     assert no_be == 11

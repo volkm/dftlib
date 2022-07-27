@@ -7,7 +7,7 @@ import dftlib.io.parser
 
 
 def test_export_galileo(tmpdir):
-    file = get_example_path("simplify", "HECS_re.json")
+    file = get_example_path("json", "hecs.json")
     dft = dftlib.io.parser.parse_dft_json_file(file)
 
     tmp_path = os.path.join(tmpdir, "hecs.dft")
