@@ -1,11 +1,10 @@
 from helpers.helper import get_example_path
 
-import dftlib.io.export
 import dftlib.io.parser
-from dftlib.transformer.rewriting import RewriteRules
+import dftlib.transformer.rewriting
 
 
-def test_rewrite_small():
+def test_rewrite_all_small():
     file = get_example_path("simplify", "small.json")
     dft = dftlib.io.parser.parse_dft_json_file(file)
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
@@ -14,9 +13,48 @@ def test_rewrite_small():
     assert no_dynamic == 0
     assert no_elements == 5
 
-    dft = dftlib.transformer.rewriting.simplify_dft(dft)
+    changed = dftlib.transformer.rewriting.simplify_dft_all_rules(dft)
+    assert changed
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
     assert no_be == 2
     assert no_static == 1
     assert no_dynamic == 0
     assert no_elements == 3
+
+
+def test_rewrite_all_gates():
+    file = get_example_path("json", "all_gates.json")
+    dft = dftlib.io.parser.parse_dft_json_file(file)
+    no_be, no_static, no_dynamic, no_elements = dft.statistics()
+    assert no_be == 19
+    assert no_static == 5
+    assert no_dynamic == 18
+    assert no_elements == 42
+
+    changed = dftlib.transformer.rewriting.simplify_dft_all_rules(dft)
+    assert changed
+    no_be, no_static, no_dynamic, no_elements = dft.statistics()
+    assert no_be == 19
+    assert no_static == 6
+    assert no_dynamic == 11
+    assert no_elements == 36
+    # TODO should have 3 ANDs less when using all rules
+
+
+def test_rewrite_all_be_types():
+    file = get_example_path("json", "all_be_distributions.json")
+    dft = dftlib.io.parser.parse_dft_json_file(file)
+    no_be, no_static, no_dynamic, no_elements = dft.statistics()
+    assert no_be == 7
+    assert no_static == 1
+    assert no_dynamic == 0
+    assert no_elements == 8
+
+    changed = dftlib.transformer.rewriting.simplify_dft_all_rules(dft)
+    assert not changed
+    # No simplification
+    no_be, no_static, no_dynamic, no_elements = dft.statistics()
+    assert no_be == 7
+    assert no_static == 1
+    assert no_dynamic == 0
+    assert no_elements == 8
