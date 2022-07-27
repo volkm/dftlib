@@ -17,7 +17,7 @@ class DftElement:
         Get whether the element is dynamic.
         :return: True iff element is dynamic.
         """
-        return self.element_type not in ["and", "or", "vot"]
+        return self.element_type not in ["be", "and", "or", "vot"]
 
     def is_be(self):
         """

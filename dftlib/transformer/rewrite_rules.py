@@ -16,17 +16,18 @@ def split_fdeps(dft):
     :return: True if at least one FDEP is split.
     """
     split = False
-    for _, fdep in dft.elements.items():
-        if isinstance(fdep, dft_gates.DftDependency):
-            pos_add = 1
-            trigger = fdep.outgoing[0]
-            for dependent in fdep.outgoing[2:]:  # Keep first dependent event for original dependency
-                position = (fdep.position[0] - (50 * pos_add), fdep.position[1] - (75 * pos_add))
-                new_fdep = dft_gates.DftDependency(dft.next_id(), 'FDEP_{}'.format(dft.next_id()), 1, [trigger, dependent], position)
-                dft.add(new_fdep)
-                fdep.remove_child(dependent)
-                pos_add += 1
-                split = True
+    # Remember FDEPs as the elements will later change through removal/adding
+    fdeps = [fdep for _, fdep in dft.elements.items() if isinstance(fdep, dft_gates.DftDependency)]
+    for fdep in fdeps:
+        pos_add = 1
+        trigger = fdep.outgoing[0]
+        for dependent in fdep.outgoing[2:]:  # Keep first dependent event for original dependency
+            position = (fdep.position[0] - (50 * pos_add), fdep.position[1] - (75 * pos_add))
+            new_fdep = dft_gates.DftDependency(dft.next_id(), 'FDEP_{}'.format(dft.next_id()), 1, [trigger, dependent], position)
+            dft.add(new_fdep)
+            fdep.remove_child(dependent)
+            pos_add += 1
+            split = True
     return split
 
 
@@ -54,7 +55,7 @@ def try_merge_bes_in_or(dft, or_gate):
     first_child = child_bes[0]
     passive_rate = first_child.dorm * first_child.rate
     for element in child_bes[1:]:
-        first_child.name += "_{}".format(element.name)
+        first_child.name += "_" + element.name
         # Update rates
         first_child.rate += element.rate
         passive_rate += element.dorm * element.rate
@@ -144,16 +145,15 @@ def try_merge_identical_gates(dft, gate1, gate2):
     :param gate2: Second gate (will be removed).
     :return: True iff merge and removal was successful.
     """
+    # The same gate cannot be merged
+    if gate1 == gate2:
+        return False
     # Check if rule is applicable.
-    if gate1.element_type != gate2.element_type:
+    if not gate1.compare(gate2, respect_ids=False):
         return False
     # Check if both gates are of type AND, OR, VOT, PAND, POR. As both gates have the same type it suffices to check gate1.
     if not (isinstance(gate1, dft_gates.DftAnd) or isinstance(gate1, dft_gates.DftOr) or isinstance(gate1, dft_gates.DftVotingGate) or isinstance(gate1,
                                                                                                                                                   dft_gates.DftPriorityGate)):
-        return False
-
-    # Check if the successors are the same
-    if not gate1.compare_successors(gate2, ordered=isinstance(gate1, dft_gates.DftPriorityGate), respect_ids=False):
         return False
 
     # Gates can be merged
@@ -161,6 +161,8 @@ def try_merge_identical_gates(dft, gate1, gate2):
     for parent in gate2.ingoing:
         if gate1 not in parent.outgoing:
             parent.add_child(gate1)
+    # Merge names as well
+    gate1.name += "_" + gate2.name
     # Remove gate2
     dft.remove(gate2)
     return True
@@ -196,21 +198,24 @@ def try_remove_gates_with_one_successor(dft, gate):
     return True
 
 
-def add_or_as_predecessor(dft, element):
+def add_or_as_predecessor(dft, element, name=None):
     """
     (Rule #4): Add an OR-gate as the single predecessor of element.
     This is helpful for other rules, e.g., rule #24.
     :param dft: DFT.
     :param element: Element which gets an OR as predecessor.
+    :param name: Name of new OR-gate.
     :return: The new OR gate or None.
     """
+    if name is None:
+        name = "OR_{}".format(dft.next_id())
     # Remember all parents
     parents = [parent for parent in element.ingoing]
     # Remove element from all parents
     for parent in parents:
         parent.remove_child(element)
     position = (element.position[0] - 100, element.position[1] - 150)
-    or_gate = dft_gates.DftOr(dft.next_id(), 'OR_{}'.format(dft.next_id()), [element], position)
+    or_gate = dft_gates.DftOr(dft.next_id(), name, [element], position)
     dft.add(or_gate)
     for parent in parents:
         parent.add_child(or_gate)
@@ -219,12 +224,12 @@ def add_or_as_predecessor(dft, element):
 
 def check_dynamic_predecessor(dft, element):
     """
-    Check whether element has at least one dynamic element in its predecessor closure.
+    Check whether element has at least one dynamic element (except a dependency) in its predecessor closure.
     :param dft: DFT.
     :param element: Element.
     :return: True iff the predecessor closure of element contains at least one dynamic element.
     """
-    if element.is_dynamic():
+    if element.is_dynamic() and not isinstance(element, dft_gates.DftDependency):
         return True
     if element.element_id == dft.top_level_element.element_id:
         return False
@@ -246,6 +251,8 @@ def try_replace_fdep_by_or(dft, fdep):
     """
     if not isinstance(fdep, dft_gates.DftDependency):
         return False
+    if fdep.probability != 1:
+        return False
     # Check if fdep has more than one dependent element
     if len(fdep.outgoing) > 2:
         return False
@@ -256,18 +263,15 @@ def try_replace_fdep_by_or(dft, fdep):
     top_module = dft.get_module(dft.top_level_element)
     if trigger.element_id not in top_module or dependent.element_id not in top_module:
         return False
-
-    # Check if trigger has some dynamic elements in the predecessor closure
-    if check_dynamic_predecessor(dft, trigger):
+    # Check if dependent has some dynamic elements in the predecessor closure
+    if check_dynamic_predecessor(dft, dependent):
         return False
-
-    # Add OR in front of trigger
-    or_gate = add_or_as_predecessor(dft, trigger)
+    # Add OR in front of dependent
+    or_gate = add_or_as_predecessor(dft, dependent, name="OR_" + dependent.name)
     if not or_gate:
         return False
-
     dft.remove(fdep)
-    or_gate.add_child(dependent)
+    or_gate.add_child(trigger)
     return True
 
 
