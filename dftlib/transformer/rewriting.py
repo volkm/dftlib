@@ -1,3 +1,4 @@
+import logging
 from enum import Enum
 
 from dftlib.transformer import rewrite_rules
@@ -28,35 +29,76 @@ class RewriteRules(Enum):
     REMOVE_SUPERFLUOUS_FDEP_SUCCESSORS = 27  # also 28
 
 
-def simplify_dft(dft, rules=None):
+def simplify_dft_all_rules(dft):
     """
-    Simplify DFT by applying the given rewrite rules of "Fault trees on a diet".
+    Simplify DFT by applying all available rewrite rules.
     :param dft: DFT.
-    :param rules: Rewrite rules to apply. They are specified as a list of type RewriteRules.
     :return: Simplified DFT.
     """
-    if rules is None:
-        # Set default rewrite rules
-        rules = [RewriteRules.SPLIT_FDEPS, RewriteRules.MERGE_ORS, RewriteRules.MERGE_BES, RewriteRules.REMOVE_SINGLE_SUCCESSOR]
+    all_rules = [
+        RewriteRules.SPLIT_FDEPS,
+        RewriteRules.MERGE_BES,
+        RewriteRules.MERGE_ORS,
+        RewriteRules.REMOVE_DEPENDENCIES_TLE,
+        RewriteRules.MERGE_IDENTICAL_GATES,
+        RewriteRules.REMOVE_SINGLE_SUCCESSOR,
+        RewriteRules.ADD_SINGLE_OR,
+        RewriteRules.REPLACE_FDEP_BY_OR,
+        RewriteRules.REMOVE_SUPERFLUOUS_FDEP,
+        RewriteRules.REMOVE_SUPERFLUOUS_FDEP_SUCCESSORS
+    ]
+    return simplify_dft_rules(dft, all_rules)
 
+
+def simplify_dft(dft):
+    """
+    Simplify DFT by applying the default rewrite rules.
+    :param dft: DFT.
+    :return: Simplified DFT.
+    """
+    default_rules = [
+        RewriteRules.SPLIT_FDEPS,
+        RewriteRules.MERGE_ORS,
+        RewriteRules.MERGE_BES,
+        RewriteRules.REMOVE_SINGLE_SUCCESSOR
+    ]
+    return simplify_dft_rules(dft, default_rules)
+
+
+def simplify_dft_rules(dft, rules):
+    """
+    Simplify DFT in place by applying the given rewrite rules of "Fault trees on a diet".
+    :param dft: DFT.
+    :param rules: Rewrite rules to apply. They are specified as a list of type RewriteRules.
+    :return: True iff the DFT changed.
+    """
+    logging.debug("Starting simplification with rules {} on {}".format(rules, dft))
+    logging.debug(dft.verbose_str())
     # Binary FDEPs are required for several rewrite rules
     if RewriteRules.SPLIT_FDEPS in rules:
-        rewrite_rules.split_fdeps(dft)
+        changed = rewrite_rules.split_fdeps(dft)
+        if changed:
+            logging.debug("Split some dependencies")
+            logging.debug(dft.verbose_str())
+    simplified = changed
 
-    changed = True
-    while changed:
+    while True:
+        changed = False
         for _, element in dft.elements.items():
             if RewriteRules.MERGE_ORS in rules:
                 changed = rewrite_rules.try_merge_or(dft, element)
                 if changed:
+                    logging.debug("Merged OR: {}".format(element))
                     break
             if RewriteRules.MERGE_BES in rules:
                 changed = rewrite_rules.try_merge_bes_in_or(dft, element)
                 if changed:
+                    logging.debug("Merged BEs under OR: {}".format(element))
                     break
             if RewriteRules.REMOVE_DEPENDENCIES_TLE in rules:
                 changed = rewrite_rules.try_remove_dependencies(dft, element)
                 if changed:
+                    logging.debug("Removed dependency: {}".format(element))
                     break
             # This rule could always be applied
             # if RewriteRules.ADD_SINGLE_OR in rules:
@@ -69,22 +111,32 @@ def simplify_dft(dft, rules=None):
                     if changed:
                         break
                 if changed:
+                    logging.debug("Merged gates {} and {}".format(element, element2))
                     break
             if RewriteRules.REMOVE_SINGLE_SUCCESSOR in rules:
                 changed = rewrite_rules.try_remove_gates_with_one_successor(dft, element)
                 if changed:
+                    logging.debug("Removed gate with single successor: {}".format(element))
                     break
             if RewriteRules.REPLACE_FDEP_BY_OR in rules:
                 changed = rewrite_rules.try_replace_fdep_by_or(dft, element)
                 if changed:
+                    logging.debug("Replaced FDEP by OR: {}".format(element))
                     break
             if RewriteRules.REMOVE_SUPERFLUOUS_FDEP in rules:
                 changed = rewrite_rules.try_remove_superfluous_fdep(dft, element)
                 if changed:
+                    logging.debug("Removed superfluous FDEP: {}".format(element))
                     break
             if RewriteRules.REMOVE_SUPERFLUOUS_FDEP_SUCCESSORS in rules:
                 changed = rewrite_rules.try_remove_fdep_successors(dft, element)
                 if changed:
+                    logging.debug("Removed FDEP with successors: {}".format(element))
                     break
-
-    return dft
+        if changed:
+            logging.debug("Changed DFT")
+            logging.debug(dft.verbose_str())
+            simplified = True
+        else:
+            break
+    return simplified

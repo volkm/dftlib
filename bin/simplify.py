@@ -3,14 +3,15 @@ import logging
 
 import dftlib.io.export
 import dftlib.io.parser
-import dftlib.transformer.trimming
-from dftlib.transformer.rewriting import RewriteRules, simplify_dft
+import dftlib.transformer.rewriting as rewriting
+import dftlib.transformer.trimming as trimming
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Simplify a DFT by rewriting.')
 
     parser.add_argument('--dft', '-i', help='The path for the dft file in JSON encoding', required=True)
     parser.add_argument('--out', '-o', help='The path for the saved dft file in JSON encoding', required=True)
+    parser.add_argument('--all-rules', '-a', help='Use all rewriting rules', action="store_true")
     parser.add_argument('--verbose', '-v', help='print more output', action="store_true")
     args = parser.parse_args()
 
@@ -21,20 +22,30 @@ if __name__ == "__main__":
     dft = dftlib.io.parser.parse_dft_json_file(args.dft)
     logging.info(dft)
 
-    changed = True
-    while changed:
-        no_elements_before = len(dft.elements)
+    simplified = False
+    while True:
         # Simplify DFT
-        simplify_dft(dft)
-        logging.debug(dft)
+        if args.all_rules:
+            rewritten = rewriting.simplify_dft_all_rules(dft)
+        else:
+            rewritten = rewriting.simplify_dft(dft)
 
-        dftlib.transformer.trimming.trim(dft)
-        logging.debug(dft)
+        if rewritten:
+            logging.info("DFT was rewritten")
+            logging.info(dft)
+            simplified = True
 
-        no_elements_after = len(dft.elements)
-        changed = (no_elements_before != no_elements_after)
-    logging.info("Simplified DFT")
-    logging.info(dft)
+        trimmed = trimming.trim(dft)
+        if trimmed:
+            logging.info("DFT was trimmed")
+            logging.info(dft)
+            simplified = True
+
+        if not rewritten and not trimmed:
+            break
+
+    if not simplified:
+        logging.info("DFT was not simplified")
 
     # Save DFT again
     dftlib.io.export.export_dft_json(dft, args.out)

@@ -5,8 +5,9 @@ import dftlib.storage.dft_gates as dft_gates
 
 def trim(dft):
     """
-    Trim parts of the DFT which do not contribute to the top level element.
+    Trim parts of the DFT in place which do not contribute to the top level element.
     :param dft: DFT which will be modified.
+    :return: True iff elements were trimmed.
     """
 
     # List of possible unused elements to trim
@@ -42,6 +43,9 @@ def trim(dft):
     assert len(unused) == len(dft.elements) - len(visited)
 
     # Remove unused elements
+    trimmed = False
     for element_id, element in unused.items():
         if not element.relevant:
             dft.remove(element)
+            trimmed = True
+    return trimmed
