@@ -97,8 +97,8 @@ def test_rewrite_all_rule5():
     assert pand.element_type == "pand"
     assert len(pand.outgoing) == 3
     assert pand.outgoing[0].name == "C"
-    assert pand.outgoing[0].name == "D"
-    assert pand.outgoing[0].name == "B2"
+    assert pand.outgoing[1].name == "D"
+    assert pand.outgoing[2].name == "B2"
 
 
 def test_rewrite_all_rule24():
