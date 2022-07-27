@@ -52,10 +52,9 @@ def test_rewrite_all_rule2():
     assert changed
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
     assert no_be == 2
-    assert no_static == 2
+    assert no_static == 1
     assert no_dynamic == 0
-    assert no_elements == 4
-    # TODO should yield single OR with both BEs using all rewrite rules
+    assert no_elements == 3
 
 
 def test_rewrite_all_rule3():
@@ -114,10 +113,9 @@ def test_rewrite_all_rule24():
     assert changed
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
     assert no_be == 3
-    assert no_static == 2
+    assert no_static == 1
     assert no_dynamic == 0
-    assert no_elements == 5
-    # TODO should yield single BE using all rewrite rules
+    assert no_elements == 4
 
     file = get_example_path("simplify", "fdep.json")
     dft = dftlib.io.parser.parse_dft_json_file(file)
@@ -131,10 +129,9 @@ def test_rewrite_all_rule24():
     assert changed
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
     assert no_be == 4
-    assert no_static == 4
+    assert no_static == 1
     assert no_dynamic == 0
-    assert no_elements == 8
-    # TODO should yield single BE "C" using all rewrite rules
+    assert no_elements == 5
 
 
 def test_rewrite_all_rule26():

@@ -38,7 +38,6 @@ def test_rewrite_all_gates():
     assert no_static == 6
     assert no_dynamic == 11
     assert no_elements == 36
-    # TODO should have 3 ANDs less when using all rules
 
 
 def test_rewrite_all_be_types():

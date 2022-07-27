@@ -256,6 +256,42 @@ def try_flatten_gate(dft, gate):
     return True
 
 
+def try_subsumption(dft, gate):
+    """
+    (Rule #8, Rule #9): Subsumption of OR-gate by AND-gate or of AND-gate by OR-gate.
+    :param dft: DFT.
+    :param gate: Gate which could be subsumed.
+    :return: True iff subsumption was possible.
+    """
+    # Check if rule is applicable.
+    if not (isinstance(gate, dft_gates.DftOr) or isinstance(gate, dft_gates.DftAnd)):
+        return False
+
+    if gate.relevant:
+        return False
+
+    if len(gate.ingoing) != 1:
+        return False
+    parent = gate.ingoing[0]
+    # Check that parent is of "opposite" type
+    if isinstance(gate, dft_gates.DftOr):
+        if not isinstance(parent, dft_gates.DftAnd):
+            return False
+    else:
+        assert isinstance(gate, dft_gates.DftAnd)
+        if not isinstance(parent, dft_gates.DftOr):
+            return False
+
+    # Check if a child occurs in both gate and parent
+    for child in gate.outgoing:
+        if child in parent.outgoing:
+            # Can remove gate
+            dft.remove(gate)
+            return True
+
+    return False
+
+
 def add_or_as_predecessor(dft, element, name=None):
     """
     (Rule #4): Add an OR-gate as the single predecessor of element.
