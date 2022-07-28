@@ -1,3 +1,4 @@
+import itertools
 import logging
 
 from dftlib.exceptions.exceptions import DftInvalidArgumentException
@@ -24,22 +25,22 @@ def apply_rules(dft, rules):
         logging.warning("Rule ADD_SINGLE_OR could lead to non-termination")
 
     for rule in rules:
-        # Try all elements
-        for _, element in dft.elements.items():
-            # Get function to execute for rule
-            func = RewriteRules.get_function(rule)
-            # Handle special rules
-            if rule == RewriteRules.MERGE_IDENTICAL_GATES:
-                # Search for other gate
-                # TODO make more efficient by only considering elements after element
-                for _, element2 in dft.elements.items():
-                    if func(dft, element, element2):
-                        return rule, element
-            elif rule == RewriteRules.TRIM:
-                if func(dft):
-                    return rule, None
-            else:
-                # Default: apply function to element
+        # Get function to execute for rule
+        func = RewriteRules.get_function(rule)
+
+        # Handle special rules
+        if rule == RewriteRules.MERGE_IDENTICAL_GATES:
+            # Iterate over all possible combinations of gates
+            for elem1, elem2 in itertools.combinations(dft.elements.values(), 2):
+                if func(dft, elem1, elem2):
+                    return rule, elem1
+        elif rule == RewriteRules.TRIM:
+            # Try to trim DFT
+            if func(dft):
+                return rule, None
+        else:
+            # Default rules: apply function to all elements
+            for element in dft.elements.values():
                 if func(dft, element):
                     return rule, element
 

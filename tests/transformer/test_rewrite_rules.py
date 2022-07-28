@@ -75,7 +75,6 @@ def test_rewrite_all_rule3():
     assert no_static == 1
     assert no_dynamic == 0
     assert no_elements == 2
-    # TODO should yield single BE using all rewrite rules
 
 
 def test_rewrite_all_rule5():
@@ -152,7 +151,6 @@ def test_rewrite_all_rule26():
     assert no_static == 2
     assert no_dynamic == 0
     assert no_elements == 5
-    # TODO could be further simplified if TLE is not relevant
 
 
 def test_rewrite_all_rule28():
@@ -171,4 +169,3 @@ def test_rewrite_all_rule28():
     assert no_static == 1
     assert no_dynamic == 1
     assert no_elements == 4
-    # TODO could be further simplified if TLE is not relevant
