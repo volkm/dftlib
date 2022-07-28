@@ -1,7 +1,7 @@
 from helpers.helper import get_example_path
 
 import dftlib.io.parser
-import dftlib.transformer.rewriting
+import dftlib.transformer.simplifier as simplifier
 
 
 def test_rewrite_all_small():
@@ -13,7 +13,7 @@ def test_rewrite_all_small():
     assert no_dynamic == 0
     assert no_elements == 5
 
-    changed = dftlib.transformer.rewriting.simplify_dft_all_rules(dft)
+    changed = simplifier.simplify_dft_all_rules(dft)
     assert changed
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
     assert no_be == 2
@@ -31,7 +31,7 @@ def test_rewrite_all_gates():
     assert no_dynamic == 18
     assert no_elements == 42
 
-    changed = dftlib.transformer.rewriting.simplify_dft_all_rules(dft)
+    changed = simplifier.simplify_dft_all_rules(dft)
     assert changed
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
     assert no_be == 19
@@ -49,7 +49,7 @@ def test_rewrite_all_be_types():
     assert no_dynamic == 0
     assert no_elements == 8
 
-    changed = dftlib.transformer.rewriting.simplify_dft_all_rules(dft)
+    changed = simplifier.simplify_dft_all_rules(dft)
     assert not changed
     # No simplification
     no_be, no_static, no_dynamic, no_elements = dft.statistics()

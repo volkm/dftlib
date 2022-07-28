@@ -1,4 +1,8 @@
+from enum import Enum
+
 import dftlib.storage.dft_gates as dft_gates
+import dftlib.transformer.trimming as trimming
+from dftlib.exceptions.exceptions import DftInvalidArgumentException
 
 """
 Rewrite rules for DFT simplification.
@@ -9,26 +13,80 @@ https://doi.org/10.1007/s00165-016-0412-0
 """
 
 
-def split_fdeps(dft):
+class RewriteRules(Enum):
+    """
+    Rewrite rules.
+    Numbers < 30 correspond to the rewrite rule number in "Fault trees on a diet".
+    """
+    SPLIT_FDEPS = 30
+    MERGE_BES = 31
+    TRIM = 32
+    REMOVE_DEPENDENCIES_TLE = 33
+    MERGE_IDENTICAL_GATES = 2
+    REMOVE_SINGLE_SUCCESSOR = 3
+    ADD_SINGLE_OR = 4
+    FLATTEN_GATE = 5
+    SUBSUME_GATE = 8  # also 9
+    REPLACE_FDEP_BY_OR = 24
+    REMOVE_SUPERFLUOUS_FDEP = 25  # also 26
+    REMOVE_SUPERFLUOUS_FDEP_SUCCESSORS = 27  # also 28
+
+    @classmethod
+    def get_function(cls, rule):
+        if rule == RewriteRules.SPLIT_FDEPS:
+            return try_split_fdep
+        elif rule == RewriteRules.MERGE_BES:
+            return try_merge_bes_in_or
+        elif rule == RewriteRules.TRIM:
+            # This method requires no element as input
+            return trimming.trim
+        elif rule == RewriteRules.REMOVE_DEPENDENCIES_TLE:
+            return try_remove_dependencies
+        elif rule == RewriteRules.MERGE_IDENTICAL_GATES:
+            # This method requires two gates as input
+            return try_merge_identical_gates
+        elif rule == RewriteRules.REMOVE_SINGLE_SUCCESSOR:
+            return try_remove_gates_with_one_successor
+        elif rule == RewriteRules.ADD_SINGLE_OR:
+            return add_or_as_predecessor
+        elif rule == RewriteRules.FLATTEN_GATE:
+            return try_flatten_gate
+        elif rule == RewriteRules.SUBSUME_GATE:
+            return try_subsumption
+        elif rule == RewriteRules.REPLACE_FDEP_BY_OR:
+            return try_replace_fdep_by_or
+        elif rule == RewriteRules.REMOVE_SUPERFLUOUS_FDEP:
+            return try_remove_superfluous_fdep
+        elif rule == RewriteRules.REMOVE_SUPERFLUOUS_FDEP_SUCCESSORS:
+            return try_remove_fdep_successors
+        else:
+            raise DftInvalidArgumentException("Rewrite rule {} not known".format(rule))
+
+
+def try_split_fdep(dft, fdep):
     """
     Split FDEPs with two or more children into single FDEPs with only one child.
     :param dft: DFT.
-    :return: True if at least one FDEP is split.
+    :param fdep: FDEP.
+    :return: True iff fdep was split.
     """
-    split = False
-    # Remember FDEPs as the elements will later change through removal/adding
-    fdeps = [fdep for _, fdep in dft.elements.items() if isinstance(fdep, dft_gates.DftDependency)]
-    for fdep in fdeps:
-        pos_add = 1
-        trigger = fdep.outgoing[0]
-        for dependent in fdep.outgoing[2:]:  # Keep first dependent event for original dependency
-            position = (fdep.position[0] - (50 * pos_add), fdep.position[1] - (75 * pos_add))
-            new_fdep = dft_gates.DftDependency(dft.next_id(), 'FDEP_{}'.format(dft.next_id()), 1, [trigger, dependent], position)
-            dft.add(new_fdep)
-            fdep.remove_child(dependent)
-            pos_add += 1
-            split = True
-    return split
+    # Check if rule can be applied
+    if not isinstance(fdep, dft_gates.DftDependency):
+        return False
+
+    if len(fdep.outgoing) <= 2:
+        return False
+
+    pos_add = 1
+    trigger = fdep.outgoing[0]
+    dependents = fdep.outgoing[2:].copy()  # Keep first dependent event for original dependency
+    for dependent in dependents:
+        position = (fdep.position[0] - (50 * pos_add), fdep.position[1] - (75 * pos_add))
+        new_fdep = dft_gates.DftDependency(dft.next_id(), 'FDEP_{}_{}'.format(fdep.name, pos_add), 1, [trigger, dependent], position)
+        dft.add(new_fdep)
+        fdep.remove_child(dependent)
+        pos_add += 1
+    return True
 
 
 def try_merge_bes_in_or(dft, or_gate):
@@ -62,37 +120,6 @@ def try_merge_bes_in_or(dft, or_gate):
         dft.remove(element)
 
     first_child.dorm = passive_rate / first_child.rate
-    return True
-
-
-def try_merge_or(dft, or_gate):
-    """
-    Try to merge two OR gates in different levels.
-    :param dft: DFT
-    :param or_gate: OR gate to remove.
-    :return: True iff merge was successful.
-    """
-    # Check if rule is applicable
-    if not isinstance(or_gate, dft_gates.DftOr):
-        return False
-
-    if or_gate.relevant:
-        return False
-
-    if len(or_gate.ingoing) != 1:
-        return False
-
-    parent = or_gate.ingoing[0]
-    if not isinstance(parent, dft_gates.DftOr):
-        return False
-
-    # Add children to parent gate
-    for child in or_gate.outgoing:
-        if child not in parent.outgoing:
-            parent.add_child(child)
-
-    # Delete OR-gate
-    dft.remove(or_gate)
     return True
 
 

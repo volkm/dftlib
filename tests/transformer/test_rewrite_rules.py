@@ -1,8 +1,8 @@
 from helpers.helper import get_example_path
 
 import dftlib.io.parser
-import dftlib.transformer.rewrite_rules as rewrite_rules
-import dftlib.transformer.rewriting
+import dftlib.transformer.simplifier as simplifier
+from dftlib.transformer.rewrite_rules import RewriteRules
 
 
 def test_split_fdeps():
@@ -14,8 +14,10 @@ def test_split_fdeps():
     assert no_dynamic == 1
     assert no_elements == 7
 
-    changed = rewrite_rules.split_fdeps(dft)
-    assert changed
+    while True:
+        changed = simplifier.simplify_dft_rules(dft, [RewriteRules.SPLIT_FDEPS])
+        if not changed:
+            break
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
     assert no_be == 4
     assert no_static == 2
@@ -32,7 +34,7 @@ def test_rewrite_all_rule2():
     assert no_dynamic == 0
     assert no_elements == 5
 
-    changed = dftlib.transformer.rewriting.simplify_dft_all_rules(dft)
+    changed = simplifier.simplify_dft_all_rules(dft)
     assert changed
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
     assert no_be == 2
@@ -48,7 +50,7 @@ def test_rewrite_all_rule2():
     assert no_dynamic == 0
     assert no_elements == 7
 
-    changed = dftlib.transformer.rewriting.simplify_dft_all_rules(dft)
+    changed = simplifier.simplify_dft_all_rules(dft)
     assert changed
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
     assert no_be == 2
@@ -66,7 +68,7 @@ def test_rewrite_all_rule3():
     assert no_dynamic == 0
     assert no_elements == 4
 
-    changed = dftlib.transformer.rewriting.simplify_dft_all_rules(dft)
+    changed = simplifier.simplify_dft_all_rules(dft)
     assert changed
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
     assert no_be == 1
@@ -85,7 +87,7 @@ def test_rewrite_all_rule5():
     assert no_dynamic == 2
     assert no_elements == 6
 
-    changed = dftlib.transformer.rewriting.simplify_dft_all_rules(dft)
+    changed = simplifier.simplify_dft_all_rules(dft)
     assert changed
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
     assert no_be == 3
@@ -109,13 +111,13 @@ def test_rewrite_all_rule24():
     assert no_dynamic == 1
     assert no_elements == 6
 
-    changed = dftlib.transformer.rewriting.simplify_dft_all_rules(dft)
+    changed = simplifier.simplify_dft_all_rules(dft)
     assert changed
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
-    assert no_be == 3
+    assert no_be == 2
     assert no_static == 1
     assert no_dynamic == 0
-    assert no_elements == 4
+    assert no_elements == 3
 
     file = get_example_path("simplify", "fdep.json")
     dft = dftlib.io.parser.parse_dft_json_file(file)
@@ -125,13 +127,13 @@ def test_rewrite_all_rule24():
     assert no_dynamic == 1
     assert no_elements == 7
 
-    changed = dftlib.transformer.rewriting.simplify_dft_all_rules(dft)
+    changed = simplifier.simplify_dft_all_rules(dft)
     assert changed
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
-    assert no_be == 4
+    assert no_be == 1
     assert no_static == 1
     assert no_dynamic == 0
-    assert no_elements == 5
+    assert no_elements == 2
 
 
 def test_rewrite_all_rule26():
@@ -143,7 +145,7 @@ def test_rewrite_all_rule26():
     assert no_dynamic == 1
     assert no_elements == 6
 
-    changed = dftlib.transformer.rewriting.simplify_dft_all_rules(dft)
+    changed = simplifier.simplify_dft_all_rules(dft)
     assert changed
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
     assert no_be == 3
@@ -162,7 +164,7 @@ def test_rewrite_all_rule28():
     assert no_dynamic == 2
     assert no_elements == 6
 
-    changed = dftlib.transformer.rewriting.simplify_dft_all_rules(dft)
+    changed = simplifier.simplify_dft_all_rules(dft)
     assert changed
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
     assert no_be == 2

@@ -3,7 +3,7 @@ import logging
 
 import dftlib.io.export
 import dftlib.io.parser
-import dftlib.transformer.rewriting
+import dftlib.transformer.simplifier
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Export a DFT into Galileo format.')

@@ -3,8 +3,7 @@ import logging
 
 import dftlib.io.export
 import dftlib.io.parser
-import dftlib.transformer.rewriting as rewriting
-import dftlib.transformer.trimming as trimming
+import dftlib.transformer.simplifier as rewriting
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Simplify a DFT by rewriting.')
@@ -22,29 +21,16 @@ if __name__ == "__main__":
     dft = dftlib.io.parser.parse_dft_json_file(args.dft)
     logging.info(dft)
 
-    simplified = False
-    while True:
-        # Simplify DFT
-        if args.all_rules:
-            rewritten = rewriting.simplify_dft_all_rules(dft)
-        else:
-            rewritten = rewriting.simplify_dft(dft)
+    # Simplify DFT
+    if args.all_rules:
+        simplified = rewriting.simplify_dft_all_rules(dft)
+    else:
+        simplified = rewriting.simplify_dft_default_rules(dft)
 
-        if rewritten:
-            logging.info("DFT was rewritten")
-            logging.info(dft)
-            simplified = True
-
-        trimmed = trimming.trim(dft)
-        if trimmed:
-            logging.info("DFT was trimmed")
-            logging.info(dft)
-            simplified = True
-
-        if not rewritten and not trimmed:
-            break
-
-    if not simplified:
+    if simplified:
+        logging.info("DFT was simplified")
+        logging.info(dft)
+    else:
         logging.info("DFT was not simplified")
 
     # Save DFT again
