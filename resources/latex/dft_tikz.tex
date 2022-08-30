@@ -1,0 +1,522 @@
+% Tikz library for DFT elements
+% -----------------------------
+% Authors:
+% - Dennis Guck (initial version)
+% - Sebastian Junges (extensions)
+%
+
+\makeatletter
+
+\pgfdeclareshape{spare}{
+  % The 'minimum width' and 'minimum height' keys, not the content, determine
+  % the size
+  \savedanchor\northeast{%
+    \pgfmathsetlength\pgf@x{\pgfshapeminwidth}%
+    \pgfmathsetlength\pgf@y{\pgfshapeminheight}%
+    \pgf@x=0.5\pgf@x
+    \pgf@y=0.5\pgf@y
+  }
+  % This is redundant, but makes some things easier:
+  \savedanchor\southwest{%
+    \pgfmathsetlength\pgf@x{\pgfshapeminwidth}%
+    \pgfmathsetlength\pgf@y{\pgfshapeminheight}%
+    \pgf@x=-0.5\pgf@x
+    \pgf@y=-0.5\pgf@y
+  }
+  % Inherit from rectangle
+  \inheritanchorborder[from=rectangle]
+
+  % Define same anchor a normal rectangle has
+  \anchor{center}{\pgfpointorigin}
+  \anchor{north}{\northeast \pgf@x=0pt}
+  \anchor{east}{\northeast \pgf@y=0pt}
+  \anchor{south}{\southwest \pgf@x=0pt}
+  \anchor{west}{\southwest \pgf@y=0pt}
+  \anchor{north east}{\northeast}
+  \anchor{north west}{\northeast \pgf@x=-\pgf@x}
+  \anchor{south west}{\southwest}
+  \anchor{south east}{\southwest \pgf@x=-\pgf@x}
+  \anchor{text}{
+    \pgfpointorigin
+    \advance\pgf@x by -.5\wd\pgfnodeparttextbox%
+    \advance\pgf@y by -.5\ht\pgfnodeparttextbox%
+    \advance\pgf@y by +.5\dp\pgfnodeparttextbox%
+  }
+
+  % Define anchors for signal ports
+  \anchor{O}{ % output anchor
+    \pgf@process{\northeast}%
+    \pgf@x=0pt%
+  }
+  \anchor{P}{ % primary anchor
+    \pgf@process{\northeast}%
+    \pgf@x=-.5\pgf@x%
+    \pgf@y=-\pgf@y%
+  }
+  \anchor{SA}{ % spare anchor
+    \pgf@process{\northeast}%
+    \pgf@x=.1\pgf@x%
+    \pgf@y=-\pgf@y%
+  }
+  \anchor{SB}{ % spare anchor
+    \pgf@process{\northeast}%
+    \pgf@x=.3\pgf@x%
+    \pgf@y=-\pgf@y%
+  }
+  \anchor{SC}{ % spare anchor
+    \pgf@process{\northeast}%
+    \pgf@x=.5\pgf@x%
+    \pgf@y=-\pgf@y%
+  }
+  \anchor{SD}{ % spare anchor
+    \pgf@process{\northeast}%
+    \pgf@x=.7\pgf@x%
+    \pgf@y=-\pgf@y%
+  }
+  \anchor{SE}{ % spare anchor
+    \pgf@process{\northeast}%
+    \pgf@x=.9\pgf@x%
+    \pgf@y=-\pgf@y%
+  }
+  \anchor{BOX}{ % spare box anchor
+    \pgf@process{\northeast}%
+    \pgf@x=\pgf@x%
+    \pgf@y=-\pgf@y%
+  }
+  \anchor{LINE}{
+    \pgf@process{\northeast}%
+    \pgf@x=-1\pgf@x%
+    \pgf@y=.\pgf@y%
+  }
+  % Draw the rectangle box and the port labels
+  \backgroundpath{
+    % Rectangle box
+    \pgfpathrectanglecorners{\southwest}{\northeast}
+    % Line in the middle
+    \pgf@anchor@spare@LINE
+    \pgf@xa=\pgf@x \pgf@ya=\pgf@y
+    \pgf@xb=\pgf@x \pgf@yb=\pgf@y
+    \advance\pgf@xb by -2\pgf@x
+    \pgfpathmoveto{\pgfpoint{\pgf@xa}{\pgf@ya}}
+    \pgfpathlineto{\pgfpoint{\pgf@xb}{\pgf@ya}}
+    % Box for spare parts
+    \pgf@anchor@spare@BOX
+    \pgf@xa=\pgf@x \pgf@ya=\pgf@y
+    \pgf@xb=\pgf@x \pgf@yb=\pgf@y
+    \pgf@xc=\pgf@x \pgf@yc=\pgf@y
+    \advance\pgf@ya by -.\pgf@y
+    \advance\pgf@yb by -.8\pgf@y
+    \advance\pgf@xb by -1\pgf@x
+    \pgfpathmoveto{\pgfpoint{\pgf@xa}{\pgf@ya}}
+    \pgfpathlineto{\pgfpoint{\pgf@xa}{\pgf@yb}}
+    \pgfpathlineto{\pgfpoint{\pgf@xb}{\pgf@yb}}
+    \pgfpathlineto{\pgfpoint{\pgf@xb}{\pgf@ya}}
+    \pgfclosepath
+
+    % Draw port labels
+    \begingroup
+    \tikzset{spare/port labels} % Use font from this style
+    \tikz@textfont
+
+    \pgf@anchor@spare@O
+    \pgftext[top,at={\pgfpoint{\pgf@x}{\pgf@y}},y=-\pgfshapeinnerysep]{}
+
+    \pgf@anchor@spare@P 
+    \pgftext[bottom,at={\pgfpoint{\pgf@x}{\pgf@y}},y=\pgfshapeinnerysep]{}
+    
+    \pgf@anchor@spare@SA
+    \pgftext[bottom,at={\pgfpoint{\pgf@x}{\pgf@y}},y=\pgfshapeinnerysep]{}
+    
+    \pgf@anchor@spare@SB
+    \pgftext[bottom,at={\pgfpoint{\pgf@x}{\pgf@y}},y=\pgfshapeinnerysep]{}
+    
+    \pgf@anchor@spare@SC
+    \pgftext[bottom,at={\pgfpoint{\pgf@x}{\pgf@y}},y=\pgfshapeinnerysep]{}
+    
+    \pgf@anchor@spare@SD
+    \pgftext[bottom,at={\pgfpoint{\pgf@x}{\pgf@y}},y=\pgfshapeinnerysep]{}
+    
+    \pgf@anchor@spare@SE
+    \pgftext[bottom,at={\pgfpoint{\pgf@x}{\pgf@y}},y=\pgfshapeinnerysep]{}
+    \endgroup
+  }
+}
+
+\tikzset{add font/.code={\expandafter\def\expandafter\tikz@textfont\expandafter{\tikz@textfont#1}}} 
+
+\tikzset{spare/port labels/.style={font=\sffamily\scriptsize}}
+\tikzset{every spare node/.style={draw,minimum height=1cm,minimum 
+width=1.5cm,fill=white!100!black,inner sep=1mm,outer sep=0pt,cap=round,add 
+font=\sffamily}}
+
+\pgfdeclareshape{spareM}{
+  % The 'minimum width' and 'minimum height' keys, not the content, determine
+  % the size
+  \savedanchor\northeast{%
+    \pgfmathsetlength\pgf@x{\pgfshapeminwidth}%
+    \pgfmathsetlength\pgf@y{\pgfshapeminheight}%
+    \pgf@x=0.5\pgf@x
+    \pgf@y=0.5\pgf@y
+  }
+  % This is redundant, but makes some things easier:
+  \savedanchor\southwest{%
+    \pgfmathsetlength\pgf@x{\pgfshapeminwidth}%
+    \pgfmathsetlength\pgf@y{\pgfshapeminheight}%
+    \pgf@x=-0.5\pgf@x
+    \pgf@y=-0.5\pgf@y
+  }
+  % Inherit from rectangle
+  \inheritanchorborder[from=rectangle]
+
+  % Define same anchor a normal rectangle has
+  \anchor{center}{\pgfpointorigin}
+  \anchor{north}{\northeast \pgf@x=0pt}
+  \anchor{east}{\northeast \pgf@y=0pt}
+  \anchor{south}{\southwest \pgf@x=0pt}
+  \anchor{west}{\southwest \pgf@y=0pt}
+  \anchor{north east}{\northeast}
+  \anchor{north west}{\northeast \pgf@x=-\pgf@x}
+  \anchor{south west}{\southwest}
+  \anchor{south east}{\southwest \pgf@x=-\pgf@x}
+  \anchor{text}{
+    \pgfpointorigin
+    \advance\pgf@x by -.5\wd\pgfnodeparttextbox%
+    \advance\pgf@y by -.5\ht\pgfnodeparttextbox%
+    \advance\pgf@y by +.5\dp\pgfnodeparttextbox%
+  }
+
+  % Define anchors for signal ports
+  \anchor{O}{ % output anchor
+    \pgf@process{\northeast}%
+    \pgf@x=0pt%
+  }
+  \anchor{P}{ % primary anchor
+    \pgf@process{\northeast}%
+    \pgf@x=.5\pgf@x%
+    \pgf@y=-\pgf@y%
+  }
+  \anchor{SA}{ % spare anchor
+    \pgf@process{\northeast}%
+    \pgf@x=-.1\pgf@x%
+    \pgf@y=-\pgf@y%
+  }
+  \anchor{SB}{ % spare anchor
+    \pgf@process{\northeast}%
+    \pgf@x=-.3\pgf@x%
+    \pgf@y=-\pgf@y%
+  }
+  \anchor{SC}{ % spare anchor
+    \pgf@process{\northeast}%
+    \pgf@x=-.5\pgf@x%
+    \pgf@y=-\pgf@y%
+  }
+  \anchor{SD}{ % spare anchor
+    \pgf@process{\northeast}%
+    \pgf@x=-.7\pgf@x%
+    \pgf@y=-\pgf@y%
+  }
+  \anchor{SE}{ % spare anchor
+    \pgf@process{\northeast}%
+    \pgf@x=.9\pgf@x%
+    \pgf@y=-\pgf@y%
+  }
+  \anchor{BOX}{ % spare box anchor
+    \pgf@process{\northwest}%
+    \pgf@x=\pgf@x%
+    \pgf@y=-\pgf@y%
+  }
+  \anchor{LINE}{
+    \pgf@process{\northeast}%
+    \pgf@x=-1\pgf@x%
+    \pgf@y=.\pgf@y%
+  }
+  % Draw the rectangle box and the port labels
+  \backgroundpath{
+    % Rectangle box
+    \pgfpathrectanglecorners{\southwest}{\northeast}
+    % Line in the middle
+    \pgf@anchor@spare@LINE
+    \pgf@xa=\pgf@x \pgf@ya=\pgf@y
+    \pgf@xb=\pgf@x \pgf@yb=\pgf@y
+    \advance\pgf@xb by -2\pgf@x
+    \pgfpathmoveto{\pgfpoint{\pgf@xa}{\pgf@ya}}
+    \pgfpathlineto{\pgfpoint{\pgf@xb}{\pgf@ya}}
+    % Box for spare parts
+    \pgf@anchor@spare@BOX
+    \pgf@xa=\pgf@x \pgf@ya=\pgf@y
+    \pgf@xb=\pgf@x \pgf@yb=\pgf@y
+    \pgf@xc=\pgf@x \pgf@yc=\pgf@y
+    \advance\pgf@ya by -.\pgf@y
+    \advance\pgf@xa by -1\pgf@x
+    \advance\pgf@yb by -.8\pgf@y
+    \advance\pgf@xb by -2\pgf@x
+    \pgfpathmoveto{\pgfpoint{\pgf@xa}{\pgf@ya}}
+    \pgfpathlineto{\pgfpoint{\pgf@xa}{\pgf@yb}}
+    \pgfpathlineto{\pgfpoint{\pgf@xb}{\pgf@yb}}
+    \pgfpathlineto{\pgfpoint{\pgf@xb}{\pgf@ya}}
+    \pgfclosepath
+
+    % Draw port labels
+    \begingroup
+    \tikzset{spareM/port labels} % Use font from this style
+    \tikz@textfont
+
+    \pgf@anchor@spare@O
+    \pgftext[top,at={\pgfpoint{\pgf@x}{\pgf@y}},y=-\pgfshapeinnerysep]{}
+
+    \pgf@anchor@spare@P 
+    \pgftext[bottom,at={\pgfpoint{\pgf@x}{\pgf@y}},y=\pgfshapeinnerysep]{}
+    
+    \pgf@anchor@spare@SA
+    \pgftext[bottom,at={\pgfpoint{\pgf@x}{\pgf@y}},y=\pgfshapeinnerysep]{}
+    
+    \pgf@anchor@spare@SB
+    \pgftext[bottom,at={\pgfpoint{\pgf@x}{\pgf@y}},y=\pgfshapeinnerysep]{}
+    
+    \pgf@anchor@spare@SC
+    \pgftext[bottom,at={\pgfpoint{\pgf@x}{\pgf@y}},y=\pgfshapeinnerysep]{}
+    
+    \pgf@anchor@spare@SD
+    \pgftext[bottom,at={\pgfpoint{\pgf@x}{\pgf@y}},y=\pgfshapeinnerysep]{}
+    
+    \pgf@anchor@spare@SE
+    \pgftext[bottom,at={\pgfpoint{\pgf@x}{\pgf@y}},y=\pgfshapeinnerysep]{}
+    \endgroup
+  }
+}
+
+\tikzset{add font/.code={\expandafter\def\expandafter\tikz@textfont\expandafter{\tikz@textfont#1}}} 
+
+\tikzset{spareM/port labels/.style={font=\sffamily\scriptsize}}
+\tikzset{every spareM node/.style={draw,minimum height=1cm,minimum 
+width=1.5cm,inner sep=1mm,outer sep=0pt,cap=round,add 
+font=\sffamily}}
+
+\pgfdeclareshape{fdep}{
+  % The 'minimum width' and 'minimum height' keys, not the content, determine
+  % the size
+  \savedanchor\northeast{%
+    \pgfmathsetlength\pgf@x{\pgfshapeminwidth}%
+    \pgfmathsetlength\pgf@y{\pgfshapeminheight}%
+    \pgf@x=0.5\pgf@x
+    \pgf@y=0.5\pgf@y
+  }
+  % This is redundant, but makes some things easier:
+  \savedanchor\southwest{%
+    \pgfmathsetlength\pgf@x{\pgfshapeminwidth}%
+    \pgfmathsetlength\pgf@y{\pgfshapeminheight}%
+    \pgf@x=-0.5\pgf@x
+    \pgf@y=-0.5\pgf@y
+  }
+  % Inherit from rectangle
+  \inheritanchorborder[from=rectangle]
+
+  % Define same anchor a normal rectangle has
+  \anchor{center}{\pgfpointorigin}
+  \anchor{north}{\northeast \pgf@x=0pt}
+  \anchor{east}{\northeast \pgf@y=0pt}
+  \anchor{south}{\southwest \pgf@x=0pt}
+  \anchor{west}{\southwest \pgf@y=0pt}
+  \anchor{north east}{\northeast}
+  \anchor{north west}{\northeast \pgf@x=-\pgf@x}
+  \anchor{south west}{\southwest}
+  \anchor{south east}{\southwest \pgf@x=-\pgf@x}
+  \anchor{text}{
+    \pgfpointorigin
+    \advance\pgf@x by -.5\wd\pgfnodeparttextbox%
+    \advance\pgf@y by -.5\ht\pgfnodeparttextbox%
+    \advance\pgf@y by +.5\dp\pgfnodeparttextbox%
+  }
+
+  % Define anchors for signal ports
+  \anchor{O}{ % output anchor
+    \pgf@process{\northeast}%
+    \pgf@x=0pt%
+  }
+  \anchor{EA}{ % spare anchor
+    \pgf@process{\northeast}%
+    \pgf@x=.1\pgf@x%
+    \pgf@y=-\pgf@y%
+  }
+  \anchor{EB}{ % spare anchor
+    \pgf@process{\northeast}%
+    \pgf@x=.3\pgf@x%
+    \pgf@y=-\pgf@y%
+  }
+  \anchor{EC}{ % spare anchor
+    \pgf@process{\northeast}%
+    \pgf@x=.5\pgf@x%
+    \pgf@y=-\pgf@y%
+  }
+  \anchor{ED}{ % spare anchor
+    \pgf@process{\northeast}%
+    \pgf@x=.7\pgf@x%
+    \pgf@y=-\pgf@y%
+  }
+  \anchor{EE}{ % spare anchor
+    \pgf@process{\northeast}%
+    \pgf@x=.9\pgf@x%
+    \pgf@y=-\pgf@y%
+  }
+  \anchor{T}{ % trigger anchor
+    \pgf@process{\northeast}%
+    \pgf@x=-1\pgf@x%
+    \pgf@y=-.5\pgf@y%
+  }
+  \anchor{LINE}{
+    \pgf@process{\northeast}%
+    \pgf@x=-1\pgf@x%
+    \pgf@y=.\pgf@y%
+  }
+  % Draw the rectangle box and the port labels
+  \backgroundpath{
+    % Rectangle box
+    \pgfpathrectanglecorners{\southwest}{\northeast}
+    % Line in the middle
+    \pgf@anchor@fdep@LINE
+    \pgf@xa=\pgf@x \pgf@ya=\pgf@y
+    \pgf@xb=\pgf@x \pgf@yb=\pgf@y
+    \advance\pgf@xb by -2\pgf@x
+    \pgfpathmoveto{\pgfpoint{\pgf@xa}{\pgf@ya}}
+    \pgfpathlineto{\pgfpoint{\pgf@xb}{\pgf@ya}}
+    % trinagle input
+    \pgf@anchor@fdep@T
+    \pgf@xa=\pgf@x \pgf@ya=\pgf@y
+    \pgf@xb=\pgf@x \pgf@yb=\pgf@y
+    \pgf@xc=\pgf@x \pgf@yc=\pgf@y
+    \advance\pgf@ya by -.3333\pgf@x
+    \advance\pgf@xb by -.5\pgf@x
+    \advance\pgf@yb by .\pgf@x
+    \advance\pgf@yc by .3333\pgf@x
+    \pgfpathmoveto{\pgfpoint{\pgf@xa}{\pgf@ya}}
+    \pgfpathlineto{\pgfpoint{\pgf@xb}{\pgf@yb}}
+    \pgfpathlineto{\pgfpoint{\pgf@xc}{\pgf@yc}}
+    \pgfclosepath
+
+    % Draw port labels
+    \begingroup
+    \tikzset{fdep/port labels} % Use font from this style
+    \tikz@textfont
+
+    \pgf@anchor@fdep@O
+    \pgftext[top,at={\pgfpoint{\pgf@x}{\pgf@y}},y=-\pgfshapeinnerysep]{}
+    
+    \pgf@anchor@fdep@EA
+    \pgftext[bottom,at={\pgfpoint{\pgf@x}{\pgf@y}},y=\pgfshapeinnerysep]{}
+    
+    \pgf@anchor@fdep@EB
+    \pgftext[bottom,at={\pgfpoint{\pgf@x}{\pgf@y}},y=\pgfshapeinnerysep]{}
+    
+    \pgf@anchor@fdep@EC
+    \pgftext[bottom,at={\pgfpoint{\pgf@x}{\pgf@y}},y=\pgfshapeinnerysep]{}
+    
+    \pgf@anchor@fdep@ED
+    \pgftext[bottom,at={\pgfpoint{\pgf@x}{\pgf@y}},y=\pgfshapeinnerysep]{}
+    
+    \pgf@anchor@fdep@EE
+    \pgftext[bottom,at={\pgfpoint{\pgf@x}{\pgf@y}},y=\pgfshapeinnerysep]{}
+    \endgroup
+  }
+}
+
+\tikzset{add font/.code={\expandafter\def\expandafter\tikz@textfont\expandafter{\tikz@textfont#1}}} 
+
+\tikzset{fdep/port labels/.style={font=\sffamily\scriptsize}}
+\tikzset{every fdep node/.style={draw,minimum height=1cm,minimum 
+width=1.5cm,inner sep=1mm,outer sep=0pt,cap=round,add 
+font=\sffamily}}
+
+\newif\ifpgfshapebaselesstrianglehasinline
+\newif\ifpgfshapebaselesstriangleclose
+\pgfkeys{/pgf/.cd,
+  baseless triangle apex angle/.style={/pgf/isosceles triangle apex angle=#1},
+  baseless triangle inline/.is if=pgfshapebaselesstrianglehasinline,
+  baseless triangle has base/.is if=pgfshapebaselesstriangleclose
+}
+
+\pgfdeclareshape{baseless triangle}{
+  % Copy some stuff from the isosecles triangle
+  \inheritsavedanchors[from={isosceles triangle}]
+  \inheritanchor[from={isosceles triangle}]{center}
+  \inheritanchor[from={isosceles triangle}]{north}
+  \inheritanchor[from={isosceles triangle}]{south}
+  \inheritanchor[from={isosceles triangle}]{east}
+  \inheritanchor[from={isosceles triangle}]{west}
+  \inheritanchorborder[from={isosceles triangle}]
+  \backgroundpath{%
+    % The isoceles triangle defines lots of parameters
+    % in the \trianglepoints macro.
+        \trianglepoints%
+        {%
+            \pgftransformshift{\centerpoint}%
+            \pgftransformrotate{\rotate}%
+            % This bit is a bit of a kludge to ensure the inline
+            % is at the top of the figure.
+            \pgftransformyscale{cos(\rotate)}%
+            \pgfpathmoveto{\lowerleft}%
+            \pgfpathlineto{\apex}%
+            \pgfpathlineto{\lowerleft\pgf@y=-\pgf@y}%
+            % Close the base?
+            \ifpgfshapebaselesstriangleclose%
+              \pgfpathclose%
+            \fi%
+            % Draw the inline?
+            \ifpgfshapebaselesstrianglehasinline
+              \pgfpointdiff{\lowerleft}%
+                 {\pgfpointlineattime{0.125}{\lowerleft}{\lowerleft\pgf@y=-\pgf@y}}%
+                \pgfgetlastxy{\x}{\y}%
+                \pgfmathveclen{\x}{\y}%
+                \let\inlineshift=\pgfmathresult%
+            % Calculate where the inline hits the sloped line of the triangle.
+            \pgfmathparse{\inlineshift/2/sin(\pgfkeysvalueof{/pgf/isosceles triangle apex angle}/2)}%
+            \let\inlineendshift=\pgfmathresult
+            \pgfpathmoveto{\pgfpointadd{\pgfpoint{0pt}{-\inlineshift}}{\lowerleft}}%
+            \pgfpathlineto{\pgfpointlineatdistance{\inlineendshift}{\apex}{\lowerleft}\pgf@y=-\pgf@y}%
+        \fi%
+    }
+    }
+}
+
+
+
+
+
+\makeatother
+
+\tikzstyle{every picture}=[>=stealth]
+\tikzstyle{fdarrow}=[>=triangle 60,double,double equal sign distance,-implies,dashed]
+\tikzstyle{and1}=[and gate US,draw,shape border rotate=90, rotate=90,logic gate inputs=n,minimum width=1cm]
+\tikzstyle{and2}=[and gate US,draw,  shape border rotate=90, rotate=90,logic gate inputs=nn,minimum width=1cm]
+\tikzstyle{and3}=[and gate US,draw, shape border rotate=90, rotate=90,logic gate inputs=nnn,minimum width=1cm]
+\tikzstyle{and}=[and gate US,draw, shape border rotate=90, rotate=90,logic gate inputs=nnn,minimum width=1cm]
+\tikzstyle{and4}=[and gate US,draw, shape border rotate=90, rotate=90,logic gate inputs=nnnn,minimum width=1cm, scale=0.9]
+\tikzstyle{and5}=[and gate US,draw, shape border rotate=90, rotate=90,logic gate inputs=nnnnn,minimum width=1cm, scale=0.8]
+\tikzstyle{and6}=[and gate US,draw, shape border rotate=90, rotate=90,logic gate inputs=nnnnnn,minimum width=1cm, scale=0.7]
+\tikzstyle{or1}=[or gate US,draw,shape border rotate=90, rotate=90,logic gate inputs=n,minimum width=1cm]
+\tikzstyle{or2}=[or gate US,draw,shape border rotate=90, rotate=90,logic gate inputs=nn,minimum width=1cm]
+\tikzstyle{or3}=[or gate US,draw,shape border rotate=90, rotate=90,logic gate inputs=nnn,minimum width=1cm]
+\tikzstyle{or}=[or gate US,draw,shape border rotate=90, rotate=90,logic gate inputs=nnn,minimum width=1cm]
+\tikzstyle{or4}=[or gate US,draw,shape border rotate=90, rotate=90,logic gate inputs=nnnn,minimum width=1cm, scale=0.9]
+\tikzstyle{or5}=[or gate US,draw,shape border rotate=90, rotate=90,logic gate inputs=nnnnn,minimum width=1cm, scale=0.8]
+\tikzstyle{or6}=[or gate US,draw,shape border rotate=90, rotate=90,logic gate inputs=nnnnnn,minimum width=1cm, scale=0.8]
+\tikzstyle{be}=[circle,draw,fill=white!100,anchor=north, inner sep=5pt, minimum width=0.7cm]
+\tikzstyle{cnst}=[diamond,draw,fill=white!100,anchor=north, minimum width=0.5cm,font=\scriptsize, scale=0.8]
+\tikzstyle{seq}=[rectangle, draw, fill=white!100, minimum width=1.0cm, minimum height=0.6cm, inner sep=3pt, label=center:{\LARGE$\rightarrow$}]
+\tikzstyle{seqincl}=[seq, label={[shift={(0.35,-0.65)}]\small{$\leq$}}]
+\tikzstyle{seqexcl}=[seq, label={[shift={(0.35,-0.65)}]\small{$<$}}]
+\tikzstyle{mutex}=[rectangle, draw, fill=white!100, minimum width=1.0cm, minimum height=0.6cm, inner sep=3pt, label=center:{\LARGE$\leftrightarrow$}]
+\tikzstyle{labelbox} = [rectangle, draw, inner sep=2pt, anchor=south, minimum width=0.6cm, minimum height=0.48cm, scale=0.8]
+\tikzstyle{ratebox} = [rectangle, draw=none, inner sep=2pt, anchor=north, minimum width=0.6cm, minimum height=0.48cm, scale=0.8, align=center]
+\tikzstyle{transfer} = [isosceles triangle, draw, shape border rotate=90, inner sep=2pt, minimum width=0.9cm, minimum height=0.7cm, isosceles triangle stretches=true]
+
+\tikzstyle{triangle}=[isosceles triangle,draw,shape border rotate=90,isosceles triangle stretches=true, minimum height=0.6cm,minimum width=0.6cm]
+\tikzstyle{triangle_pand}=[triangle, scale=1.62, yshift=-3.5, xscale=0.80]
+\tikzstyle{btriangle}=[baseless triangle,draw,rotate=90, minimum height=0.6cm]
+\tikzstyle{triangle_por}=[btriangle, scale=1.62, yscale=0.915, xshift=-0.113cm]
+
+\tikzstyle{subtree}=[triangle]
+\tikzstyle{failed}=[draw=red!60!black!100, fill=red!05]
+
+\tikzstyle{repr}=[fill=black!30!white]
+% Need to copy style from spare and explicitly set background colour
+\tikzstyle{spare_repr}=[spare, every spare node/.style={draw,minimum height=1cm,minimum width=1.5cm,fill=black!30!white,inner sep=1mm,outer sep=0pt,cap=round,add font=\sffamily}]

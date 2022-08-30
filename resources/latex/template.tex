@@ -1,0 +1,21 @@
+\documentclass[crop,tikz]{standalone}
+
+\usepackage{amsmath} % Required for aligned
+
+\usetikzlibrary{positioning, shapes, shapes.gates.logic.US} % Required for DFTs
+
+% Load tikz files for DFTs
+\input{dft_tikz}
+
+% Rates for BEs
+\newcommand*{\ratelabel}[2]{\ensuremath{\begin{aligned}\lambda_{a}&=#1\\ \lambda_{p}&=#2\end{aligned}}}
+\newcommand*{\rateactlabel}[1]{\ensuremath{\lambda=#1}}
+\newcommand*{\ratelabeloneline}[2]{\ensuremath{\lambda_{a}=#1, \lambda_{p}=#2}}
+\newcommand*{\problabel}[2]{\ensuremath{\begin{aligned}p_{a}&=#1\\ p_{p}&=#2\end{aligned}}}
+\newcommand*{\probactlabel}[1]{\ensuremath{p=#1}}
+\newcommand*{\problabeloneline}[2]{\ensuremath{p_{a}=#1, p_{p}=#2}}
+
+\begin{document}
+    % Load generated DFT tikz file
+    \input{dft.tex}
+\end{document}

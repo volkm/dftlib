@@ -4,3 +4,6 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 .idea/
+resources/latex/*.aux
+resources/latex/*.log
+resources/latex/*.pdf
