@@ -59,8 +59,10 @@ def generate_tikz_node(element, is_tle=False):
         element, dft_gates.DftPor):
         label_anchor = "east"
     label = name
+    # Replace underscores
+    label = label.replace("_", "\_")
     if is_tle:
-        label = "\\underline{{{}}}".format(name)
+        label = "\\underline{{{}}}".format(label)
     s += "\t\\node[labelbox] ({0}_label) at ({0}.{1}) {{{2}}};\n".format(name, label_anchor, label)
 
     # Add ratebox for BEs
