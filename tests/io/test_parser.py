@@ -27,6 +27,16 @@ def test_load_galileo():
     assert no_elements == 21
 
 
+def test_load_txt():
+    s = " AND(A, OR( B,C) ) "
+    dft = dftlib.io.parser.parse_dft_txt(s)
+    no_be, no_static, no_dynamic, no_elements = dft.statistics()
+    assert no_be == 3
+    assert no_static == 2
+    assert no_dynamic == 0
+    assert no_elements == 5
+
+
 def test_all_gates_types():
     file = get_example_path("json", "all_gates.json")
     dft = dftlib.io.parser.parse_dft_json_file(file)
