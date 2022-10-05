@@ -16,7 +16,7 @@ def create_from_json(json):
     name = data['name']
     gate_type = data['type']
     if 'position' in json:
-        position = (json['position']['x'], json['position']['y'])
+        position = (int(json['position']['x']), int(json['position']['y']))
     else:
         position = (0, 0)
 
@@ -66,7 +66,7 @@ def create_from_json(json):
         raise DftTypeNotKnownException("Gate type '{}' not known.".format(gate_type))
 
     if 'relevant' in data:
-        element.relevant = data['relevant']
+        element.relevant = bool(data['relevant'])
     return element
 
 
