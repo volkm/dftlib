@@ -48,15 +48,15 @@ class SMTAnalysis:
             upper = length
         else:
             # Refine and find upper bound (minimal number of BEs which always leads to a DFT failure)
-            l, u = 0, length
-            while l != u:
-                threshold = math.ceil((l + u) / 2)
-                sat = self.check_threshold(base_encoding, threshold, u, toplevel, smt_file)
+            l_up, u_up = 0, length
+            while l_up != u_up:
+                threshold = math.ceil((l_up + u_up) / 2)
+                sat = self.check_threshold(base_encoding, threshold, u_up, toplevel, smt_file)
                 if sat:
-                    l = threshold
+                    l_up = threshold
                 else:
-                    u = threshold - 1
-            upper = l
+                    u_up = threshold - 1
+            upper = l_up
 
         # Check lower bound
         # No BE failures should lead to no failure
@@ -64,15 +64,15 @@ class SMTAnalysis:
         assert not sat
 
         # Refine and find lower bound (minimal number of BEs which leads to a DFT failure)
-        l, u = 0, upper
-        while l != u:
-            threshold = math.floor((l + u) / 2)
-            sat = self.check_threshold(base_encoding, l, threshold, toplevel, smt_file)
+        l_low, u_low = 0, upper
+        while l_low != u_low:
+            threshold = math.floor((l_low + u_low) / 2)
+            sat = self.check_threshold(base_encoding, l_low, threshold, toplevel, smt_file)
             if sat:
-                u = threshold
+                u_low = threshold
             else:
-                l = threshold + 1
-        lower = l
+                l_low = threshold + 1
+        lower = l_low
 
         return lower, upper, length
 

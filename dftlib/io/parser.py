@@ -81,7 +81,6 @@ def parse_dft_element_txt(dft, dft_text):
     :param dft_text: Textual description of DFT element.
     :return: DFT element.
     """
-    # TODO parse
     s = dft_text.strip()
     pos_opening = s.find('(')
     if pos_opening >= 0:

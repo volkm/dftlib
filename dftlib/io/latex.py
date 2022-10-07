@@ -55,9 +55,8 @@ def generate_tikz_node(element, is_tle=False):
 
     # Add labelbox for all elements
     label_anchor = "north"
-    if isinstance(element, dft_gates.DftAnd) or isinstance(element, dft_gates.DftOr) or isinstance(element, dft_gates.DftVotingGate) or isinstance(element,
-                                                                                                                                                   dft_gates.DftPand) or isinstance(
-        element, dft_gates.DftPor):
+    if isinstance(element, dft_gates.DftAnd) or isinstance(element, dft_gates.DftOr) or isinstance(element, dft_gates.DftVotingGate) or isinstance(element, dft_gates.DftPand) \
+            or isinstance(element, dft_gates.DftPor):
         label_anchor = "east"
     label = name
     # Replace underscores

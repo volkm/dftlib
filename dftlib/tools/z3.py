@@ -43,4 +43,3 @@ class Z3:
             return True
         else:
             raise DftInvalidArgumentException("Unknown output of z3 '" + str(result) + "'")
-            return None
