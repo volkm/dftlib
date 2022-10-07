@@ -159,6 +159,8 @@ class Dft:
         """
         data = dict()
         data['toplevel'] = str(self.top_level_element.element_id)
+        if self.parametric():
+            data['parameters'] = self.parameters
         nodes = []
         for (_, element) in self.elements.items():
             nodes.append(element.get_json())
