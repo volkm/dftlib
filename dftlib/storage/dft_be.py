@@ -1,11 +1,13 @@
+import dftlib.io.number_parser as number_parser
 from dftlib.exceptions.exceptions import DftTypeNotKnownException
 from dftlib.storage.dft_element import DftElement
 
 
-def create_from_json(json):
+def create_from_json(json, parameters=None):
     """
     Create BE from JSON string.
     :param json: JSON string.
+    :param parameters: Parameters which are defined. Used for parsing parametric values.
     :return: DFT BE.
     """
     assert json['group'] == "nodes"
@@ -28,29 +30,29 @@ def create_from_json(json):
         failed = bool(data['failed'])
         element = BeConstant(element_id, name, failed, position)
     elif distribution == "probability":
-        probability = float(data['prob'])
-        dorm = float(data['dorm'])
+        probability = number_parser.parse_number(data['prob'], parameters)
+        dorm = number_parser.parse_number(data['dorm'], parameters)
         element = BeProbability(element_id, name, probability, dorm, position)
     elif distribution == "exponential":
-        rate = float(data['rate'])
-        dorm = float(data['dorm'])
+        rate = number_parser.parse_number(data['rate'], parameters)
+        dorm = number_parser.parse_number(data['dorm'], parameters)
         if 'repair' in data:
-            repair = float(data['repair'])
+            repair = number_parser.parse_number(data['repair'], parameters)
         else:
             repair = 0
         element = BeExponential(element_id, name, rate, dorm, repair, position)
     elif distribution == "erlang":
-        rate = float(data['rate'])
+        rate = number_parser.parse_number(data['rate'], parameters)
         phases = int(data['phases'])
-        dorm = float(data['dorm'])
+        dorm = number_parser.parse_number(data['dorm'], parameters)
         element = BeErlang(element_id, name, rate, phases, dorm, position)
     elif distribution == "weibull":
-        shape = float(data['shape'])
-        rate = float(data['rate'])
+        shape = number_parser.parse_number(data['shape'], parameters)
+        rate = number_parser.parse_number(data['rate'], parameters)
         element = BeWeibull(element_id, name, shape, rate, position)
     elif distribution == "lognormal":
-        mean = float(data['mean'])
-        stddev = float(data['stddev'])
+        mean = number_parser.parse_number(data['mean'], parameters)
+        stddev = number_parser.parse_number(data['stddev'], parameters)
         element = BeLognormal(element_id, name, mean, stddev, position)
     else:
         raise DftTypeNotKnownException("BE distribution '{}' not known.".format(distribution))

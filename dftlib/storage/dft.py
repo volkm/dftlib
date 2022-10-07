@@ -16,6 +16,7 @@ class Dft:
         self.position_bounds = [0, 0, 0, 0]  # Left, Top, Right, Bottom
         self.top_level_element = None
         self.elements = {}
+        self.parameters = None
         # Parse json
         if json:
             self.from_json(json)
@@ -25,6 +26,12 @@ class Dft:
         Initialize from JSON.
         :param json: JSON object.
         """
+        # Parse (optional) parameters
+        if 'parameters' in json:
+            self.parameters = []
+            for param in json['parameters']:
+                assert param not in self.parameters
+                self.parameters.append(param)
         # Parse nodes
         for node in json['nodes']:
             element_type = node['data']['type']
@@ -32,9 +39,9 @@ class Dft:
                 # Compound nodes are ignored
                 continue
             elif element_type == "be" or element_type == "be_exp":
-                self.add(dft_be.create_from_json(node))
+                self.add(dft_be.create_from_json(node, self.parameters))
             else:
-                self.add(dft_gates.create_from_json(node))
+                self.add(dft_gates.create_from_json(node, self.parameters))
 
         # Set children
         for node in json['nodes']:
@@ -52,6 +59,22 @@ class Dft:
         if top_level_id < 0:
             raise DftInvalidArgumentException("Top level element not defined")
         self.set_top_level_element(top_level_id)
+
+    def parametric(self):
+        """
+        Return whether the DFT contains parameters.
+        :return: True iff parameters are defined.
+        """
+        return self.parameters is not None
+
+    def has_parameter(self, name):
+        """
+        Check whether the given parameter is known.
+        :param name: Name of the parameter.
+        :return: True iff parameter was defined before.
+        """
+        assert self.parametric()
+        return name in self.parameters
 
     def next_id(self):
         return self.max_id + 1

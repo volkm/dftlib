@@ -1,12 +1,14 @@
+import dftlib.io.number_parser as number_parser
 from dftlib.exceptions.exceptions import DftTypeNotKnownException
 from dftlib.storage.dft_element import DftElement
 
 
-def create_from_json(json):
+def create_from_json(json, parameters=None):
     """
     Create DFT gate from JSON string.
     The children are ignored and must be explicitly set afterwards when all elements are known.
     :param json: JSON string.
+    :param parameters: Parameters which are defined. Used for parsing parametric values.
     :return: DFT gate.
     """
     assert json['group'] == "nodes"
@@ -37,7 +39,7 @@ def create_from_json(json):
     elif gate_type == "pdep":
         # PDEP (dependency with probability)
         assert 'probability' in data
-        prob = float(data['probability'])
+        prob = number_parser.parse_number(data['probability'], parameters)
         element = DftDependency(element_id, name, prob, [], position)
     elif gate_type == "pand":
         # PAND
