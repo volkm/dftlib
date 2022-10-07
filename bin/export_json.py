@@ -20,5 +20,5 @@ if __name__ == "__main__":
     logging.info(dft)
 
     # Save DFT again
-    dftlib.io.export.export_dft_json(dft, args.out)
+    dftlib.io.export.export_dft_json_file(dft, args.out)
     logging.info("Exported DFT in JSON format.")

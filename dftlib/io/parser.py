@@ -60,9 +60,18 @@ def parse_dft_json_file(file):
     :param file: File.
     :return: DFT.
     """
-    with open(file) as jsonFile:
-        json_obj = json.load(jsonFile)
+    with open(file) as json_file:
+        json_obj = json.load(json_file)
     return parse_dft_json(json_obj)
+
+
+def parse_dft_json_string(json_string):
+    """
+    Parse DFT from JSON string.
+    :param json_string: JSON string.
+    :return: DFT.
+    """
+    return parse_dft_json(json.loads(json_string))
 
 
 def parse_dft_element_txt(dft, dft_text):

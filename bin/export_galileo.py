@@ -20,5 +20,5 @@ if __name__ == "__main__":
     logging.info(dft)
 
     # Save DFT again
-    dftlib.io.export.export_dft_galileo(dft, args.out)
+    dftlib.io.export.export_dft_galileo_file(dft, args.out)
     logging.info("Exported DFT in Galileo format.")

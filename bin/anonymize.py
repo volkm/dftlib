@@ -24,5 +24,5 @@ if __name__ == "__main__":
     dftlib.transformer.anonymizer.make_anonymous(dft, args.grid)
 
     # Save DFT again
-    dftlib.io.export.export_dft_json(dft, args.out)
+    dftlib.io.export.export_dft_json_file(dft, args.out)
     logging.info("Anonymized DFT.")

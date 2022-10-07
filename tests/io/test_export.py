@@ -11,7 +11,7 @@ def test_export_galileo(tmpdir):
     dft = dftlib.io.parser.parse_dft_json_file(file)
 
     tmp_path = os.path.join(tmpdir, "hecs.dft")
-    dftlib.io.export.export_dft_galileo(dft, tmp_path)
+    dftlib.io.export.export_dft_galileo_file(dft, tmp_path)
 
     expected_lines = [
         'toplevel "HECS";',
@@ -49,7 +49,7 @@ def test_export_json_all_gates(tmpdir):
     dft = dftlib.io.parser.parse_dft_json_file(file)
 
     tmp_path = os.path.join(tmpdir, "all_gates.json")
-    dftlib.io.export.export_dft_json(dft, tmp_path)
+    dftlib.io.export.export_dft_json_file(dft, tmp_path)
     dft2 = dftlib.io.parser.parse_dft_json_file(tmp_path)
 
     assert dft.compare(dft2, respect_ids=True)
@@ -60,7 +60,17 @@ def test_export_json_all_be(tmpdir):
     dft = dftlib.io.parser.parse_dft_json_file(file)
 
     tmp_path = os.path.join(tmpdir, "all_be_distributions.json")
-    dftlib.io.export.export_dft_json(dft, tmp_path)
+    dftlib.io.export.export_dft_json_file(dft, tmp_path)
     dft2 = dftlib.io.parser.parse_dft_json_file(tmp_path)
+
+    assert dft.compare(dft2, respect_ids=True)
+
+
+def test_export_json_string_all_gates():
+    file = get_example_path("json", "all_gates.json")
+    dft = dftlib.io.parser.parse_dft_json_file(file)
+
+    json_string = dftlib.io.export.export_dft_json_string(dft)
+    dft2 = dftlib.io.parser.parse_dft_json_string(json_string)
 
     assert dft.compare(dft2, respect_ids=True)

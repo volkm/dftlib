@@ -4,7 +4,7 @@ import dftlib.storage.dft_gates as dft_gates
 from dftlib.exceptions.exceptions import DftTypeNotKnownException, DftInvalidArgumentException
 
 
-def export_dft_json(dft, file):
+def export_dft_json_file(dft, file):
     """
     Export DFT to JSON file.
     :param dft: DFT.
@@ -12,6 +12,15 @@ def export_dft_json(dft, file):
     """
     with open(file, 'w') as outFile:
         json.dump(dft.json(), outFile, indent=4)
+
+
+def export_dft_json_string(dft, indent=None):
+    """
+    Export DFT to JSON string.
+    :param dft: DFT.
+    :param indent: Indentation level.
+    """
+    return json.dumps(dft.json(), indent=indent)
 
 
 def galileo_name(element):
@@ -23,7 +32,7 @@ def galileo_name(element):
     return '"{}"'.format(element.name)
 
 
-def export_dft_galileo(dft, file):
+def export_dft_galileo_file(dft, file):
     """
     Export DFT to Galileo file.
     :param dft: DFT.
