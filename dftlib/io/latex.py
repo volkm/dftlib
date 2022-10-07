@@ -12,6 +12,7 @@ def generate_tikz_node(element, is_tle=False):
     position = "({}, {})".format(pos_x, pos_y)
 
     # Set node type
+    no_children = 0
     if not element.is_be():
         if len(element.outgoing) > 6:
             raise DftTypeNotSupportedException("More than 6 children (for element '{}') are currently not supported for tikz export.".format(element.name))

@@ -1,7 +1,7 @@
 import json
 
 import dftlib.tools.stormpy as stormpy
-from dftlib.exceptions.exceptions import DftInvalidArgumentException
+from dftlib.exceptions.exceptions import DftInvalidArgumentException, DftTypeNotKnownException
 from dftlib.storage.dft import Dft
 from dftlib.storage.dft_be import BeExponential
 from dftlib.storage.dft_gates import DftAnd, DftOr
@@ -160,7 +160,7 @@ def parse_dft(file):
         return parse_dft_galileo(file)
     elif is_json_file(file):
         return parse_dft_json_file(file)
-    elif is_txt_file(file):
+    elif is_text_file(file):
         return parse_dft_txt_file(file)
     else:
         raise DftInvalidArgumentException("File type of '{}' not known.".format(file))
