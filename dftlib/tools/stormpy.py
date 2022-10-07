@@ -1,3 +1,4 @@
+import dftlib.io.export
 from dftlib.exceptions.exceptions import ToolNotFound
 
 """
@@ -36,3 +37,17 @@ def convert_to_json(file):
     """
     dft_stormpy = _stormpy.dft.load_dft_galileo_file(file)
     return _stormpy.dft.export_dft_json_string(dft_stormpy)
+
+
+@requires_stormpy
+def get_stormpy_dft(dft):
+    """
+    Convert DFT to representation in stormpy.
+    :param dft: DFT as dftlib object.
+    :return: DFT as stormpy object.
+    """
+    json_string = dftlib.io.export.export_dft_json_string(dft, indent=None)
+    if dft.parametric():
+        return _stormpy.dft.load_parametric_dft_json_string(json_string)
+    else:
+        return _stormpy.dft.load_dft_json_string(json_string)

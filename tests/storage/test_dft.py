@@ -1,6 +1,11 @@
+from conftest import stormpy
+from helpers.helper import get_example_path
+
+import dftlib.io.parser
 import dftlib.storage.dft as dfts
 import dftlib.storage.dft_be as dft_be
 import dftlib.storage.dft_gates as dft_gates
+import dftlib.tools.stormpy as sp
 
 
 def test_create_dft():
@@ -20,3 +25,19 @@ def test_create_dft():
     assert no_dynamic == 0
     assert no_elements == 3
     assert dft.top_level_element.element_id == 2
+
+
+@stormpy
+def test_convert_stormpy_dft():
+    file = get_example_path("galileo", "mcs.dft")
+    dft = dftlib.io.parser.parse_dft_galileo(file)
+    no_be, no_static, no_dynamic, no_elements = dft.statistics()
+    assert no_be == 12
+    assert no_static == 4
+    assert no_dynamic == 5
+    assert no_elements == 21
+
+    sp_dft = sp.get_stormpy_dft(dft)
+    assert sp_dft.nr_be() == 12
+    assert sp_dft.nr_dynamic() == 5
+    assert sp_dft.nr_elements() == 21
