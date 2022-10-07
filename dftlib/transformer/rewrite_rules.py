@@ -100,6 +100,10 @@ def try_merge_bes_in_or(dft, or_gate):
     if not isinstance(or_gate, dft_gates.DftOr):
         return False
 
+    if dft.parametric():
+        # BEs with parameters are currently not supported.
+        return False
+
     child_bes = []
     for child in or_gate.outgoing:
         # Check if rule is applicable for BE
