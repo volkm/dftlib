@@ -27,7 +27,7 @@ class Dft:
         :param json: JSON object.
         """
         # Parse (optional) parameters
-        if 'parameters' in json:
+        if 'parameters' in json and len(json['parameters']) > 0:
             self.parameters = []
             for param in json['parameters']:
                 assert param not in self.parameters
