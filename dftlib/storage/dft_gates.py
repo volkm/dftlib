@@ -117,23 +117,22 @@ class DftGate(DftElement):
                     return False
             return True
         else:
-            map_outgoing = {elem.element_id: elem for elem in other.outgoing}
+            # Use either id or name as unique identifier
+            map_outgoing = {elem.element_id if respect_ids else elem.name: elem for elem in other.outgoing}
             for element in self.outgoing:
-                elem_id = element.element_id
-                if elem_id in map_outgoing:
-                    if element.compare(map_outgoing[elem_id], respect_ids):
+                identifier = element.element_id if respect_ids else element.name
+                if identifier in map_outgoing:
+                    if element.compare(map_outgoing[identifier], respect_ids):
                         # Found matching successor
-                        del map_outgoing[elem_id]
+                        del map_outgoing[identifier]
                     else:
                         # Not matching
                         return False
                 else:
                     # Found no matching successor in other
                     return False
-            if len(map_outgoing) > 0:
-                # Some successors of other are not present in self
-                return False
 
+            assert len(map_outgoing) == 0
             return True
 
     def get_json(self):

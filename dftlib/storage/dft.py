@@ -213,32 +213,41 @@ class Dft:
     def compare(self, other, respect_ids):
         """
         Compare two DFT.
+        Note that the comparison currently performs redundant work as for each element comparison the complete subtree is chekced.
         :param other: Other DFT.
         :param respect_ids: Whether the ids must be equal.
         :return: True iff all elements, the top-level element and the structure are equal between the two DFTs.
         """
-        if not self.top_level_element.compare(other.top_level_element, respect_ids):
-            raise Exception("Top level elements {} and {} not equal.".format(self.top_level_element, other.top_level_element))
-
         if len(self.elements) != len(other.elements):
             raise Exception("Different number of elements: {} and {}.".format(len(self.elements), len(other.elements)))
 
-        maximal = max(self.max_id, other.max_id)
-        for i in range(0, maximal):
-            element = None
-            other_element = None
-            if i in self.elements:
+        if respect_ids:
+            if self.max_id != other.max_id:
+                raise Exception("Different maximal ids: {} and {} .".format(self.max_id, other.max_id))
+            for i in range(0, self.max_id):
+                assert i in self.elements
                 element = self.elements[i]
-            if i in other.elements:
+                assert i in other.elements
                 other_element = other.elements[i]
-            if element is None:
-                if other_element is not None:
-                    raise Exception("Element with id {} only exists in one.".format(i))
-            elif other_element is None:
-                raise Exception("Element with id {} only exists in one.".format(i))
-            else:
                 if not element.compare(other_element, respect_ids):
                     raise Exception("Elements with id {} are different: {} and {}.".format(i, element, other_element))
+        else:
+            # Prepare mapping from name to id (for other DFT)
+            # because ids could be different between both DFTs
+            other_mapping = dict()
+            for element in other.elements.values():
+                assert element.name not in other_mapping
+                other_mapping[element.name] = element
+
+            for element in self.elements.values():
+                if element.name not in other_mapping:
+                    raise Exception("Element {} not present in other DFT.".format(element))
+                other_element = other_mapping[element.name]
+                if not element.compare(other_element, respect_ids):
+                    raise Exception("Elements are different: {} and {}.".format(element, other_element))
+
+        if not self.top_level_element.compare(other.top_level_element, respect_ids):
+            raise Exception("Top level elements {} and {} not equal.".format(self.top_level_element, other.top_level_element))
 
         return True
 
