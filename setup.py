@@ -1,7 +1,7 @@
 import os
 import sys
 
-from setuptools import setup
+from setuptools import setup, find_packages
 from setuptools.command.test import test
 
 # Get the long description from the README file
@@ -28,7 +28,7 @@ setup(
     description='dftlib - Python library for dynamic fault tree analysis',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    packages=['dftlib'],
+    packages=find_packages(),
     cmdclass={
         'test': PyTest
     },
