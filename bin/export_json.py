@@ -1,7 +1,7 @@
 import argparse
 import logging
 
-import dftlib.io.export
+import dftlib.io.export_json
 import dftlib.io.parser
 import dftlib.transformer.simplifier
 
@@ -20,5 +20,5 @@ if __name__ == "__main__":
     logging.info(dft)
 
     # Save DFT again
-    dftlib.io.export.export_dft_json_file(dft, args.out)
+    dftlib.io.export_json.export_dft_file(dft, args.out)
     logging.info("Exported DFT in JSON format.")

@@ -1,4 +1,4 @@
-import dftlib.io.export
+import dftlib.io.export_json
 from dftlib.exceptions.exceptions import ToolNotFound
 
 """
@@ -46,7 +46,7 @@ def get_stormpy_dft(dft):
     :param dft: DFT as dftlib object.
     :return: DFT as stormpy object.
     """
-    json_string = dftlib.io.export.export_dft_json_string(dft, indent=None)
+    json_string = dftlib.io.export_json.export_dft_string(dft, indent=None)
     if dft.parametric():
         return _stormpy.dft.load_parametric_dft_json_string(json_string)
     else:

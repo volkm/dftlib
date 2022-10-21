@@ -1,7 +1,7 @@
 from conftest import stormpy
 from helpers.helper import get_example_path
 
-import dftlib.io.export
+import dftlib.io.export_json
 import dftlib.io.parser
 import dftlib.storage.dft_be as dft_be
 
