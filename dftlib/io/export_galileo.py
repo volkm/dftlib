@@ -1,3 +1,4 @@
+import dftlib.storage.dft_be as dft_be
 import dftlib.storage.dft_gates as dft_gates
 from dftlib.exceptions.exceptions import DftTypeNotKnownException, DftInvalidArgumentException
 
@@ -53,9 +54,9 @@ def export_gate_string(gate):
     elif isinstance(gate, dft_gates.DftVotingGate):
         s += " vot{}".format(gate.voting_threshold)
     elif isinstance(gate, dft_gates.DftPand):
-        s += " pand" + ("" if gate.inclusive else "excl")
+        s += " pand" + ("" if gate.inclusive else "-excl")
     elif isinstance(gate, dft_gates.DftPor):
-        s += " por" + ("" if gate.inclusive else "excl")
+        s += " por" + ("" if gate.inclusive else "-excl")
     elif isinstance(gate, dft_gates.DftSpare):
         assert gate.element_type == "spare"
         s += " wsp"
@@ -87,7 +88,28 @@ def export_be_string(be):
     assert be.is_be()
     s = galileo_name(be)
 
-    s += " lambda={}".format(be.rate)
-    s += " dorm={}".format(be.dorm)
+    # Handle BE type
+    if isinstance(be, dft_be.BeConstant):
+        s += " prob=" + ("1" if be.failed else "0")
+    elif isinstance(be, dft_be.BeProbability):
+        s += " prob={}".format(be.probability)
+        s += " dorm={}".format(be.dorm)
+    elif isinstance(be, dft_be.BeExponential):
+        s += " lambda={}".format(be.rate)
+        s += " dorm={}".format(be.dorm)
+        if be.repair > 0:
+            s += " repair={}".format(be.repair)
+    elif isinstance(be, dft_be.BeErlang):
+        s += " lambda={}".format(be.rate)
+        s += " phases={}".format(be.phases)
+        s += " dorm={}".format(be.dorm)
+    elif isinstance(be, dft_be.BeWeibull):
+        s += " shape={}".format(be.shape)
+        s += " rate={}".format(be.rate)
+    elif isinstance(be, dft_be.BeLognormal):
+        s += " mean={}".format(be.mean)
+        s += " stddev={}".format(be.stddev)
+    else:
+        raise DftTypeNotKnownException("BE distribution '{}' not known.".format(be.distribution))
 
     return s

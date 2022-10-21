@@ -1,5 +1,6 @@
 import os
 
+from conftest import stormpy
 from helpers.helper import get_example_path
 
 import dftlib.io.export_galileo
@@ -73,5 +74,39 @@ def test_export_json_string_all_gates():
 
     json_string = dftlib.io.export_json.export_dft_string(dft)
     dft2 = dftlib.io.parser.parse_dft_json_string(json_string)
+
+    assert dft.compare(dft2, respect_ids=True)
+
+
+def test_export_json_string_all_be():
+    file = get_example_path("json", "all_be_distributions.json")
+    dft = dftlib.io.parser.parse_dft_json_file(file)
+
+    json_string = dftlib.io.export_json.export_dft_string(dft)
+    dft2 = dftlib.io.parser.parse_dft_json_string(json_string)
+
+    assert dft.compare(dft2, respect_ids=True)
+
+
+@stormpy
+def test_export_galileo_all_gates(tmpdir):
+    file = get_example_path("json", "all_gates.json")
+    dft = dftlib.io.parser.parse_dft_json_file(file)
+
+    tmp_path = os.path.join(tmpdir, "all_gates.dft")
+    dftlib.io.export_galileo.export_dft_file(dft, tmp_path)
+    dft2 = dftlib.io.parser.parse_dft_galileo(tmp_path)
+
+    assert dft.compare(dft2, respect_ids=False)
+
+
+@stormpy
+def test_export_galileo_all_be(tmpdir):
+    file = get_example_path("json", "all_be_distributions.json")
+    dft = dftlib.io.parser.parse_dft_json_file(file)
+
+    tmp_path = os.path.join(tmpdir, "all_be_distributions.dft")
+    dftlib.io.export_galileo.export_dft_file(dft, tmp_path)
+    dft2 = dftlib.io.parser.parse_dft_galileo(tmp_path)
 
     assert dft.compare(dft2, respect_ids=True)
