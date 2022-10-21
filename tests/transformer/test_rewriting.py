@@ -69,9 +69,9 @@ def test_rewrite_parametric():
     assert no_elements == 3
 
     changed = simplifier.simplify_dft_all_rules(dft)
-    assert not changed
+    assert changed
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
-    assert no_be == 2
+    assert no_be == 1
     assert no_static == 1
     assert no_dynamic == 0
-    assert no_elements == 3
+    assert no_elements == 2

@@ -100,10 +100,6 @@ def try_merge_bes_in_or(dft, or_gate):
     if not isinstance(or_gate, dft_gates.DftOr):
         return False
 
-    if dft.parametric():
-        # BEs with parameters are currently not supported.
-        return False
-
     child_bes = []
     for child in or_gate.outgoing:
         # Check if rule is applicable for BE
@@ -115,15 +111,44 @@ def try_merge_bes_in_or(dft, or_gate):
 
     # Merge BEs into one
     first_child = child_bes[0]
-    passive_rate = first_child.dorm * first_child.rate
-    for element in child_bes[1:]:
-        first_child.name += "_" + element.name
-        # Update rates
-        first_child.rate += element.rate
-        passive_rate += element.dorm * element.rate
-        dft.remove(element)
 
-    first_child.dorm = passive_rate / first_child.rate
+    if dft.parametric():
+        # Handle numbers as strings
+        assert isinstance(first_child.rate, str)
+        assert isinstance(first_child.dorm, str)
+        active_rate = "({})".format(first_child.rate)
+        passive_rate = "(({}) * ({}))".format(first_child.dorm, first_child.rate)
+        # Keep track whether all BEs have the same dormancy factor. This can lead to a simpler dormancy factor
+        same_dorm = True
+        for element in child_bes[1:]:
+            first_child.name += "_" + element.name
+            # Update rates
+            assert isinstance(element.rate, str)
+            assert isinstance(element.dorm, str)
+            active_rate += " + ({})".format(element.rate)
+            passive_rate += " + (({}) * ({}))".format(element.dorm, element.rate)
+            if element.dorm != first_child.dorm:
+                same_dorm = False
+            dft.remove(element)
+        first_child.rate = active_rate
+        if not same_dorm:
+            # Need to set a new dormancy factor
+            first_child.dorm = "({}) / ({})".format(passive_rate, active_rate)
+    else:
+        assert isinstance(first_child.rate, float)
+        assert isinstance(first_child.dorm, float)
+        passive_rate = first_child.dorm * first_child.rate
+        for element in child_bes[1:]:
+            first_child.name += "_" + element.name
+            # Update rates
+            assert isinstance(element.rate, float)
+            assert isinstance(element.dorm, float)
+            first_child.rate += element.rate
+            passive_rate += element.dorm * element.rate
+            dft.remove(element)
+
+        first_child.dorm = passive_rate / first_child.rate
+
     return True
 
 
