@@ -213,7 +213,7 @@ class Dft:
     def compare(self, other, respect_ids):
         """
         Compare two DFT.
-        Note that the comparison currently performs redundant work as for each element comparison the complete subtree is chekced.
+        Note that the comparison currently performs redundant work as for each element comparison the complete subtree is checked.
         :param other: Other DFT.
         :param respect_ids: Whether the ids must be equal.
         :return: True iff all elements, the top-level element and the structure are equal between the two DFTs.
