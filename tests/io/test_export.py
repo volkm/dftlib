@@ -110,3 +110,14 @@ def test_export_galileo_all_be(tmpdir):
     dft2 = dftlib.io.parser.parse_dft_galileo(tmp_path)
 
     assert dft.compare(dft2, respect_ids=True)
+
+
+def test_export_json_parametric(tmpdir):
+    file = get_example_path("json", "parametric.json")
+    dft = dftlib.io.parser.parse_dft_json_file(file)
+
+    tmp_path = os.path.join(tmpdir, "parametric.json")
+    dftlib.io.export_json.export_dft_file(dft, tmp_path)
+    dft2 = dftlib.io.parser.parse_dft_json_file(tmp_path)
+
+    assert set(dft.parameters) == set(dft2.parameters)

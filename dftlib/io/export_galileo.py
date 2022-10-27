@@ -30,7 +30,13 @@ def export_dft_file(dft, file):
 
     # Write file
     with open(file, 'w') as out_file:
+        # Parameters
+        if dft.parametric():
+            for param in dft.parameters:
+                out_file.write("param {};\n".format(param))
+        # Top level event
         out_file.write("toplevel {};\n".format(galileo_name(dft.top_level_element)))
+        # DFT elements
         for element in elements:
             if element.is_be():
                 out_file.write(export_be_string(element) + ";\n")

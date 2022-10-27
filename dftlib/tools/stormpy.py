@@ -35,8 +35,18 @@ def convert_to_json(file):
     :param file: Galileo file.
     :return: JSON string of the DFT.
     """
-    dft_stormpy = _stormpy.dft.load_dft_galileo_file(file)
-    return _stormpy.dft.export_dft_json_string(dft_stormpy)
+    # Check whether the file contains a parametric DFT
+    parametric = False
+    with open(file) as f:
+        # Check whether the file starts with 'param xyz;'
+        if f.readline().startswith('param'):
+            parametric = True
+    if parametric:
+        dft_stormpy = _stormpy.dft.load_parametric_dft_galileo_file(file)
+        return _stormpy.dft.export_parametric_dft_json_string(dft_stormpy)
+    else:
+        dft_stormpy = _stormpy.dft.load_dft_galileo_file(file)
+        return _stormpy.dft.export_dft_json_string(dft_stormpy)
 
 
 @requires_stormpy

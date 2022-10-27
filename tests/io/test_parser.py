@@ -35,6 +35,21 @@ def test_load_parametric_json():
     assert no_static == 1
     assert no_dynamic == 0
     assert no_elements == 3
+    assert dft.parametric()
+    assert len(dft.parameters) == 2
+
+
+@stormpy
+def test_load_parametric_galileo():
+    file = get_example_path("galileo", "parametric.dft")
+    dft = dftlib.io.parser.parse_dft_galileo(file)
+    no_be, no_static, no_dynamic, no_elements = dft.statistics()
+    assert no_be == 3
+    assert no_static == 1
+    assert no_dynamic == 1
+    assert no_elements == 5
+    assert dft.parametric()
+    assert len(dft.parameters) == 2
 
 
 def test_load_txt():
