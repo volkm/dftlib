@@ -169,3 +169,30 @@ def test_rewrite_all_rule28():
     assert no_static == 1
     assert no_dynamic == 1
     assert no_elements == 4
+
+
+def test_merge_bes_parametric():
+    file = get_example_path("json", "parametric.json")
+    dft = dftlib.io.parser.parse_dft_json_file(file)
+    no_be, no_static, no_dynamic, no_elements = dft.statistics()
+    assert no_be == 2
+    assert no_static == 1
+    assert no_dynamic == 0
+    assert no_elements == 3
+    be_a = dft.get_element_by_name("A")
+    assert be_a.dorm == 1
+    assert be_a.rate == "(a)/(1)"
+    be_b = dft.get_element_by_name("B")
+    assert be_b.dorm == 1
+    assert be_b.rate == "(b)/(1)"
+
+    changed = simplifier.simplify_dft_all_rules(dft)
+    assert changed
+    no_be, no_static, no_dynamic, no_elements = dft.statistics()
+    assert no_be == 1
+    assert no_static == 1
+    assert no_dynamic == 0
+    assert no_elements == 2
+    be = dft.get_element_by_name("A_B")
+    assert be.dorm == 1
+    assert be.rate == "((a)/(1)) + ((b)/(1))"

@@ -1,4 +1,4 @@
-import dftlib.io.number_parser as number_parser
+import dftlib.utility.numbers as numbers
 from dftlib.exceptions.exceptions import DftTypeNotKnownException
 from dftlib.storage.dft_element import DftElement
 
@@ -39,7 +39,7 @@ def create_from_json(json, parameters=None):
     elif gate_type == "pdep":
         # PDEP (dependency with probability)
         assert 'probability' in data
-        prob = number_parser.parse_number(data['probability'], parameters)
+        prob = numbers.parse_number(data['probability'], parameters)
         element = DftDependency(element_id, name, prob, [], position)
     elif gate_type == "pand":
         # PAND

@@ -120,4 +120,5 @@ def test_export_json_parametric(tmpdir):
     dftlib.io.export_json.export_dft_file(dft, tmp_path)
     dft2 = dftlib.io.parser.parse_dft_json_file(tmp_path)
 
+    assert dft.compare(dft2, respect_ids=True)
     assert set(dft.parameters) == set(dft2.parameters)

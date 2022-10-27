@@ -2,6 +2,7 @@ from enum import Enum
 
 import dftlib.storage.dft_gates as dft_gates
 import dftlib.transformer.trimming as trimming
+import dftlib.utility.numbers as numbers
 from dftlib.exceptions.exceptions import DftInvalidArgumentException
 
 """
@@ -104,50 +105,92 @@ def try_merge_bes_in_or(dft, or_gate):
     for child in or_gate.outgoing:
         # Check if rule is applicable for BE
         if child.is_be() and len(child.ingoing) <= 1 and not child.relevant and child.distribution == "exponential":
-            child_bes.append(child)
+            # Repair rates need dedicated handling
+            if numbers.is_zero(child.repair):
+                child_bes.append(child)
 
     if len(child_bes) <= 1:
         return False
 
     # Merge BEs into one
+    # Needs careful distinction between numbers represented as floats and rational functions represented as strings
+    name = ""
+    active_rate_float = 0
+    passive_rate_float = 0
+    active_rate_str = ""
+    passive_rate_str = ""
     first_child = child_bes[0]
+    for element in child_bes:
+        # Set name
+        if name:
+            name += "_"
+        name += element.name
 
-    if dft.parametric():
-        # Handle numbers as strings
-        assert isinstance(first_child.rate, str)
-        assert isinstance(first_child.dorm, str)
-        active_rate = "({})".format(first_child.rate)
-        passive_rate = "(({}) * ({}))".format(first_child.dorm, first_child.rate)
-        # Keep track whether all BEs have the same dormancy factor. This can lead to a simpler dormancy factor
-        same_dorm = True
-        for element in child_bes[1:]:
-            first_child.name += "_" + element.name
-            # Update rates
-            assert isinstance(element.rate, str)
-            assert isinstance(element.dorm, str)
-            active_rate += " + ({})".format(element.rate)
-            passive_rate += " + (({}) * ({}))".format(element.dorm, element.rate)
-            if element.dorm != first_child.dorm:
-                same_dorm = False
+        # Set active rate
+        if isinstance(element.rate, float):
+            active_rate_float += element.rate
+        else:
+            if active_rate_str:
+                active_rate_str += " + "
+            active_rate_str += "({})".format(element.rate)
+
+        # Set passive rate
+        if numbers.is_one(element.dorm):
+            # Passive rate is active rate
+            if isinstance(element.rate, float):
+                passive_rate_float += active_rate_float
+            else:
+                if passive_rate_str:
+                    passive_rate_str += " + "
+                passive_rate_str += "({})".format(element.rate)
+        elif numbers.is_zero(element.dorm):
+            # Passive rate is zero
+            pass
+        else:
+            if isinstance(element.dorm, float) and isinstance(element.rate, float):
+                passive_rate_float += element.dorm * element.rate
+            else:
+                if passive_rate_str:
+                    passive_rate_str += " + "
+                passive_rate_str += "(({}) * ({}))".format(element.dorm, element.rate)
+
+        assert numbers.is_zero(element.repair)
+        # Remove merged element from DFT
+        if element != first_child:
             dft.remove(element)
-        first_child.rate = active_rate
-        if not same_dorm:
-            # Need to set a new dormancy factor
-            first_child.dorm = "({}) / ({})".format(passive_rate, active_rate)
+
+    # Update merged BE
+    # Set name
+    first_child.name = name
+    
+    # Set active rate
+    if active_rate_str is None:
+        first_child.rate = active_rate_float
+    elif active_rate_float > 0:
+        first_child.rate = "{} + ({})".format(active_rate_float, active_rate_str)
     else:
-        assert isinstance(first_child.rate, float)
-        assert isinstance(first_child.dorm, float)
-        passive_rate = first_child.dorm * first_child.rate
-        for element in child_bes[1:]:
-            first_child.name += "_" + element.name
-            # Update rates
-            assert isinstance(element.rate, float)
-            assert isinstance(element.dorm, float)
-            first_child.rate += element.rate
-            passive_rate += element.dorm * element.rate
-            dft.remove(element)
+        first_child.rate = active_rate_str
 
+    # Compute passive rate
+    if passive_rate_str is None:
+        passive_rate = passive_rate_float
+    elif passive_rate_float > 0:
+        passive_rate = "{} + ({})".format(passive_rate_float, passive_rate_str)
+    else:
+        passive_rate = passive_rate_str
+
+    # Set dormancy factor
+    if isinstance(first_child.rate, float) and isinstance(passive_rate, float):
         first_child.dorm = passive_rate / first_child.rate
+    elif numbers.is_zero(passive_rate):
+        first_child.dorm = 0.0
+    elif first_child.rate == passive_rate:
+        first_child.dorm = 1.0
+    else:
+        first_child.dorm = "({}) / ({})".format(passive_rate, first_child.rate)
+
+    # Repair rate is zero
+    first_child.repair = 0.0
 
     return True
 
