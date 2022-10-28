@@ -265,8 +265,10 @@ def try_merge_identical_gates(dft, gate1, gate2):
     # Gates can be merged
     # Add parents of gate2 to gate1
     for parent in gate2.parents():
-        if gate1 not in parent.children():
-            parent.add_child(gate1)
+        # Add gate if not yet present or add gate a second time when order is important
+        if gate1 not in parent.children() or isinstance(parent, dft_gates.DftPriorityGate):
+            parent.replace_child(gate2, gate1)
+
     # Merge names as well
     gate1.name += "_" + gate2.name
     # Remove gate2
@@ -299,8 +301,10 @@ def try_remove_gates_with_one_successor(dft, gate):
 
     # Add child to parents
     for parent in gate.parents():
-        if child not in parent.children():
-            parent.add_child(child)
+        # Add gate if not yet present or add gate a second time when order is important
+        if child not in parent.children() or isinstance(parent, dft_gates.DftPriorityGate):
+            parent.replace_child(gate, child)
+
     # Remove gate
     dft.remove(gate)
     return True
@@ -404,14 +408,12 @@ def add_or_as_predecessor(dft, element, name=None):
         name = "OR_{}".format(dft.next_id())
     # Remember all parents
     parents = [parent for parent in element.parents()]
-    # Remove element from all parents
-    for parent in parents:
-        parent.remove_child(element)
     position = (element.position[0] - 100, element.position[1] - 150)
     or_gate = dft_gates.DftOr(dft.next_id(), name, [element], position)
     dft.add(or_gate)
+    # Replace current element by or_gate in all parents
     for parent in parents:
-        parent.add_child(or_gate)
+        parent.replace_child(element, or_gate)
     return or_gate
 
 

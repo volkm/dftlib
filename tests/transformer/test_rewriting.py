@@ -75,3 +75,28 @@ def test_rewrite_parametric():
     assert no_static == 1
     assert no_dynamic == 0
     assert no_elements == 2
+
+
+def test_rewrite_keep_order():
+    file = get_example_path("simplify", "order.json")
+    dft = dftlib.io.parser.parse_dft_json_file(file)
+    no_be, no_static, no_dynamic, no_elements = dft.statistics()
+    assert no_be == 2
+    assert no_static == 1
+    assert no_dynamic == 1
+    assert no_elements == 4
+    children = dft.top_level_element.children()
+    assert children[0].name == "X"
+    assert children[0].children()[0].name == "A"
+    assert children[1].name == "B"
+
+    changed = simplifier.simplify_dft_all_rules(dft)
+    assert changed
+    no_be, no_static, no_dynamic, no_elements = dft.statistics()
+    assert no_be == 2
+    assert no_static == 0
+    assert no_dynamic == 1
+    assert no_elements == 3
+    children = dft.top_level_element.children()
+    assert children[0].name == "A"
+    assert children[1].name == "B"

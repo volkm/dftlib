@@ -1,0 +1,99 @@
+{
+    "toplevel": 0,
+    "parameters": {},
+    "nodes": [
+        {
+            "data": {
+                "id": "0",
+                "name": "T",
+                "type": "pand",
+                "repairable": false,
+                "children": [
+                    "1",
+                    "2"
+                ],
+                "label": "T"
+            },
+            "position": {
+                "x": 603,
+                "y": 137
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "pand toplevel"
+        },
+        {
+            "data": {
+                "id": "1",
+                "name": "X",
+                "type": "or",
+                "repairable": false,
+                "children": [
+                    "3"
+                ],
+                "label": "X"
+            },
+            "position": {
+                "x": 534,
+                "y": 289
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "or"
+        },
+        {
+            "data": {
+                "id": "2",
+                "name": "B",
+                "type": "be_exp",
+                "repairable": false,
+                "rate": 5,
+                "repair": 0,
+                "dorm": 0,
+                "label": "B (λ: 5)"
+            },
+            "position": {
+                "x": 676,
+                "y": 384
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be_exp"
+        },
+        {
+            "data": {
+                "id": "3",
+                "name": "A",
+                "type": "be_exp",
+                "repairable": false,
+                "rate": 1,
+                "repair": 0,
+                "dorm": 0,
+                "label": "A (λ: 1)"
+            },
+            "position": {
+                "x": 524,
+                "y": 385
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be_exp"
+        }
+    ]
+}

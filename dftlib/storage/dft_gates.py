@@ -101,6 +101,18 @@ class DftGate(DftElement):
         self._outgoing.remove(element)
         element.remove_parent(self)
 
+    def replace_child(self, child, element):
+        """
+        Replace given child with new element.
+        Maintains the order.
+        :param child: Original child to be replaced.
+        :param element: Element which will be the new child.
+        """
+        index = self._outgoing.index(child)  # A ValueError is raised if the child was not found
+        self._outgoing[index] = element
+        child.remove_parent(self)
+        element._ingoing.append(self)
+
     def children(self):
         """
         Get children.
