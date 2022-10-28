@@ -79,7 +79,7 @@ def export_gate_string(gate):
         raise DftTypeNotKnownException("Type '{}' not known.".format(gate.element_type))
 
     # Add children
-    for child in gate.outgoing:
+    for child in gate.children():
         s += " " + galileo_name(child)
 
     return s

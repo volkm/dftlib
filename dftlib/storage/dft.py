@@ -134,12 +134,13 @@ class Dft:
         assert element.element_id in self.elements
         # Remember ids for iteration
         # Otherwise we are iterating over the list we are also removing from
-        parent_ids = [element.element_id for element in element.ingoing]
-        child_ids = [element.element_id for element in element.outgoing]
+        parent_ids = [element.element_id for element in element.parents()]
         for parent_id in parent_ids:
             self.get_element(parent_id).remove_child(element)
-        for child_id in child_ids:
-            self.get_element(child_id).remove_parent(element)
+        if element.is_gate():
+            child_ids = [element.element_id for element in element.children()]
+            for child_id in child_ids:
+                self.get_element(child_id).remove_parent(element)
         del self.elements[element.element_id]
 
     def update_bounds(self, element):
@@ -264,7 +265,9 @@ class Dft:
         while len(queue) > 0:
             element = queue.popleft()
             elements.append(element)
-            for child in element.outgoing:
+            if element.is_be():
+                continue
+            for child in element.children():
                 if child.element_id not in visited:
                     queue.append(child)
                     visited.add(child.element_id)
@@ -295,14 +298,14 @@ class Dft:
         while len(queue) > 0:
             elem = queue.popleft()
             module.append(elem.element_id)
-            # Go "downwards" and only stop when encountering a SPARE
-            if not isinstance(elem, dft_gates.DftSpare):
-                for child in elem.outgoing:
+            # Go "downwards" and only stop when encountering a BE or a SPARE
+            if not elem.is_be() and not isinstance(elem, dft_gates.DftSpare):
+                for child in elem.children():
                     if child.element_id not in visited:
                         queue.append(child)
                         visited.add(child.element_id)
             # Go "sideways" for dependencies and SEQ/MUTEX
-            for parent in elem.ingoing:
+            for parent in elem.parents():
                 if parent.element_id not in visited:
                     if isinstance(elem, dft_gates.DftDependency) or isinstance(elem, dft_gates.DftSeq) or isinstance(elem, dft_gates.DftMutex):
                         queue.append(parent)

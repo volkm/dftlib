@@ -28,14 +28,14 @@ def trim(dft):
         # Continue search
         if current.is_be():
             # Add possible SEQ or FDEP gates
-            for parent in current.ingoing:
+            for parent in current.parents():
                 if isinstance(parent, dft_gates.DftDependency) or isinstance(parent, dft_gates.DftSeq) or isinstance(parent, dft_gates.DftMutex):
                     if parent.element_id not in visited:
                         queue.append(parent)
                         visited.add(parent.element_id)
         elif current.is_gate():
             # Add children of gate
-            for child in current.outgoing:
+            for child in current.children():
                 if child.element_id not in visited:
                     queue.append(child)
                     visited.add(child.element_id)

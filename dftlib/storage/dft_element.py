@@ -8,8 +8,7 @@ class DftElement:
         self.name = name
         self.element_type = element_type
         self.position = position
-        self.ingoing = []
-        self.outgoing = []
+        self._ingoing = []
         self.relevant = False
 
     def is_dynamic(self):
@@ -38,8 +37,15 @@ class DftElement:
         Remove parent.
         :param element: Parent to remove.
         """
-        assert element in self.ingoing
-        self.ingoing.remove(element)
+        assert element in self._ingoing
+        self._ingoing.remove(element)
+
+    def parents(self):
+        """
+        Get parents.
+        :return: List of parents.
+        """
+        return self._ingoing
 
     def set_relevant(self, relevant=True):
         """

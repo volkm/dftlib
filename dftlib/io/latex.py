@@ -14,10 +14,10 @@ def generate_tikz_node(element, is_tle=False):
     # Set node type
     no_children = 0
     if not element.is_be():
-        if len(element.outgoing) > 6:
+        if len(element.children()) > 6:
             raise DftTypeNotSupportedException("More than 6 children (for element '{}') are currently not supported for tikz export.".format(element.name))
         else:
-            no_children = str(len(element.outgoing))
+            no_children = str(len(element.children()))
 
     if element.is_be():
         if isinstance(element, dft_be.BeConstant):
@@ -102,16 +102,14 @@ FDEP_CHILDREN = {
 def generate_tikz_edges(element):
     s = ""
 
-    if element.is_be():
-        assert not element.outgoing
-    else:
+    if element.is_gate():
         assert element.is_gate()
-        no_children = len(element.outgoing)
+        no_children = len(element.children())
         assert no_children <= 6
         # Handle gate type
 
         i = 1
-        for child in element.outgoing:
+        for child in element.children():
             if isinstance(element, dft_gates.DftAnd) or isinstance(element, dft_gates.DftOr) \
                     or isinstance(element, dft_gates.DftVotingGate) or isinstance(element, dft_gates.DftPand) \
                     or isinstance(element, dft_gates.DftPor):

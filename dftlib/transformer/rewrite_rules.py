@@ -75,12 +75,12 @@ def try_split_fdep(dft, fdep):
     if not isinstance(fdep, dft_gates.DftDependency):
         return False
 
-    if len(fdep.outgoing) <= 2:
+    if len(fdep.children()) <= 2:
         return False
 
     pos_add = 1
-    trigger = fdep.outgoing[0]
-    dependents = fdep.outgoing[2:].copy()  # Keep first dependent event for original dependency
+    trigger = fdep.trigger()
+    dependents = fdep.children()[2:].copy()  # Keep first dependent event for original dependency
     for dependent in dependents:
         position = (fdep.position[0] - (50 * pos_add), fdep.position[1] - (75 * pos_add))
         new_fdep = dft_gates.DftDependency(dft.next_id(), 'FDEP_{}_{}'.format(fdep.name, pos_add), 1, [trigger, dependent], position)
@@ -102,9 +102,9 @@ def try_merge_bes_in_or(dft, or_gate):
         return False
 
     child_bes = []
-    for child in or_gate.outgoing:
+    for child in or_gate.children():
         # Check if rule is applicable for BE
-        if child.is_be() and len(child.ingoing) <= 1 and not child.relevant and child.distribution == "exponential":
+        if child.is_be() and len(child.parents()) <= 1 and not child.relevant and child.distribution == "exponential":
             # Repair rates need dedicated handling
             if numbers.is_zero(child.repair):
                 child_bes.append(child)
@@ -162,7 +162,7 @@ def try_merge_bes_in_or(dft, or_gate):
     # Update merged BE
     # Set name
     first_child.name = name
-    
+
     # Set active rate
     if active_rate_str is None:
         first_child.rate = active_rate_float
@@ -207,7 +207,7 @@ def has_immediate_failure(dft, gate):
         # Gate is top level element
         return True
     else:
-        for parent in gate.ingoing:
+        for parent in gate.parents():
             if isinstance(parent, dft_gates.DftOr):
                 if has_immediate_failure(dft, parent):
                     return True
@@ -226,8 +226,7 @@ def try_remove_dependencies(dft, dependency):
     if not isinstance(dependency, dft_gates.DftDependency):
         return False
 
-    trigger = dependency.outgoing[0]
-    if not has_immediate_failure(dft, trigger):
+    if not has_immediate_failure(dft, dependency.trigger()):
         return False
 
     # Remove superfluous dependency
@@ -265,8 +264,8 @@ def try_merge_identical_gates(dft, gate1, gate2):
 
     # Gates can be merged
     # Add parents of gate2 to gate1
-    for parent in gate2.ingoing:
-        if gate1 not in parent.outgoing:
+    for parent in gate2.parents():
+        if gate1 not in parent.children():
             parent.add_child(gate1)
     # Merge names as well
     gate1.name += "_" + gate2.name
@@ -293,14 +292,14 @@ def try_remove_gates_with_one_successor(dft, gate):
     if gate.relevant:
         return False
 
-    if len(gate.outgoing) != 1:
+    if len(gate.children()) != 1:
         return False
 
-    child = gate.outgoing[0]
+    child = gate.children()[0]
 
     # Add child to parents
-    for parent in gate.ingoing:
-        if child not in parent.outgoing:
+    for parent in gate.parents():
+        if child not in parent.children():
             parent.add_child(child)
     # Remove gate
     dft.remove(gate)
@@ -321,9 +320,9 @@ def try_flatten_gate(dft, gate):
     if gate.relevant:
         return False
 
-    if len(gate.ingoing) != 1:
+    if len(gate.parents()) != 1:
         return False
-    parent = gate.ingoing[0]
+    parent = gate.parents()[0]
     if gate.element_type != parent.element_type:
         return False
 
@@ -331,23 +330,24 @@ def try_flatten_gate(dft, gate):
         if parent.inclusive != gate.inclusive:
             return False
         # Flattening for PAND only works if it is the left-most child
-        if parent.outgoing[0] != gate:
+        if parent.children()[0] != gate:
             return False
 
         # Add children of PAND as first children of parent gate
         # First remove existing children and then later add them again
-        existing_children = [child for child in parent.outgoing]
+        existing_children = [child for child in parent.children()]
         for child in existing_children:
             parent.remove_child(child)
-        for child in gate.outgoing:
+        assert not parent.children()
+        for child in gate.children():
             parent.add_child(child)
         for child in existing_children:
             parent.add_child(child)
     else:
         # Add children of AND or OR to parent gate
         # The order is irrelevant here
-        for child in gate.outgoing:
-            if child not in parent.outgoing:
+        for child in gate.children():
+            if child not in parent.children():
                 parent.add_child(child)
 
     # Delete gate
@@ -369,9 +369,9 @@ def try_subsumption(dft, gate):
     if gate.relevant:
         return False
 
-    if len(gate.ingoing) != 1:
+    if len(gate.parents()) != 1:
         return False
-    parent = gate.ingoing[0]
+    parent = gate.parents()[0]
     # Check that parent is of "opposite" type
     if isinstance(gate, dft_gates.DftOr):
         if not isinstance(parent, dft_gates.DftAnd):
@@ -382,8 +382,8 @@ def try_subsumption(dft, gate):
             return False
 
     # Check if a child occurs in both gate and parent
-    for child in gate.outgoing:
-        if child in parent.outgoing:
+    for child in gate.children():
+        if child in parent.children():
             # Can remove gate
             dft.remove(gate)
             return True
@@ -403,7 +403,7 @@ def add_or_as_predecessor(dft, element, name=None):
     if name is None:
         name = "OR_{}".format(dft.next_id())
     # Remember all parents
-    parents = [parent for parent in element.ingoing]
+    parents = [parent for parent in element.parents()]
     # Remove element from all parents
     for parent in parents:
         parent.remove_child(element)
@@ -426,7 +426,7 @@ def check_dynamic_predecessor(dft, element):
         return True
     if element.element_id == dft.top_level_element.element_id:
         return False
-    for elem in element.ingoing:
+    for elem in element.parents():
         if check_dynamic_predecessor(dft, elem):
             return True
     return False
@@ -447,10 +447,10 @@ def try_replace_fdep_by_or(dft, fdep):
     if fdep.probability != 1:
         return False
     # Check if fdep has more than one dependent element
-    if len(fdep.outgoing) > 2:
+    if len(fdep.children()) > 2:
         return False
-    trigger = fdep.outgoing[0]
-    dependent = fdep.outgoing[1]
+    trigger = fdep.trigger()
+    dependent = fdep.dependent()[0]
 
     # Check if both trigger and dependent are part of the top module
     top_module = dft.get_module(dft.top_level_element)
@@ -481,15 +481,15 @@ def try_remove_superfluous_fdep(dft, fdep):
         return False
 
     # Check if fdep has more than one dependent element
-    if len(fdep.outgoing) > 2:
+    if len(fdep.children()) > 2:
         return False
-    trigger = fdep.outgoing[0]
-    dependent = fdep.outgoing[1]
+    trigger = fdep.trigger()
+    dependent = fdep.dependent()[0]
 
     # Trigger is single parent of dependent (apart from fdep)
-    if len(dependent.ingoing) > 2:
+    if len(dependent.parents()) > 2:
         return False
-    if trigger not in dependent.ingoing:
+    if trigger not in dependent.parents():
         return False
 
     if isinstance(trigger, dft_gates.DftAnd):
@@ -500,13 +500,13 @@ def try_remove_superfluous_fdep(dft, fdep):
     if isinstance(trigger, dft_gates.DftOr):
         # FDEP is possibly superfluous (Rule #26)
         # Check for FDEPs from other children of the parent
-        for child in trigger.outgoing:
+        for child in trigger.children():
             if child != dependent:
                 # Check that other child has FDEP to dependent as well
                 has_fdep = False
-                for parent in child.ingoing:
+                for parent in child.parents():
                     if isinstance(parent, dft_gates.DftDependency):
-                        if len(parent.outgoing) == 2 and parent.outgoing[0] == child and parent.outgoing[1] == dependent:
+                        if len(parent.children()) == 2 and parent.children()[0] == child and parent.children()[1] == dependent:
                             has_fdep = True
                             break
                 if not has_fdep:
@@ -532,18 +532,18 @@ def try_remove_fdep_successors(dft, fdep):
         return False
 
     # Check if fdep has more than one dependent element
-    if len(fdep.outgoing) > 2:
+    if len(fdep.children()) > 2:
         return False
-    trigger = fdep.outgoing[0]
-    dependent = fdep.outgoing[1]
+    trigger = fdep.trigger()
+    dependent = fdep.dependent()[0]
 
     # Dependent has single parent (apart from fdep)
-    if len(dependent.ingoing) > 2:
+    if len(dependent.parents()) > 2:
         return False
-    parent = dependent.ingoing[0] if not isinstance(dependent, dft_gates.DftDependency) else dependent.ingoing[1]
+    parent = dependent.parents()[0] if not isinstance(dependent, dft_gates.DftDependency) else dependent.parents()[1]
 
     # Trigger has the same parent
-    if trigger not in parent.outgoing:
+    if trigger not in parent.children():
         return False
 
     if isinstance(parent, dft_gates.DftOr):
@@ -555,7 +555,7 @@ def try_remove_fdep_successors(dft, fdep):
         # FDEP is possibly superfluous (Rule #28)
         # Check if dependent is left of trigger
         dependent_is_left = False
-        for child in parent.outgoing:
+        for child in parent.children():
             if child == trigger:
                 dependent_is_left = False
                 break

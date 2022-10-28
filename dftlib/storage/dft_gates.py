@@ -80,6 +80,7 @@ class DftGate(DftElement):
     def __init__(self, element_id, name, element_type, children, position):
         DftElement.__init__(self, element_id, name, element_type, position)
         assert self.is_gate()
+        self._outgoing = []
         for child in children:
             self.add_child(child)
 
@@ -88,17 +89,24 @@ class DftGate(DftElement):
         Add child.
         :param element: Child to add.
         """
-        self.outgoing.append(element)
-        element.ingoing.append(self)
+        self._outgoing.append(element)
+        element._ingoing.append(self)
 
     def remove_child(self, element):
         """
         Remove child.
         :param element: Child to remove.
         """
-        assert element in self.outgoing
-        self.outgoing.remove(element)
+        assert element in self._outgoing
+        self._outgoing.remove(element)
         element.remove_parent(self)
+
+    def children(self):
+        """
+        Get children.
+        :return: Ordered list of children.
+        """
+        return self._outgoing
 
     def compare_successors(self, other, ordered, respect_ids):
         """
@@ -108,23 +116,23 @@ class DftGate(DftElement):
         :param respect_ids: Whether the ids of the successors must be equal.
         :return: True iff both gates have the same successors.
         """
-        if len(self.outgoing) != len(other.outgoing):
+        if len(self.children()) != len(other.children()):
             return False
 
         if ordered:
-            for i in range(len(self.outgoing)):
-                if not self.outgoing[i].compare(other.outgoing[i], respect_ids):
+            for i in range(len(self.children())):
+                if not self.children()[i].compare(other.children()[i], respect_ids):
                     return False
             return True
         else:
             # Use either id or name as unique identifier
-            map_outgoing = {elem.element_id if respect_ids else elem.name: elem for elem in other.outgoing}
-            for element in self.outgoing:
+            map_children = {elem.element_id if respect_ids else elem.name: elem for elem in other.children()}
+            for element in self.children():
                 identifier = element.element_id if respect_ids else element.name
-                if identifier in map_outgoing:
-                    if element.compare(map_outgoing[identifier], respect_ids):
+                if identifier in map_children:
+                    if element.compare(map_children[identifier], respect_ids):
                         # Found matching successor
-                        del map_outgoing[identifier]
+                        del map_children[identifier]
                     else:
                         # Not matching
                         return False
@@ -132,16 +140,16 @@ class DftGate(DftElement):
                     # Found no matching successor in other
                     return False
 
-            assert len(map_outgoing) == 0
+            assert len(map_children) == 0
             return True
 
     def get_json(self):
         json = DftElement.get_json(self)
-        json['data']['children'] = [str(child.element_id) for child in self.outgoing]
+        json['data']['children'] = [str(child.element_id) for child in self.children()]
         return json
 
     def __str__(self):
-        return super().__str__() + " with children: " + ", ".join([str(child.name) for child in self.outgoing])
+        return super().__str__() + " with children: " + ", ".join([str(child.name) for child in self.children()])
 
 
 class DftAnd(DftGate):
@@ -276,14 +284,14 @@ class DftDependency(DftGate):
             json['data']['probability'] = str(self.probability)
         return json
 
-    def get_trigger(self):
-        if self.outgoing:
-            return self.outgoing[0]
+    def trigger(self):
+        if self.children():
+            return self.children()[0]
         else:
             return None
 
-    def get_dependent(self):
-        return self.outgoing[1:]
+    def dependent(self):
+        return self.children()[1:]
 
     def compare(self, other, respect_ids):
         if not super().compare(other, respect_ids):
@@ -292,7 +300,7 @@ class DftDependency(DftGate):
         if not self.compare_successors(other, ordered=False, respect_ids=respect_ids):
             return False
         # Compare trigger
-        if not self.outgoing[0].compare(other.outgoing[0], respect_ids):
+        if not self.trigger().compare(other.trigger(), respect_ids):
             return False
 
         return self.probability == other.probability
