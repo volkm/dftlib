@@ -138,7 +138,7 @@ def try_merge_bes_in_or(dft, or_gate):
         if numbers.is_one(element.dorm):
             # Passive rate is active rate
             if isinstance(element.rate, float):
-                passive_rate_float += active_rate_float
+                passive_rate_float += element.rate
             else:
                 if passive_rate_str:
                     passive_rate_str += " + "
@@ -164,7 +164,7 @@ def try_merge_bes_in_or(dft, or_gate):
     first_child.name = name
 
     # Set active rate
-    if active_rate_str is None:
+    if active_rate_str == "":
         first_child.rate = active_rate_float
     elif active_rate_float > 0:
         first_child.rate = "{} + ({})".format(active_rate_float, active_rate_str)
@@ -172,7 +172,7 @@ def try_merge_bes_in_or(dft, or_gate):
         first_child.rate = active_rate_str
 
     # Compute passive rate
-    if passive_rate_str is None:
+    if passive_rate_str == "":
         passive_rate = passive_rate_float
     elif passive_rate_float > 0:
         passive_rate = "{} + ({})".format(passive_rate_float, passive_rate_str)
