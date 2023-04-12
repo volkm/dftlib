@@ -183,14 +183,14 @@ def try_merge_bes_in_or(dft, or_gate):
     if isinstance(first_child.rate, float) and isinstance(passive_rate, float):
         first_child.dorm = passive_rate / first_child.rate
     elif numbers.is_zero(passive_rate):
-        first_child.dorm = 0.0
+        first_child.dorm = 0
     elif first_child.rate == passive_rate:
-        first_child.dorm = 1.0
+        first_child.dorm = 1
     else:
         first_child.dorm = "({}) / ({})".format(passive_rate, first_child.rate)
 
     # Repair rate is zero
-    first_child.repair = 0.0
+    first_child.repair = 0
 
     return True
 

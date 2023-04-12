@@ -24,8 +24,8 @@ def is_one(number):
     :param number: Number represented either as float or string.
     :return: True iff number equals one.
     """
-    if isinstance(number, float):
-        return number == 1.0
+    if isinstance(number, float) or isinstance(number, int):
+        return number == 1
     else:
         assert isinstance(number, str)
         return number == "1.0" or number == "1"
@@ -37,8 +37,8 @@ def is_zero(number):
     :param number: Number represented either as float or string.
     :return: True iff number equals zero.
     """
-    if isinstance(number, float):
-        return number == 0.0
+    if isinstance(number, float) or isinstance(number, int):
+        return number == 0
     else:
         assert isinstance(number, str)
         return number == "0.0" or number == "0"
