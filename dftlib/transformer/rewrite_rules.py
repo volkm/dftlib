@@ -78,6 +78,10 @@ def try_split_fdep(dft, fdep):
     if len(fdep.children()) <= 2:
         return False
 
+    if not numbers.is_one(fdep.probability):
+        # Cannot be applied to PDEPs
+        return False
+
     pos_add = 1
     trigger = fdep.trigger()
     dependents = fdep.children()[2:].copy()  # Keep first dependent event for original dependency
