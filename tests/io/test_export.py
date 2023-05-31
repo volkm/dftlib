@@ -5,6 +5,7 @@ from helpers.helper import get_example_path
 
 import dftlib.io.export_galileo
 import dftlib.io.export_json
+import dftlib.io.export_txt
 import dftlib.io.parser
 
 
@@ -122,3 +123,11 @@ def test_export_json_parametric(tmpdir):
 
     assert dft.compare(dft2, respect_ids=True)
     assert set(dft.parameters) == set(dft2.parameters)
+
+
+def test_export_txt_string():
+    file = get_example_path("simplify", "rule2_test2.json")
+    dft = dftlib.io.parser.parse_dft_json_file(file)
+
+    txt_string = dftlib.io.export_txt.export_dft_string(dft)
+    assert txt_string == "AND(AND(BE0,BE1),AND(BE1,BE0),AND(BE0,BE1),OR(BE0,BE1))"
