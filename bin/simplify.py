@@ -8,8 +8,8 @@ import dftlib.transformer.simplifier as rewriting
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Simplify a DFT by rewriting.')
 
-    parser.add_argument('--dft', '-i', help='The path for the dft file in JSON encoding', required=True)
-    parser.add_argument('--out', '-o', help='The path for the saved dft file in JSON encoding', required=True)
+    parser.add_argument('--dft', '-i', help='The path for the dft file', required=True)
+    parser.add_argument('--out', '-o', help='The path for the simplified dft file in JSON encoding', required=True)
     parser.add_argument('--all-rules', '-a', help='Use all rewriting rules', action="store_true")
     parser.add_argument('--verbose', '-v', help='print more output', action="store_true")
     args = parser.parse_args()
@@ -18,7 +18,7 @@ if __name__ == "__main__":
 
     # Read DFT file
     logging.info("Reading {}".format(args.dft))
-    dft = dftlib.io.parser.parse_dft_json_file(args.dft)
+    dft = dftlib.io.parser.parse_dft_file(args.dft)
     logging.info(dft)
 
     # Simplify DFT

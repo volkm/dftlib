@@ -8,7 +8,7 @@ import dftlib.transformer.simplifier
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Export a DFT into Galileo format.')
 
-    parser.add_argument('--dft', '-i', help='The path for the dft file in JSON encoding', required=True)
+    parser.add_argument('--dft', '-i', help='The path for the dft file', required=True)
     parser.add_argument('--out', '-o', help='The path for the saved dft file in Galileo format', required=True)
     args = parser.parse_args()
 
@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     # Read DFT file
     logging.info("Reading {}".format(args.dft))
-    dft = dftlib.io.parser.parse_dft_json_file(args.dft)
+    dft = dftlib.io.parser.parse_dft_file(args.dft)
     logging.info(dft)
 
     # Save DFT again

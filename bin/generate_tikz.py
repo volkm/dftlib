@@ -7,7 +7,7 @@ import dftlib.io.parser
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate tikz file visualizing the given DFT.')
 
-    parser.add_argument('--dft', '-i', help='The path for the dft file in JSON encoding', required=True)
+    parser.add_argument('--dft', '-i', help='The path for the dft file', required=True)
     parser.add_argument('--out', '-o', help='The path for the generated tikz file', required=True)
     args = parser.parse_args()
 
@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     # Read DFT file
     logging.info("Reading {}".format(args.dft))
-    dft = dftlib.io.parser.parse_dft_json_file(args.dft)
+    dft = dftlib.io.parser.parse_dft_file(args.dft)
     logging.info(dft)
 
     # Generate tikz file

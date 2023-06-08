@@ -1,6 +1,7 @@
 import math
+import tempfile
 
-from dftlib.io.parser import parse_dft_galileo_file
+import dftlib.io.export_galileo
 from dftlib.tools.storm import Storm
 from dftlib.tools.z3 import Z3
 
@@ -14,19 +15,20 @@ class SMTAnalysis:
         self.storm = Storm()
         self.z3 = Z3()
 
-    def check_eventually_fail(self, file, smt_file):
+    def check_eventually_fail(self, dft, smt_file):
         """
         Check that the DFT will eventually fail using SMT solvers.
-        :param file: Input DFT file in Galileo format.
+        :param dft: DFT.
         :param smt_file: Output file in SMT format.
         #:return: Tuple (lower bound, upper bound, number of failable BEs)
         """
-        # Generate SMT encoding with Storm
-        smt_encoding = self.storm.export_smt(file)
+        smt_encoding = ""
+        with tempfile.NamedTemporaryFile() as tmp_file:
+            dftlib.io.export_galileo.export_dft_file(dft, tmp_file.name)
+            # Generate SMT encoding with Storm
+            smt_encoding = self.storm.export_smt(tmp_file.name)
         lines = smt_encoding.splitlines()
         assert lines[-1] == "(check-sat)"
-        # Get top level event by converting to JSON
-        dft = parse_dft_galileo_file(file)
         assert dft.top_level_element
         toplevel = dft.top_level_element.name
         # Get maximal length as number of BEs
