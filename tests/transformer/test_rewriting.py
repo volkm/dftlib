@@ -1,4 +1,5 @@
 from helpers.helper import get_example_path
+from conftest import storm
 
 import dftlib.io.parser
 import dftlib.storage.dft_gates as dft_gates
@@ -103,6 +104,7 @@ def test_rewrite_keep_order():
     assert children[1].name == "B"
 
 
+@storm
 def test_rewrite_replace_parents():
     file = get_example_path("simplify", "replace_parents.dft")
     dft = dftlib.io.parser.parse_dft_galileo_file(file)
