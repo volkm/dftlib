@@ -1,0 +1,58 @@
+name: Build Test
+# Builds and tests dftlib with different dependencies
+
+on:
+  push:
+  schedule:
+    # run weekly
+    - cron: '0 10 * * 3'
+  # needed to trigger the workflow manually
+  workflow_dispatch:
+  pull_request:
+
+env:
+  GIT_URL: "${{ github.server_url }}/${{ github.repository }}.git"
+  BRANCH: "${{ github.ref }}"
+  # GitHub runners currently have two cores
+  NR_JOBS: "2"
+
+jobs:
+  stormTests:
+    name: Tests with Storm (${{ matrix.base}})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        base: ["stormpy:ci-release", "stormpy:ci-debug"]
+    steps:
+      - name: Git clone
+        uses: actions/checkout@v3
+      - name: Build dftlib from Dockerfile
+        run: docker build -t volkm/dftlib . --build-arg BASE_IMAGE=movesrwth/${{ matrix.base }}
+      - name: Run Docker
+        run: docker run -d -it --name ci volkm/dftlib
+      - name: Build optional dftlib libraries
+        run: docker exec ci bash -c "cd /opt/dftlib; pip3 install -e '.[with_smt,with_stormpy]'"
+      - name: Run tests
+        run: docker exec ci bash -c "cd /opt/dftlib; python setup.py test"
+
+  BuildTest:
+    name: Test (Python ${{ matrix.python-version }})
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+
+    steps:
+      - name: Git clone
+        uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip
+      - name: Build dftlib
+        run: python setup.py develop
+      - name: Run tests
+        run: python setup.py test
