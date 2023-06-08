@@ -1,6 +1,7 @@
 from helpers.helper import get_example_path
 
 import dftlib.io.parser
+import dftlib.storage.dft_gates as dft_gates
 import dftlib.transformer.simplifier as simplifier
 
 
@@ -100,3 +101,29 @@ def test_rewrite_keep_order():
     children = dft.top_level_element.children()
     assert children[0].name == "A"
     assert children[1].name == "B"
+
+
+def test_rewrite_replace_parents():
+    file = get_example_path("simplify", "replace_parents.dft")
+    dft = dftlib.io.parser.parse_dft_galileo_file(file)
+    no_be, no_static, no_dynamic, no_elements = dft.statistics()
+    assert no_be == 8
+    assert no_static == 5
+    assert no_dynamic == 3
+    assert no_elements == 16
+    children = dft.top_level_element.children()
+    for child in children:
+        assert isinstance(child, dft_gates.DftSpare)
+        assert len(child.children()) == 2
+
+    changed = simplifier.simplify_dft_all_rules(dft)
+    assert changed
+    no_be, no_static, no_dynamic, no_elements = dft.statistics()
+    assert no_be == 4
+    assert no_static == 1
+    assert no_dynamic == 3
+    assert no_elements == 8
+    children = dft.top_level_element.children()
+    for child in children:
+        assert isinstance(child, dft_gates.DftSpare)
+        assert len(child.children()) == 2

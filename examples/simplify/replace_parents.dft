@@ -1,0 +1,17 @@
+toplevel "l1";
+"l1" or "l4" "l5" "l6";
+"l4" wsp "l2" "l23";
+"l5" wsp "l21" "l23";
+"l6" wsp "l22" "l23";
+"l2" or "l3" "l7";
+"l23" or "l33" "l73";
+"l21" or "l31" "l71";
+"l22" or "l32" "l72";
+"l3" lambda=1.0 dorm=1.0;
+"l7" lambda=1.0 dorm=1.0;
+"l33" lambda=1.0 dorm=1.0;
+"l73" lambda=1.0 dorm=1.0;
+"l31" lambda=1.0 dorm=1.0;
+"l71" lambda=1.0 dorm=1.0;
+"l32" lambda=1.0 dorm=1.0;
+"l72" lambda=1.0 dorm=1.0;
