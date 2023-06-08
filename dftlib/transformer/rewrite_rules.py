@@ -23,6 +23,7 @@ class RewriteRules(Enum):
     MERGE_BES = 31
     TRIM = 32
     REMOVE_DEPENDENCIES_TLE = 33
+    REMOVE_DUPLICATES = 34
     MERGE_IDENTICAL_GATES = 2
     REMOVE_SINGLE_SUCCESSOR = 3
     ADD_SINGLE_OR = 4
@@ -43,6 +44,8 @@ class RewriteRules(Enum):
             return trimming.trim
         elif rule == RewriteRules.REMOVE_DEPENDENCIES_TLE:
             return try_remove_dependencies
+        elif rule == RewriteRules.REMOVE_DUPLICATES:
+            return try_remove_duplicates
         elif rule == RewriteRules.MERGE_IDENTICAL_GATES:
             # This method requires two gates as input
             return try_merge_identical_gates
@@ -235,6 +238,40 @@ def try_remove_dependencies(dft, dependency):
 
     # Remove superfluous dependency
     dft.remove(dependency)
+    return True
+
+
+def try_remove_duplicates(dft, gate):
+    """
+    Try to remove duplicate elements in gate successors.
+    :param dft: DFT
+    :param gate: Gate.
+    :return: True iff removal was successful.
+    """
+
+    if gate.is_be():
+        return False
+
+    # Check if duplicates exist
+    duplicates = []
+    for i in range(len(gate.children())):
+        element = gate.children()[i]
+        idi = element.element_id
+        for j in range(i + 1, len(gate.children())):
+            idj = gate.children()[j].element_id
+            if idi == idj:
+                duplicates.append(element)
+    if not duplicates:
+        return False
+
+    # Duplicates must be kept if order of children is important
+    if not (isinstance(gate, dft_gates.DftAnd) or isinstance(gate, dft_gates.DftOr) or isinstance(gate, dft_gates.DftVotingGate)):
+        return False
+
+    # Remove duplicate
+    for element in duplicates:
+        gate.remove_child(element)
+
     return True
 
 
