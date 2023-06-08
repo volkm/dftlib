@@ -268,10 +268,10 @@ def try_merge_identical_gates(dft, gate1, gate2):
 
     # Gates can be merged
     # Add parents of gate2 to gate1
-    for parent in gate2.parents():
-        # Add gate if not yet present or add gate a second time when order is important
-        if gate1 not in parent.children() or isinstance(parent, dft_gates.DftPriorityGate):
-            parent.replace_child(gate2, gate1)
+    while gate2.parents():
+        parent = gate2.parents()[-1]
+        parent.replace_child(gate2, gate1)
+        # Parent was removed from gate2 by replace_child
 
     # Merge names as well
     gate1.name += "_" + gate2.name
@@ -304,10 +304,11 @@ def try_remove_gates_with_one_successor(dft, gate):
     child = gate.children()[0]
 
     # Add child to parents
-    for parent in gate.parents():
-        # Add gate if not yet present or add gate a second time when order is important
-        if child not in parent.children() or isinstance(parent, dft_gates.DftPriorityGate):
-            parent.replace_child(gate, child)
+    while gate.parents():
+        parent = gate.parents()[-1]
+        # Replace gate by single child
+        parent.replace_child(gate, child)
+        # Parent was removed from gate by replace_child
 
     # Remove gate
     dft.remove(gate)
@@ -410,14 +411,19 @@ def add_or_as_predecessor(dft, element, name=None):
     """
     if name is None:
         name = "OR_{}".format(dft.next_id())
-    # Remember all parents
-    parents = [parent for parent in element.parents()]
+    # Create empty OR-gate
     position = (element.position[0] - 100, element.position[1] - 150)
-    or_gate = dft_gates.DftOr(dft.next_id(), name, [element], position)
-    dft.add(or_gate)
+    or_gate = dft_gates.DftOr(dft.next_id(), name, [], position)
+
     # Replace current element by or_gate in all parents
-    for parent in parents:
+    while element.parents():
+        parent = element.parents()[-1]
         parent.replace_child(element, or_gate)
+        # Parent was removed from element by replace_child
+
+    # Add element to OR-gate
+    or_gate.add_child(element)
+    dft.add(or_gate)
     return or_gate
 
 
