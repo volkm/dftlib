@@ -96,7 +96,7 @@ def test_export_galileo_all_gates(tmpdir):
 
     tmp_path = os.path.join(tmpdir, "all_gates.dft")
     dftlib.io.export_galileo.export_dft_file(dft, tmp_path)
-    dft2 = dftlib.io.parser.parse_dft_galileo(tmp_path)
+    dft2 = dftlib.io.parser.parse_dft_galileo_file(tmp_path)
 
     assert dft.compare(dft2, respect_ids=False)
 
@@ -108,7 +108,7 @@ def test_export_galileo_all_be(tmpdir):
 
     tmp_path = os.path.join(tmpdir, "all_be_distributions.dft")
     dftlib.io.export_galileo.export_dft_file(dft, tmp_path)
-    dft2 = dftlib.io.parser.parse_dft_galileo(tmp_path)
+    dft2 = dftlib.io.parser.parse_dft_galileo_file(tmp_path)
 
     assert dft.compare(dft2, respect_ids=True)
 

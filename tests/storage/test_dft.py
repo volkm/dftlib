@@ -30,7 +30,7 @@ def test_create_dft():
 @stormpy
 def test_convert_stormpy_dft():
     file = get_example_path("galileo", "mcs.dft")
-    dft = dftlib.io.parser.parse_dft_galileo(file)
+    dft = dftlib.io.parser.parse_dft_galileo_file(file)
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
     assert no_be == 12
     assert no_static == 4

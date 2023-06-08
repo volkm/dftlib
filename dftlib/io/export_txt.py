@@ -1,5 +1,5 @@
 import dftlib.storage.dft_gates as dft_gates
-from dftlib.exceptions.exceptions import DftTypeNotSupportedException
+from dftlib.exceptions.exceptions import DftInvalidArgumentException, DftTypeNotSupportedException
 
 
 def export_dft_string(dft):
@@ -23,7 +23,7 @@ def export_dft_string(dft):
         nonlocal next_be_id
 
         if element.element_id in exported_elements:
-            # Elements was already exported before -> use existing textual description
+            # Element was already exported before -> use existing textual description
             return exported_elements[element.element_id]
         else:
             if element.is_be():
@@ -42,9 +42,9 @@ def export_dft_string(dft):
             exported_elements[element.element_id] = s
             return s
 
-    s = export_element_string(dft.top_level_element)
+    dft_string = export_element_string(dft.top_level_element)
     assert next_be_id == dft.number_of_be()
-    return s
+    return dft_string
 
 
 def export_dft_file(dft, file):

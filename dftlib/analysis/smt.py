@@ -1,6 +1,6 @@
 import math
 
-from dftlib.io.parser import parse_dft_galileo
+from dftlib.io.parser import parse_dft_galileo_file
 from dftlib.tools.storm import Storm
 from dftlib.tools.z3 import Z3
 
@@ -26,7 +26,7 @@ class SMTAnalysis:
         lines = smt_encoding.splitlines()
         assert lines[-1] == "(check-sat)"
         # Get top level event by converting to JSON
-        dft = parse_dft_galileo(file)
+        dft = parse_dft_galileo_file(file)
         assert dft.top_level_element
         toplevel = dft.top_level_element.name
         # Get maximal length as number of BEs

@@ -19,7 +19,7 @@ def test_load_json():
 @stormpy
 def test_load_galileo():
     file = get_example_path("galileo", "mcs.dft")
-    dft = dftlib.io.parser.parse_dft_galileo(file)
+    dft = dftlib.io.parser.parse_dft_galileo_file(file)
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
     assert no_be == 12
     assert no_static == 4
@@ -42,7 +42,7 @@ def test_load_parametric_json():
 @stormpy
 def test_load_parametric_galileo():
     file = get_example_path("galileo", "parametric.dft")
-    dft = dftlib.io.parser.parse_dft_galileo(file)
+    dft = dftlib.io.parser.parse_dft_galileo_file(file)
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
     assert no_be == 3
     assert no_static == 1
@@ -54,7 +54,7 @@ def test_load_parametric_galileo():
 
 def test_load_txt():
     s = " AND(A, OR( B,C) ) "
-    dft = dftlib.io.parser.parse_dft_txt(s)
+    dft = dftlib.io.parser.parse_dft_txt_string(s)
     no_be, no_static, no_dynamic, no_elements = dft.statistics()
     assert no_be == 3
     assert no_static == 2

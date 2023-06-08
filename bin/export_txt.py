@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     # Read DFT file
     logging.info("Reading {}".format(args.dft))
-    dft = dftlib.io.parser.parse_dft(args.dft)
+    dft = dftlib.io.parser.parse_dft_file(args.dft)
     logging.info(dft)
 
     # Save DFT again
