@@ -19,7 +19,7 @@ jobs:
         stormpyImg: ["ci", "ci-debug"]
     steps:
       - name: Git clone
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Build dftlib from Dockerfile
         run: docker build -t volkm/dftlib . --build-arg STORMPY_BASE=movesrwth/stormpy:${{ matrix.stormpyImg }}
       - name: Run Docker
@@ -38,7 +38,7 @@ jobs:
 
     steps:
       - name: Git clone
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
