@@ -467,6 +467,7 @@ def add_or_as_predecessor(dft, element, name=None):
 def check_dynamic_predecessor(dft, element):
     """
     Check whether element has at least one dynamic element (except a dependency) in its predecessor closure.
+    Performs DFS of predecessors.
     :param dft: DFT.
     :param element: Element.
     :return: True iff the predecessor closure of element contains at least one dynamic element.
@@ -477,6 +478,26 @@ def check_dynamic_predecessor(dft, element):
         return False
     for elem in element.parents():
         if check_dynamic_predecessor(dft, elem):
+            return True
+    return False
+
+def check_for_cycle(dft, element, current):
+    """
+    Check for cycle by checking whether element contains itself in its predecessor closure.
+    The cycle check excludes dependencies and restrictors.
+    :param dft: DFT.
+    :param element: Element to search for.
+    :param ceurrent Current element.
+    :return: True iff the predecessor closure of current contains eleement.
+    """
+    if current.element_id == element.element_id:
+        return True
+    if current.is_dynamic() and not isinstance(current, dft_gates.DftDependency) and not isinstance(current, dft_gates.DftSeq) and not isinstance(current, dft_gates.DftMutex):
+        return False
+    if current.element_id == dft.top_level_element.element_id:
+        return False
+    for parent in current.parents():
+        if check_for_cycle(dft, element, parent):
             return True
     return False
 
@@ -508,6 +529,11 @@ def try_replace_fdep_by_or(dft, fdep):
     # Check if dependent has some dynamic elements in the predecessor closure
     if check_dynamic_predecessor(dft, dependent):
         return False
+    # Check if rewriting would yield a cycle
+    for parent in dependent.parents():
+        if check_for_cycle(dft, trigger, parent):
+            return False
+
     # Add OR in front of dependent
     or_gate = add_or_as_predecessor(dft, dependent, name="OR_" + dependent.name)
     if not or_gate:

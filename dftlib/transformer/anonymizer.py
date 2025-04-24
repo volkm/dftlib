@@ -13,7 +13,7 @@ def make_anonymous(dft, grid_layout=False):
     dist_y = 200
     end_x = 10 * dist_x
     # Make all elements anonymous
-    for _, element in dft.elements.items():
+    for element in dft.elements.values():
         element.element_id = counter
         element.name = "A{}".format(counter)
         if grid_layout:
