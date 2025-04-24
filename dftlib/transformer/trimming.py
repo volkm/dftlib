@@ -44,7 +44,7 @@ def trim(dft):
 
     # Remove unused elements
     trimmed = False
-    for element_id, element in unused.items():
+    for element in unused.values():
         if not element.relevant:
             dft.remove(element)
             trimmed = True

@@ -103,7 +103,7 @@ class Dft:
         :param name: Name.
         :return: Element.
         """
-        for (_, element) in self.elements.items():
+        for element in self.elements.values():
             if name == element.name:
                 return element
         raise DftInvalidArgumentException("Element {} not known.".format(name))
@@ -164,7 +164,7 @@ class Dft:
         if self.parametric():
             data['parameters'] = self.parameters
         nodes = []
-        for (_, element) in self.elements.items():
+        for element in self.elements.values():
             nodes.append(element.get_json())
         data['nodes'] = nodes
         return data
@@ -175,7 +175,7 @@ class Dft:
         :return: Number of BEs.
         """
         no_be = 0
-        for (_, element) in self.elements.items():
+        for element in self.elements.values():
             if element.is_be():
                 no_be += 1
         return no_be
@@ -188,7 +188,7 @@ class Dft:
         no_be = 0
         no_static = 0
         no_dynamic = 0
-        for (_, element) in self.elements.items():
+        for element in self.elements.values():
             if element.is_be():
                 no_be += 1
             else:
@@ -210,7 +210,7 @@ class Dft:
         Get verbose string containing information about all elements.
         :return: Verbose string.
         """
-        return "{}\n".format(self) + "\n".join([str(element) for (_, element) in self.elements.items()])
+        return "{}\n".format(self) + "\n".join([str(element) for element in self.elements.values()])
 
     def compare(self, other, respect_ids):
         """
@@ -274,7 +274,7 @@ class Dft:
                     visited.add(child.element_id)
 
         # Add remaining elements
-        for _, element in self.elements.items():
+        for element in self.elements.values():
             if element.element_id not in visited:
                 elements.append(element)
         assert len(elements) == len(self.elements)
