@@ -139,4 +139,5 @@ def simplify_dft_rules(dft, rules):
         # Print new DFT
         logging.debug(dft.verbose_str())
 
+    assert not dft.is_cyclic()
     return simplified

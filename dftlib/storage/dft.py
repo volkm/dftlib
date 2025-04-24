@@ -59,6 +59,7 @@ class Dft:
         if top_level_id < 0:
             raise DftInvalidArgumentException("Top level element not defined")
         self.set_top_level_element(top_level_id)
+        assert self.is_valid()
 
     def parametric(self):
         """
@@ -311,3 +312,49 @@ class Dft:
                         queue.append(parent)
                         visited.add(parent)
         return module
+
+
+    def is_valid(self):
+        """
+        Checks whether the DFT is valid, e.g. acyclic, has TLE, etc.
+        DFTs should be well-formed.
+        :return: True iff the DFT is valid.
+        """
+        if self.size() > self.max_id + 1:
+            return False
+        if not self.top_level_element:
+            return False
+        if self.is_cyclic():
+            return False
+        return True
+
+
+    def is_cyclic(self):
+        """
+        Checks whether the DFT is cyclic.
+        DFTs should be acyclic.
+        :return: True iff the DFT has a cycle (excluding dependencies and restrictors).
+        """
+
+        def dfs(element):
+            if finished[element.element_id]:
+                return False
+            if visited[element.element_id]:
+                # Found cycle
+                return True
+            visited[element.element_id] = True
+            if not element.is_be() and not isinstance(element, dft_gates.DftDependency) and not isinstance(element, dft_gates.DftSeq) and not isinstance(element, dft_gates.DftMutex):
+                # BEs, dependencies and restrictors are skipped
+                for child in element.children():
+                    if dfs(child):
+                        return True
+            finished[element.element_id] = True
+            return False
+
+        # Check for cycle via DFS
+        visited = [False] * self.next_id()
+        finished = [False] * self.next_id()
+        for elem in self.elements.values():
+            if dfs(elem):
+                return True
+        return False
