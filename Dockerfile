@@ -3,18 +3,18 @@
 # The Docker image can be built by executing:
 # docker build -t yourusername/dftlib .
 # A different base image can be set from the commandline with:
-# --build-arg BASE_IMAGE=<new_base_image>
+# --build-arg STORMPY_BASE=<new_base_image>
 
 # Set stormpy base image
-ARG BASE_IMAGE=movesrwth/stormpy:ci-release
-FROM $BASE_IMAGE
-MAINTAINER Matthias Volk <m.volk@utwente.nl>
+ARG STORMPY_BASE=movesrwth/stormpy:stable
+FROM $STORMPY_BASE
+MAINTAINER Matthias Volk <m.volk@tue.nl>
 
 
 # Set-up virtual environment
 ############################
 ENV VIRTUAL_ENV=/opt/venv
-# Uncomment if no virtual environment is present in BASE_IMAGE
+# Uncomment if no virtual environment is present in STORMPY_BASE
 #RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
@@ -28,4 +28,5 @@ WORKDIR /opt/dftlib
 COPY . .
 
 # Build dftlib
+RUN pip install setuptools
 RUN python setup.py develop
