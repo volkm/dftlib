@@ -37,9 +37,9 @@ class Z3:
     def check(self, lines):
         constraints = _z3.parse_smt2_string("\n".join(lines))
         result = self.solver.check(constraints)
-        if str(result) == 'unsat':
+        if str(result) == "unsat":
             return False
-        elif str(result) == 'sat':
+        elif str(result) == "sat":
             return True
         else:
             raise DftInvalidArgumentException("Unknown output of z3 '" + str(result) + "'")

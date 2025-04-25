@@ -11,14 +11,14 @@ def create_from_json(json, parameters=None):
     :param parameters: Parameters which are defined. Used for parsing parametric values.
     :return: DFT gate.
     """
-    assert json['group'] == "nodes"
+    assert json["group"] == "nodes"
     # Parse data from json
-    data = json['data']
-    element_id = int(data['id'])
-    name = data['name']
-    gate_type = data['type']
-    if 'position' in json:
-        position = (int(json['position']['x']), int(json['position']['y']))
+    data = json["data"]
+    element_id = int(data["id"])
+    name = data["name"]
+    gate_type = data["type"]
+    if "position" in json:
+        position = (int(json["position"]["x"]), int(json["position"]["y"]))
     else:
         position = (0, 0)
 
@@ -30,28 +30,28 @@ def create_from_json(json, parameters=None):
         element = DftOr(element_id, name, [], position)
     elif gate_type == "vot":
         # VOTing gate
-        assert 'voting' in data
-        threshold = int(data['voting'])
+        assert "voting" in data
+        threshold = int(data["voting"])
         element = DftVotingGate(element_id, name, threshold, [], position)
     elif gate_type == "fdep":
         # Functional dependency (FDEP)
         element = DftDependency(element_id, name, 1, [], position)
     elif gate_type == "pdep":
         # PDEP (dependency with probability)
-        assert 'probability' in data
-        prob = numbers.parse_number(data['probability'], parameters)
+        assert "probability" in data
+        prob = numbers.parse_number(data["probability"], parameters)
         element = DftDependency(element_id, name, prob, [], position)
     elif gate_type == "pand":
         # PAND
-        if 'inclusive' in data:
-            inclusive = bool(data['inclusive'])
+        if "inclusive" in data:
+            inclusive = bool(data["inclusive"])
         else:
             inclusive = True
         element = DftPand(element_id, name, inclusive, [], position)
     elif gate_type == "por":
         # POR
-        if 'inclusive' in data:
-            inclusive = bool(data['inclusive'])
+        if "inclusive" in data:
+            inclusive = bool(data["inclusive"])
         else:
             inclusive = True
         element = DftPor(element_id, name, inclusive, [], position)
@@ -67,8 +67,8 @@ def create_from_json(json, parameters=None):
     else:
         raise DftTypeNotKnownException("Gate type '{}' not known.".format(gate_type))
 
-    if 'relevant' in data:
-        element.relevant = bool(data['relevant'])
+    if "relevant" in data:
+        element.relevant = bool(data["relevant"])
     return element
 
 
@@ -157,7 +157,7 @@ class DftGate(DftElement):
 
     def get_json(self):
         json = DftElement.get_json(self)
-        json['data']['children'] = [str(child.element_id) for child in self.children()]
+        json["data"]["children"] = [str(child.element_id) for child in self.children()]
         return json
 
     def __str__(self):
@@ -205,7 +205,7 @@ class DftVotingGate(DftGate):
 
     def get_json(self):
         json = DftGate.get_json(self)
-        json['data']['voting'] = str(self.voting_threshold)
+        json["data"]["voting"] = str(self.voting_threshold)
         return json
 
     def __str__(self):
@@ -232,7 +232,7 @@ class DftPriorityGate(DftGate):
 
     def get_json(self):
         json = DftGate.get_json(self)
-        json['data']['inclusive'] = self.inclusive
+        json["data"]["inclusive"] = self.inclusive
         return json
 
     def __str__(self):
@@ -293,7 +293,7 @@ class DftDependency(DftGate):
     def get_json(self):
         json = DftGate.get_json(self)
         if self.probability != 1:
-            json['data']['probability'] = str(self.probability)
+            json["data"]["probability"] = str(self.probability)
         return json
 
     def trigger(self):

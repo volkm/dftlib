@@ -67,7 +67,7 @@ def simplify_dft_all_rules(dft):
         RewriteRules.SUBSUME_GATE,
         RewriteRules.REPLACE_FDEP_BY_OR,
         RewriteRules.REMOVE_SUPERFLUOUS_FDEP,
-        RewriteRules.REMOVE_SUPERFLUOUS_FDEP_SUCCESSORS
+        RewriteRules.REMOVE_SUPERFLUOUS_FDEP_SUCCESSORS,
     ]
     return simplify_dft_rules(dft, all_rules)
 
@@ -78,13 +78,7 @@ def simplify_dft_default_rules(dft):
     :param dft: DFT.
     :return: Simplified DFT.
     """
-    default_rules = [
-        RewriteRules.SPLIT_FDEPS,
-        RewriteRules.MERGE_BES,
-        RewriteRules.TRIM,
-        RewriteRules.REMOVE_SINGLE_SUCCESSOR,
-        RewriteRules.FLATTEN_GATE
-    ]
+    default_rules = [RewriteRules.SPLIT_FDEPS, RewriteRules.MERGE_BES, RewriteRules.TRIM, RewriteRules.REMOVE_SINGLE_SUCCESSOR, RewriteRules.FLATTEN_GATE]
     return simplify_dft_rules(dft, default_rules)
 
 

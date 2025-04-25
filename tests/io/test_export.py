@@ -39,10 +39,10 @@ def test_export_galileo(tmpdir):
         '"FDEP_B" fdep "MIU1" "M1";',
         '"FDEP_C" fdep "MIU2" "M5";',
         '"FDEP_25" fdep "MIU1" "M2";',
-        '"FDEP_26" fdep "MIU2" "M4";'
+        '"FDEP_26" fdep "MIU2" "M4";',
     ]
 
-    tmp_file = open(tmp_path, 'r').read().splitlines()
+    tmp_file = open(tmp_path, "r").read().splitlines()
     for i in range(0, len(tmp_file)):
         assert tmp_file[i] == expected_lines[i]
 

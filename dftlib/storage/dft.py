@@ -27,14 +27,14 @@ class Dft:
         :param json: JSON object.
         """
         # Parse (optional) parameters
-        if 'parameters' in json and len(json['parameters']) > 0:
+        if "parameters" in json and len(json["parameters"]) > 0:
             self.parameters = []
-            for param in json['parameters']:
+            for param in json["parameters"]:
                 assert param not in self.parameters
                 self.parameters.append(param)
         # Parse nodes
-        for node in json['nodes']:
-            element_type = node['data']['type']
+        for node in json["nodes"]:
+            element_type = node["data"]["type"]
             if element_type == "compound":
                 # Compound nodes are ignored
                 continue
@@ -44,18 +44,18 @@ class Dft:
                 self.add(dft_gates.create_from_json(node, self.parameters))
 
         # Set children
-        for node in json['nodes']:
-            if node['data']['type'] == "compound":
+        for node in json["nodes"]:
+            if node["data"]["type"] == "compound":
                 # Compound nodes are ignored
                 continue
-            node_id = node['data']['id']
+            node_id = node["data"]["id"]
             element = self.get_element(int(node_id))
             if element.is_gate():
-                for child_id in node['data']['children']:
+                for child_id in node["data"]["children"]:
                     element.add_child(self.get_element(int(child_id)))
 
         # Set top level element
-        top_level_id = int(json['toplevel'])
+        top_level_id = int(json["toplevel"])
         if top_level_id < 0:
             raise DftInvalidArgumentException("Top level element not defined")
         self.set_top_level_element(top_level_id)
@@ -160,13 +160,13 @@ class Dft:
         :return: JSON string.
         """
         data = dict()
-        data['toplevel'] = str(self.top_level_element.element_id)
+        data["toplevel"] = str(self.top_level_element.element_id)
         if self.parametric():
-            data['parameters'] = self.parameters
+            data["parameters"] = self.parameters
         nodes = []
         for element in self.elements.values():
             nodes.append(element.get_json())
-        data['nodes'] = nodes
+        data["nodes"] = nodes
         return data
 
     def number_of_be(self):
@@ -202,8 +202,9 @@ class Dft:
 
     def __str__(self):
         no_be, no_static, no_dynamic, no_elements = self.statistics()
-        return "Dft with {} elements ({} BEs, {} static elements, {} dynamic elements), top element: {}".format(no_elements, no_be, no_static, no_dynamic,
-                                                                                                                self.top_level_element.name)
+        return "Dft with {} elements ({} BEs, {} static elements, {} dynamic elements), top element: {}".format(
+            no_elements, no_be, no_static, no_dynamic, self.top_level_element.name
+        )
 
     def verbose_str(self):
         """
@@ -313,7 +314,6 @@ class Dft:
                         visited.add(parent)
         return module
 
-
     def is_valid(self):
         """
         Checks whether the DFT is valid, e.g. acyclic, has TLE, etc.
@@ -327,7 +327,6 @@ class Dft:
         if self.is_cyclic():
             return False
         return True
-
 
     def is_cyclic(self):
         """
@@ -343,7 +342,12 @@ class Dft:
                 # Found cycle
                 return True
             visited[element.element_id] = True
-            if not element.is_be() and not isinstance(element, dft_gates.DftDependency) and not isinstance(element, dft_gates.DftSeq) and not isinstance(element, dft_gates.DftMutex):
+            if (
+                not element.is_be()
+                and not isinstance(element, dft_gates.DftDependency)
+                and not isinstance(element, dft_gates.DftSeq)
+                and not isinstance(element, dft_gates.DftMutex)
+            ):
                 # BEs, dependencies and restrictors are skipped
                 for child in element.children():
                     if dfs(child):

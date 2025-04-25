@@ -7,6 +7,7 @@ class DftFormats(Enum):
     """
     File formats to represent DFTs.
     """
+
     GALILEO = 0
     JSON = 1
     SAFEST = 2
@@ -26,7 +27,7 @@ def get_file_extension(file_format):
     elif file_format == DftFormats.SAFEST:
         return ".safest"
     elif file_format == DftFormats.TEXT:
-        return '.txt'
+        return ".txt"
     else:
         raise DftInvalidArgumentException("DFT format {} not known.".format(file_format))
 

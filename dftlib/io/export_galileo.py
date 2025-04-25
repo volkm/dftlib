@@ -29,7 +29,7 @@ def export_dft_file(dft, file):
         names[element.name] = element
 
     # Write file
-    with open(file, 'w') as out_file:
+    with open(file, "w") as out_file:
         # Parameters
         if dft.parametric():
             for param in dft.parameters:

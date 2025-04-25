@@ -60,19 +60,15 @@ class DftElement:
         :return: JSON string.
         """
         data = dict()
-        data['id'] = str(self.element_id)
-        data['name'] = str(self.name)
-        data['type'] = self.element_type
+        data["id"] = str(self.element_id)
+        data["name"] = str(self.name)
+        data["type"] = self.element_type
         if self.relevant:
-            data['relevant'] = True
+            data["relevant"] = True
         position = dict()
         position["x"] = self.position[0]
         position["y"] = self.position[1]
-        json = {
-            "data": data,
-            "position": position,
-            "group": "nodes"
-        }
+        json = {"data": data, "position": position, "group": "nodes"}
         return json
 
     def __str__(self):
