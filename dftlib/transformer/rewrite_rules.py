@@ -19,6 +19,7 @@ class RewriteRules(Enum):
     Rewrite rules.
     Numbers < 30 correspond to the rewrite rule number in "Fault trees on a diet".
     """
+
     SPLIT_FDEPS = 30
     MERGE_BES = 31
     TRIM = 32
@@ -90,7 +91,7 @@ def try_split_fdep(dft, fdep):
     dependents = fdep.children()[2:].copy()  # Keep first dependent event for original dependency
     for dependent in dependents:
         position = (fdep.position[0] - (50 * pos_add), fdep.position[1] - (75 * pos_add))
-        new_fdep = dft_gates.DftDependency(dft.next_id(), 'FDEP_{}_{}'.format(fdep.name, pos_add), 1, [trigger, dependent], position)
+        new_fdep = dft_gates.DftDependency(dft.next_id(), "FDEP_{}_{}".format(fdep.name, pos_add), 1, [trigger, dependent], position)
         dft.add(new_fdep)
         fdep.remove_child(dependent)
         pos_add += 1
@@ -293,8 +294,12 @@ def try_merge_identical_gates(dft, gate1, gate2):
         return False
 
     # Check if both gates are of type AND, OR, VOT, PAND, POR. As both gates have the same type it suffices to check gate1.
-    if not (isinstance(gate1, dft_gates.DftAnd) or isinstance(gate1, dft_gates.DftOr) or isinstance(gate1, dft_gates.DftVotingGate) or isinstance(gate1,
-                                                                                                                                                  dft_gates.DftPriorityGate)):
+    if not (
+        isinstance(gate1, dft_gates.DftAnd)
+        or isinstance(gate1, dft_gates.DftOr)
+        or isinstance(gate1, dft_gates.DftVotingGate)
+        or isinstance(gate1, dft_gates.DftPriorityGate)
+    ):
         return False
 
     if gate2.element_id == dft.top_level_element.element_id:
@@ -326,7 +331,12 @@ def try_remove_gates_with_one_successor(dft, gate):
     :return: True iff gate has been removed.
     """
     # Check if rule is applicable.
-    if not (isinstance(gate, dft_gates.DftOr) or isinstance(gate, dft_gates.DftAnd) or isinstance(gate, dft_gates.DftVotingGate) or isinstance(gate, dft_gates.DftPriorityGate)):
+    if not (
+        isinstance(gate, dft_gates.DftOr)
+        or isinstance(gate, dft_gates.DftAnd)
+        or isinstance(gate, dft_gates.DftVotingGate)
+        or isinstance(gate, dft_gates.DftPriorityGate)
+    ):
         return False
 
     if gate.element_id == dft.top_level_element.element_id:
@@ -481,6 +491,7 @@ def check_dynamic_predecessor(dft, element):
             return True
     return False
 
+
 def check_for_cycle(dft, element, current):
     """
     Check for cycle by checking whether element contains itself in its predecessor closure.
@@ -492,7 +503,12 @@ def check_for_cycle(dft, element, current):
     """
     if current.element_id == element.element_id:
         return True
-    if current.is_dynamic() and not isinstance(current, dft_gates.DftDependency) and not isinstance(current, dft_gates.DftSeq) and not isinstance(current, dft_gates.DftMutex):
+    if (
+        current.is_dynamic()
+        and not isinstance(current, dft_gates.DftDependency)
+        and not isinstance(current, dft_gates.DftSeq)
+        and not isinstance(current, dft_gates.DftMutex)
+    ):
         return False
     if current.element_id == dft.top_level_element.element_id:
         return False

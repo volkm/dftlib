@@ -3,7 +3,7 @@ import sys
 
 import pytest
 
-sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
+sys.path.append(os.path.join(os.path.dirname(__file__), "helpers"))
 
 # Skip functionality which is not available
 from dftlib.tools.storm import _has_storm

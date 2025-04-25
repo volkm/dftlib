@@ -63,12 +63,12 @@ def parse_dft_txt_string(dft_text):
         :return: DFT element.
         """
         s = element_text.strip()
-        pos_opening = s.find('(')
+        pos_opening = s.find("(")
         if pos_opening >= 0:
             # Current level describes a gate
-            assert s[-1] == ')'
+            assert s[-1] == ")"
             gate_type = s[:pos_opening].lower()
-            children_text = s[pos_opening + 1:-1]
+            children_text = s[pos_opening + 1 : -1]
             if gate_type == "and":
                 gate = DftAnd(dft.next_id(), "And_{}".format(dft.next_id()), [], (0, 0))
             elif gate_type == "or":
@@ -80,18 +80,18 @@ def parse_dft_txt_string(dft_text):
             brackets = 0
             i = 0
             while i < len(children_text):
-                if children_text[i] == '(':
+                if children_text[i] == "(":
                     brackets += 1
-                elif children_text[i] == ')':
+                elif children_text[i] == ")":
                     assert brackets > 0
                     brackets -= 1
-                elif children_text[i] == ',' and brackets == 0:
+                elif children_text[i] == "," and brackets == 0:
                     # Can split
                     child_text = children_text[:i]
                     child_element = parse_dft_element_txt(dft, child_text)
                     gate.add_child(child_element)
                     # Keep text for remaining children
-                    children_text = children_text[i + 1:]
+                    children_text = children_text[i + 1 :]
                     i = -1  # To account for += 1
                 i += 1
             # Handle last child

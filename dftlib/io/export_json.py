@@ -7,7 +7,7 @@ def export_dft_file(dft, file):
     :param dft: DFT.
     :param file: File.
     """
-    with open(file, 'w') as outFile:
+    with open(file, "w") as outFile:
         json.dump(dft.json(), outFile, indent=4)
 
 

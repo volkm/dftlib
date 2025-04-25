@@ -39,7 +39,7 @@ class SMTAnalysis:
         base_encoding = lines[:-1]
 
         # Write base encoding to file
-        with open(smt_file, 'w') as f:
+        with open(smt_file, "w") as f:
             f.write("\n".join(base_encoding))
 
         # Check upper bound
@@ -86,7 +86,7 @@ class SMTAnalysis:
             comparison = "and (>= t_{0} {1}) (<= t_{0} {2})".format(toplevel, threshold_l, threshold_u)
 
         # Add assertions to output file
-        with open(smt_file, 'a') as f:
+        with open(smt_file, "a") as f:
             f.write("\n(push)")
             f.write("\n(assert ({}))".format(comparison))
             f.write("\n(check-sat)")

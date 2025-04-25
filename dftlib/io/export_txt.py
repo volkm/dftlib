@@ -54,7 +54,7 @@ def export_dft_file(dft, file):
     :param file: File.
     """
     # Write file
-    with open(file, 'w') as out_file:
+    with open(file, "w") as out_file:
         # Parameters
         if dft.parametric():
             raise DftInvalidArgumentException("Parameters are not supported in export.")

@@ -39,7 +39,7 @@ def convert_to_json(file):
     parametric = False
     with open(file) as f:
         # Check whether the file starts with 'param xyz;'
-        if f.readline().startswith('param'):
+        if f.readline().startswith("param"):
             parametric = True
     if parametric:
         dft_stormpy = _stormpy.dft.load_parametric_dft_galileo_file(file)

@@ -10,55 +10,55 @@ def create_from_json(json, parameters=None):
     :param parameters: Parameters which are defined. Used for parsing parametric values.
     :return: DFT BE.
     """
-    assert json['group'] == "nodes"
+    assert json["group"] == "nodes"
     # Parse data from json
-    data = json['data']
-    element_id = int(data['id'])
-    name = data['name']
-    assert data['type'] == "be" or data['type'] == "be_exp"
-    if 'position' in json:
-        position = (int(json['position']['x']), int(json['position']['y']))
+    data = json["data"]
+    element_id = int(data["id"])
+    name = data["name"]
+    assert data["type"] == "be" or data["type"] == "be_exp"
+    if "position" in json:
+        position = (int(json["position"]["x"]), int(json["position"]["y"]))
     else:
         position = (0, 0)
 
-    if 'distribution' in data:
-        distribution = data['distribution']
+    if "distribution" in data:
+        distribution = data["distribution"]
     else:
         distribution = "exponential"
 
     if distribution == "const":
-        failed = bool(data['failed'])
+        failed = bool(data["failed"])
         element = BeConstant(element_id, name, failed, position)
     elif distribution == "probability":
-        probability = numbers.parse_number(data['prob'], parameters)
-        dorm = numbers.parse_number(data['dorm'], parameters)
+        probability = numbers.parse_number(data["prob"], parameters)
+        dorm = numbers.parse_number(data["dorm"], parameters)
         element = BeProbability(element_id, name, probability, dorm, position)
     elif distribution == "exponential":
-        rate = numbers.parse_number(data['rate'], parameters)
-        dorm = numbers.parse_number(data['dorm'], parameters)
-        if 'repair' in data:
-            repair = numbers.parse_number(data['repair'], parameters)
+        rate = numbers.parse_number(data["rate"], parameters)
+        dorm = numbers.parse_number(data["dorm"], parameters)
+        if "repair" in data:
+            repair = numbers.parse_number(data["repair"], parameters)
         else:
             repair = 0.0
         element = BeExponential(element_id, name, rate, dorm, repair, position)
     elif distribution == "erlang":
-        rate = numbers.parse_number(data['rate'], parameters)
-        phases = int(data['phases'])
-        dorm = numbers.parse_number(data['dorm'], parameters)
+        rate = numbers.parse_number(data["rate"], parameters)
+        phases = int(data["phases"])
+        dorm = numbers.parse_number(data["dorm"], parameters)
         element = BeErlang(element_id, name, rate, phases, dorm, position)
     elif distribution == "weibull":
-        shape = numbers.parse_number(data['shape'], parameters)
-        rate = numbers.parse_number(data['rate'], parameters)
+        shape = numbers.parse_number(data["shape"], parameters)
+        rate = numbers.parse_number(data["rate"], parameters)
         element = BeWeibull(element_id, name, shape, rate, position)
     elif distribution == "lognormal":
-        mean = numbers.parse_number(data['mean'], parameters)
-        stddev = numbers.parse_number(data['stddev'], parameters)
+        mean = numbers.parse_number(data["mean"], parameters)
+        stddev = numbers.parse_number(data["stddev"], parameters)
         element = BeLognormal(element_id, name, mean, stddev, position)
     else:
         raise DftTypeNotKnownException("BE distribution '{}' not known.".format(distribution))
 
-    if 'relevant' in data:
-        element.relevant = bool(data['relevant'])
+    if "relevant" in data:
+        element.relevant = bool(data["relevant"])
     return element
 
 
@@ -73,7 +73,7 @@ class DftBe(DftElement):
 
     def get_json(self):
         json = DftElement.get_json(self)
-        json['data']['distribution'] = self.distribution
+        json["data"]["distribution"] = self.distribution
         return json
 
     def compare(self, other, respect_ids):
@@ -93,7 +93,7 @@ class BeConstant(DftBe):
 
     def get_json(self):
         json = DftBe.get_json(self)
-        json['data']['failed'] = self.failed
+        json["data"]["failed"] = self.failed
         return json
 
     def __str__(self):
@@ -119,8 +119,8 @@ class BeProbability(DftBe):
 
     def get_json(self):
         json = DftBe.get_json(self)
-        json['data']['prob'] = str(self.probability)
-        json['data']['dorm'] = str(self.dorm)
+        json["data"]["prob"] = str(self.probability)
+        json["data"]["dorm"] = str(self.dorm)
         return json
 
     def __str__(self):
@@ -154,9 +154,9 @@ class BeExponential(DftBe):
 
     def get_json(self):
         json = DftBe.get_json(self)
-        json['data']['rate'] = str(self.rate)
-        json['data']['dorm'] = str(self.dorm)
-        json['data']['repair'] = str(self.repair)
+        json["data"]["rate"] = str(self.rate)
+        json["data"]["dorm"] = str(self.dorm)
+        json["data"]["repair"] = str(self.repair)
         return json
 
     def __str__(self):
@@ -194,9 +194,9 @@ class BeErlang(DftBe):
 
     def get_json(self):
         json = DftBe.get_json(self)
-        json['data']['rate'] = str(self.rate)
-        json['data']['phases'] = str(self.phases)
-        json['data']['dorm'] = str(self.dorm)
+        json["data"]["rate"] = str(self.rate)
+        json["data"]["phases"] = str(self.phases)
+        json["data"]["dorm"] = str(self.dorm)
         return json
 
     def __str__(self):
@@ -231,8 +231,8 @@ class BeWeibull(DftBe):
 
     def get_json(self):
         json = DftBe.get_json(self)
-        json['data']['shape'] = str(self.shape)
-        json['data']['rate'] = str(self.rate)
+        json["data"]["shape"] = str(self.shape)
+        json["data"]["rate"] = str(self.rate)
         return json
 
     def __str__(self):
@@ -263,8 +263,8 @@ class BeLognormal(DftBe):
 
     def get_json(self):
         json = DftBe.get_json(self)
-        json['data']['mean'] = str(self.mean)
-        json['data']['stddev'] = str(self.stddev)
+        json["data"]["mean"] = str(self.mean)
+        json["data"]["stddev"] = str(self.stddev)
         return json
 
     def __str__(self):

@@ -55,8 +55,13 @@ def generate_tikz_node(element, is_tle=False):
 
     # Add labelbox for all elements
     label_anchor = "north"
-    if isinstance(element, dft_gates.DftAnd) or isinstance(element, dft_gates.DftOr) or isinstance(element, dft_gates.DftVotingGate) or isinstance(element, dft_gates.DftPand) \
-            or isinstance(element, dft_gates.DftPor):
+    if (
+        isinstance(element, dft_gates.DftAnd)
+        or isinstance(element, dft_gates.DftOr)
+        or isinstance(element, dft_gates.DftVotingGate)
+        or isinstance(element, dft_gates.DftPand)
+        or isinstance(element, dft_gates.DftPor)
+    ):
         label_anchor = "east"
     label = name
     # Replace underscores
@@ -92,10 +97,20 @@ def generate_tikz_node(element, is_tle=False):
 
 
 SPARE_CHILDREN = {
-    1: "P", 2: "SA", 3: "SB", 4: "SC", 5: "SD", 6: "SE",
+    1: "P",
+    2: "SA",
+    3: "SB",
+    4: "SC",
+    5: "SD",
+    6: "SE",
 }
 FDEP_CHILDREN = {
-    1: "T", 2: "EA", 3: "EB", 4: "EC", 5: "ED", 6: "EE",
+    1: "T",
+    2: "EA",
+    3: "EB",
+    4: "EC",
+    5: "ED",
+    6: "EE",
 }
 
 
@@ -110,9 +125,13 @@ def generate_tikz_edges(element):
 
         i = 1
         for child in element.children():
-            if isinstance(element, dft_gates.DftAnd) or isinstance(element, dft_gates.DftOr) \
-                    or isinstance(element, dft_gates.DftVotingGate) or isinstance(element, dft_gates.DftPand) \
-                    or isinstance(element, dft_gates.DftPor):
+            if (
+                isinstance(element, dft_gates.DftAnd)
+                or isinstance(element, dft_gates.DftOr)
+                or isinstance(element, dft_gates.DftVotingGate)
+                or isinstance(element, dft_gates.DftPand)
+                or isinstance(element, dft_gates.DftPor)
+            ):
                 s += "\t\\draw[-]({}.input {}) -- ({}_label.north);\n".format(element.name, i, child.name)
                 i += 1
             elif isinstance(element, dft_gates.DftSpare):
@@ -131,7 +150,9 @@ def generate_tikz_edges(element):
                 elif no_children == 5:
                     seq_children = {1: 250, 2: 260, 3: 270, 4: 280, 5: 290}
                 else:
-                    raise DftTypeNotSupportedException("{} children (for element '{}') are currently not supported for tikz export.".format(no_children, element.name))
+                    raise DftTypeNotSupportedException(
+                        "{} children (for element '{}') are currently not supported for tikz export.".format(no_children, element.name)
+                    )
                 s += "\t\\draw[-]({}.{}) -- ({}_label.north);\n".format(element.name, seq_children[i], child.name)
                 i += 1
             else:
@@ -149,7 +170,7 @@ def generate_tikz(dft, file):
     elements = dft.topological_sort()
     tle_id = dft.top_level_element.element_id
 
-    with open(file, 'w') as f:
+    with open(file, "w") as f:
         f.write("\\begin{tikzpicture}\n")
 
         # Draw nodes

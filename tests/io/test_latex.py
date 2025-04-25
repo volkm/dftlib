@@ -13,6 +13,6 @@ def test_export_tikz(tmpdir):
     tmp_path = os.path.join(tmpdir, "tizk.tex")
     dftlib.io.latex.generate_tikz(dft, tmp_path)
 
-    tmp_file = open(tmp_path, 'r').read().splitlines()
+    tmp_file = open(tmp_path, "r").read().splitlines()
     assert tmp_file[0] == "\\begin{tikzpicture}"
     assert tmp_file[-1] == "\\end{tikzpicture}"
