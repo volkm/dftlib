@@ -28,5 +28,4 @@ WORKDIR /opt/dftlib
 COPY . .
 
 # Build dftlib
-RUN pip install setuptools
-RUN python setup.py develop
+RUN pip install .

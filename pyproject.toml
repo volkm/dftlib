@@ -1,0 +1,70 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dftlib"
+description = "dftlib - Python library for dynamic fault tree analysis"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+dynamic = ["version"]
+authors = [
+    { name = "M. Volk", email = "m.volk@tue.nl" }
+]
+requires-python = ">=3.8"
+dependencies = [
+    # Currently no dependencies
+]
+classifiers = [
+    'Intended Audience :: Science/Research',
+    'Topic :: Scientific/Engineering',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+]
+
+[project.urls]
+Homepage = "https://github.com/volkm/dftlib"
+"Bug Tracker" = "https://github.com/volkm/dftlib/issues"
+
+[project.optional-dependencies]
+smt = [
+    "z3-solver"
+]
+stormpy = [
+    "stormpy>=1.9.0"
+]
+dev = [
+    # Formatting
+    "black",
+]
+test = [
+    "pytest",
+]
+
+[tool.hatch.version]
+path = "dftlib/__init__.py"
+
+
+[tool.black]
+line-length = 160
+target-version = [
+    "py39",
+    "py310",
+    "py311",
+    "py312",
+    "py313",
+]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = [
+    "tests",
+]
+python_files = [
+    "test*.py",
+]
+python_functions = [
+    "*_test",
+    "test_*",
+    "example_*",
+]
