@@ -5,7 +5,7 @@
             "data": {
                 "id": "0",
                 "name": "A",
-                "type": "be_exp",
+                "type": "be",
                 "distribution": "const",
                 "failed": false,
                 "label": "A (λ: 1)",
@@ -24,7 +24,7 @@
             "selectable": true,
             "locked": false,
             "grabbable": true,
-            "classes": "be_exp"
+            "classes": "be"
         },
         {
             "data": {
