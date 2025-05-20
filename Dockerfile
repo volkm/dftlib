@@ -1,14 +1,23 @@
-# Base Dockerfile for using dftlib
-##################################
+# Dockerfile for dftlib
+#######################
 # The Docker image can be built by executing:
 # docker build -t yourusername/dftlib .
-# A different base image can be set from the commandline with:
+# A different stormpy base image can be set from the commandline with:
 # --build-arg STORMPY_BASE=<new_base_image>
 
 # Set stormpy base image
 ARG STORMPY_BASE=movesrwth/stormpy:stable
 FROM $STORMPY_BASE
-MAINTAINER Matthias Volk <m.volk@tue.nl>
+LABEL org.opencontainers.image.authors="m.volk@tue.nl"
+
+
+# Configuration arguments
+#########################
+# The arguments can be set from the commandline with:
+# --build-arg <arg_name>=<value>
+
+# Optional support to install for dftlib, such as '[test,stormpy]'
+ARG options=""
 
 
 # Set-up virtual environment
@@ -28,4 +37,4 @@ WORKDIR /opt/dftlib
 COPY . .
 
 # Build dftlib
-RUN pip install .
+RUN pip install -v .$options

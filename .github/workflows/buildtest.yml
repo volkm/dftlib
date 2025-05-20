@@ -21,13 +21,15 @@ jobs:
       - name: Git clone
         uses: actions/checkout@v4
       - name: Build dftlib from Dockerfile
-        run: docker build -t volkm/dftlib . --build-arg STORMPY_BASE=movesrwth/stormpy:${{ matrix.stormpyImg }}
+        run: |
+          docker build -t volkm/dftlib . \
+            --build-arg STORMPY_BASE=movesrwth/stormpy:${{ matrix.stormpyImg }} \
+            --build-arg options="[smt,stormpy,test]"
       - name: Run Docker
         run: docker run -d -it --name ci volkm/dftlib
-      - name: Build optional dftlib libraries
-        run: docker exec ci bash -c "cd /opt/dftlib; pip install -e '.[smt,stormpy,test]'"
       - name: Run tests
         run: docker exec ci bash -c "cd /opt/dftlib; pytest"
+
 
   BuildTest:
     name: Test (Python ${{ matrix.python-version }})
