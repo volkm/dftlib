@@ -60,6 +60,7 @@ def simplify_dft_all_rules(dft):
         RewriteRules.TRIM,
         RewriteRules.REMOVE_DEPENDENCIES_TLE,
         RewriteRules.REMOVE_DUPLICATES,
+        RewriteRules.FACTOR_COMMON_CAUSE,
         RewriteRules.MERGE_IDENTICAL_GATES,
         RewriteRules.REMOVE_SINGLE_SUCCESSOR,
         # RewriteRules.ADD_SINGLE_OR, # Could lead to infinite loop by adding new gates
@@ -111,6 +112,8 @@ def simplify_dft_rules(dft, rules):
             logging.debug("Removed dependency: {}".format(element))
         elif rule == RewriteRules.REMOVE_DUPLICATES:
             logging.debug("Removed duplicates in gate {}".format(element))
+        elif rule == RewriteRules.FACTOR_COMMON_CAUSE:
+            logging.debug("Factored out common cause in gate {}".format(element))
         elif rule == RewriteRules.MERGE_IDENTICAL_GATES:
             logging.debug("Merged gate {}".format(element))
         elif rule == RewriteRules.REMOVE_SINGLE_SUCCESSOR:
