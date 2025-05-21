@@ -25,6 +25,7 @@ class RewriteRules(Enum):
     TRIM = 32
     REMOVE_DEPENDENCIES_TLE = 33
     REMOVE_DUPLICATES = 34
+    FACTOR_COMMON_CAUSE = 35
     MERGE_IDENTICAL_GATES = 2
     REMOVE_SINGLE_SUCCESSOR = 3
     ADD_SINGLE_OR = 4
@@ -47,6 +48,8 @@ class RewriteRules(Enum):
             return try_remove_dependencies
         elif rule == RewriteRules.REMOVE_DUPLICATES:
             return try_remove_duplicates
+        elif rule == RewriteRules.FACTOR_COMMON_CAUSE:
+            return try_factor_common_cause
         elif rule == RewriteRules.MERGE_IDENTICAL_GATES:
             # This method requires two gates as input
             return try_merge_identical_gates
@@ -102,7 +105,7 @@ def try_merge_bes_in_or(dft, or_gate):
     """
     Try to merge BEs under an OR-gate into one BE.
     :param dft: DFT.
-    :param or_gate: OR gate.
+    :param or_gate: OR-gate.
     :return: True iff merge was successful.
     """
     # Check if rule is applicable
@@ -206,7 +209,7 @@ def try_merge_bes_in_or(dft, or_gate):
 def has_immediate_failure(dft, gate):
     """
     Checks whether a failure of the gate leads to an immediate failure of the top level element.
-    In other words, all parents are OR gates.
+    In other words, all parents are OR-gates.
     :param dft: DFT.
     :param gate: Gate.
     :return: True iff failure leads to system failure.
@@ -249,8 +252,8 @@ def try_remove_duplicates(dft, gate):
     :param gate: Gate.
     :return: True iff removal was successful.
     """
-
-    if gate.is_be():
+    # Duplicates must be kept if order of children is important
+    if not (isinstance(gate, dft_gates.DftAnd) or isinstance(gate, dft_gates.DftOr) or isinstance(gate, dft_gates.DftVotingGate)):
         return False
 
     # Check if duplicates exist
@@ -265,14 +268,78 @@ def try_remove_duplicates(dft, gate):
     if not duplicates:
         return False
 
-    # Duplicates must be kept if order of children is important
-    if not (isinstance(gate, dft_gates.DftAnd) or isinstance(gate, dft_gates.DftOr) or isinstance(gate, dft_gates.DftVotingGate)):
-        return False
-
     # Remove duplicate
     for element in duplicates:
         gate.remove_child(element)
 
+    return True
+
+
+def try_factor_common_cause(dft, gate):
+    """
+    Try to factor out a common cause failure.
+    A structure (A || B) && (B || C) with common cause B can be rewritten to B || (A && C).
+    :param dft: DFT
+    :param gate: Gate.
+    :return: True iff common cause factoring was successful.
+    """
+    # Check if rule is applicable
+    if not isinstance(gate, dft_gates.DftAnd):
+        return False
+    if len(gate.children()) <= 1:
+        return False
+
+    # Search for common cause candidates
+    common_causes = None
+    for or_gate in gate.children():
+        if not isinstance(or_gate, dft_gates.DftOr):
+            return False
+        if len(or_gate.parents()) > 1:
+            # Only AND-gate should be the parent
+            return False
+
+        children = set([c.element_id for c in or_gate.children()])
+        if common_causes is None:
+            common_causes = children
+        else:
+            # Intersection to only keep common cause failures
+            common_causes &= children
+
+    if len(common_causes) == 0:
+        # No common cause failures found
+        return False
+
+    common_causes = [dft.get_element(c) for c in common_causes]
+
+    # Remove common causes from OR-gates
+    for or_gate in gate.children():
+        for common_cause in common_causes:
+            or_gate.remove_child(common_cause)
+
+    # Create new AND-gate over remaining Or-gates
+    # This gate represents the independent failures
+    position = (gate.position[0] + 100, gate.position[1] + 150)
+    independent_gate = dft_gates.DftAnd(dft.next_id(), gate.name + "_IndepFailures", gate.children(), position)
+    dft.add(independent_gate)
+
+    # Set element for common cause failures
+    # If there are multiple ones, introduce a new gate
+    if len(common_causes) > 1:
+        position = (gate.position[0] - 100, gate.position[1] + 150)
+        common_cause = dft_gates.DftOr(dft.next_id(), gate.name + "_CommonCauseFailures", common_causes, position)
+        dft.add(common_cause)
+    else:
+        common_cause = common_causes[0]
+
+    # Create new OR-gate as combination of common causes and independent failures
+    position = (gate.position[0], gate.position[1] + 50)
+    or_gate = dft_gates.DftOr(dft.next_id(), gate.name + "_2", [common_cause, independent_gate], position)
+    # Add new gate as single child of existing gate
+    # This will be simplified later on with rule REMOVE_SINGLE_SUCCESSOR
+    dft.add(or_gate)
+    while len(gate.children()) > 0:
+        gate.remove_child(gate.children()[0])
+    gate.add_child(or_gate)
     return True
 
 
@@ -454,7 +521,7 @@ def add_or_as_predecessor(dft, element, name=None):
     :param dft: DFT.
     :param element: Element which gets an OR as predecessor.
     :param name: Name of new OR-gate.
-    :return: The new OR gate or None.
+    :return: The new OR-gate or None.
     """
     if name is None:
         name = "OR_{}".format(dft.next_id())
@@ -498,8 +565,8 @@ def check_for_cycle(dft, element, current):
     The cycle check excludes dependencies and restrictors.
     :param dft: DFT.
     :param element: Element to search for.
-    :param ceurrent Current element.
-    :return: True iff the predecessor closure of current contains eleement.
+    :param current: Current element.
+    :return: True iff the predecessor closure of current contains element.
     """
     if current.element_id == element.element_id:
         return True

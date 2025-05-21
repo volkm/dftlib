@@ -172,6 +172,24 @@ def test_rewrite_all_rule28():
     assert no_elements == 4
 
 
+def test_rewrite_all_rule35():
+    file = get_example_path("simplify", "rule35_test.json")
+    dft = dftlib.io.parser.parse_dft_json_file(file)
+    no_be, no_static, no_dynamic, no_elements = dft.statistics()
+    assert no_be == 6
+    assert no_static == 5
+    assert no_dynamic == 1
+    assert no_elements == 12
+
+    changed = simplifier.simplify_dft_all_rules(dft)
+    assert changed
+    no_be, no_static, no_dynamic, no_elements = dft.statistics()
+    assert no_be == 5
+    assert no_static == 3
+    assert no_dynamic == 1
+    assert no_elements == 9
+
+
 def test_rewrite_all_fdep_cycle():
     file = get_example_path("simplify", "fdep_cycle.json")
     dft = dftlib.io.parser.parse_dft_json_file(file)
