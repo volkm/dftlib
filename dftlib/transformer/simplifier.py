@@ -110,9 +110,9 @@ def simplify_dft_rules(dft, rules):
         elif rule == RewriteRules.REMOVE_DEPENDENCIES_TLE:
             logging.debug("Removed dependency: {}".format(element))
         elif rule == RewriteRules.REMOVE_DUPLICATES:
-            logging.debug("Removed duplicates in gate".format(element))
+            logging.debug("Removed duplicates in gate {}".format(element))
         elif rule == RewriteRules.MERGE_IDENTICAL_GATES:
-            logging.debug("Merged gate".format(element))
+            logging.debug("Merged gate {}".format(element))
         elif rule == RewriteRules.REMOVE_SINGLE_SUCCESSOR:
             logging.debug("Removed gate with single successor: {}".format(element))
         elif rule == RewriteRules.ADD_SINGLE_OR:

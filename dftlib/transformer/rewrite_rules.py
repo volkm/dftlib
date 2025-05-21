@@ -102,7 +102,7 @@ def try_merge_bes_in_or(dft, or_gate):
     """
     Try to merge BEs under an OR-gate into one BE.
     :param dft: DFT.
-    :param or_gate: OR gate.
+    :param or_gate: OR-gate.
     :return: True iff merge was successful.
     """
     # Check if rule is applicable
@@ -206,7 +206,7 @@ def try_merge_bes_in_or(dft, or_gate):
 def has_immediate_failure(dft, gate):
     """
     Checks whether a failure of the gate leads to an immediate failure of the top level element.
-    In other words, all parents are OR gates.
+    In other words, all parents are OR-gates.
     :param dft: DFT.
     :param gate: Gate.
     :return: True iff failure leads to system failure.
@@ -249,8 +249,8 @@ def try_remove_duplicates(dft, gate):
     :param gate: Gate.
     :return: True iff removal was successful.
     """
-
-    if gate.is_be():
+    # Duplicates must be kept if order of children is important
+    if not (isinstance(gate, dft_gates.DftAnd) or isinstance(gate, dft_gates.DftOr) or isinstance(gate, dft_gates.DftVotingGate)):
         return False
 
     # Check if duplicates exist
@@ -263,10 +263,6 @@ def try_remove_duplicates(dft, gate):
             if idi == idj:
                 duplicates.append(element)
     if not duplicates:
-        return False
-
-    # Duplicates must be kept if order of children is important
-    if not (isinstance(gate, dft_gates.DftAnd) or isinstance(gate, dft_gates.DftOr) or isinstance(gate, dft_gates.DftVotingGate)):
         return False
 
     # Remove duplicate
@@ -454,7 +450,7 @@ def add_or_as_predecessor(dft, element, name=None):
     :param dft: DFT.
     :param element: Element which gets an OR as predecessor.
     :param name: Name of new OR-gate.
-    :return: The new OR gate or None.
+    :return: The new OR-gate or None.
     """
     if name is None:
         name = "OR_{}".format(dft.next_id())
@@ -498,8 +494,8 @@ def check_for_cycle(dft, element, current):
     The cycle check excludes dependencies and restrictors.
     :param dft: DFT.
     :param element: Element to search for.
-    :param ceurrent Current element.
-    :return: True iff the predecessor closure of current contains eleement.
+    :param current: Current element.
+    :return: True iff the predecessor closure of current contains element.
     """
     if current.element_id == element.element_id:
         return True
