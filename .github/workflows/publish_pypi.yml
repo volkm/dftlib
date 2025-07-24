@@ -12,6 +12,9 @@ on:
   release:
     types:
       - published
+  push:
+    branches:
+      - pypi
 
 jobs:
   build:
@@ -172,7 +175,7 @@ jobs:
     permissions:
       id-token: write
     # Only upload if not using test.pypi and using original repo and triggered by either a release or a manual workflow dispatch
-    if: ${{ !inputs.testPypi && github.repository_owner == 'volkm' && ((github.event_name == 'release' && github.event.action == 'published') || github.event_name == 'workflow_dispatch') }}
+    if: false #${{ !inputs.testPypi && github.repository_owner == 'volkm' && ((github.event_name == 'release' && github.event.action == 'published') || github.event_name == 'workflow_dispatch') }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -196,7 +199,7 @@ jobs:
     permissions:
       id-token: write
     # Only upload if using test.pypi and using original repo and triggered by either a release or a manual workflow dispatch
-    if: ${{ inputs.testPypi && github.repository_owner == 'volkm' && ((github.event_name == 'release' && github.event.action == 'published') || github.event_name == 'workflow_dispatch') }}
+    if: true # ${{ inputs.testPypi && github.repository_owner == 'volkm' && ((github.event_name == 'release' && github.event.action == 'published') || github.event_name == 'workflow_dispatch') }}
     steps:
       - uses: actions/download-artifact@v4
         with:
