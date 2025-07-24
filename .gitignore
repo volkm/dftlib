@@ -1,9 +1,15 @@
-__pycache__/
 *.py[cod]
 .eggs/
 *.egg-info/
+build/
+_autosummary/
+dist/
+.idea/
+__pycache__/
+_build/
 .pytest_cache/
 .idea/
 resources/latex/*.aux
 resources/latex/*.log
 resources/latex/*.pdf
+.DS_Store

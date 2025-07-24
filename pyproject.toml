@@ -33,6 +33,11 @@ smt = [
 stormpy = [
     "stormpy>=1.9.0"
 ]
+doc = [
+    "Sphinx>=8.2.2",
+    "sphinx-nefertiti",
+    "sphinx-copybutton",
+] # also requires pandoc to be installed
 dev = [
     # Formatting
     "black",
@@ -57,8 +62,10 @@ target-version = [
 
 [tool.pytest.ini_options]
 minversion = "6.0"
+addopts = "--doctest-glob='*.rst'"
 testpaths = [
     "tests",
+    "doc",
 ]
 python_files = [
     "test*.py",
