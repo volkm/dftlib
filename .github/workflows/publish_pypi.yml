@@ -61,6 +61,7 @@ jobs:
         with:
           path: dist/test_files
           sparse-checkout: |
+            examples
             tests
       - name: Install from wheel and test
         run: |
@@ -94,7 +95,7 @@ jobs:
           echo "Installing $WHEEL..."
           python3 -m venv venv
           source venv/bin/activate
-          python3 -m pip install .
+          python3 -m pip install "$WHEEL"
 
           # Run a basic import test (replace with pytest if needed)
           python3 -c "import dftlib; print('Import successful')"
@@ -156,6 +157,7 @@ jobs:
         with:
           path: dist/test_files
           sparse-checkout: |
+            examples
             tests
       - name: Test
         working-directory: dist
