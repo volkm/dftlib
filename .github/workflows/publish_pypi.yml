@@ -1,0 +1,210 @@
+name: Build and upload to PyPI
+
+on:
+  # needed to trigger the workflow manually
+  workflow_dispatch:
+    inputs:
+      testPypi:
+        description: 'Whether to use test.pypi instead of pypi'
+        required: true
+        default: true
+        type: boolean
+  release:
+    types:
+      - published
+
+jobs:
+  build:
+    name: Build wheels
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Install pypa/build
+        run: python3 -m pip install build --user
+      - name: Build a binary wheel and a source tarball
+        run: python3 -m build
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+
+  test_wheels_linux:
+    name: Test wheel on ${{ matrix.distro }}
+    needs: [build]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        distro:
+          - ubuntu:24.04
+          - debian:12
+          - fedora:latest
+          - archlinux:latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Checkout test files
+        uses: actions/checkout@v4
+        with:
+          path: dist/test_files
+          sparse-checkout: |
+            examples
+            tests
+      - name: Install from wheel and test
+        run: |
+          docker run -i --rm -v ./dist:/wheel ${{ matrix.distro }} /bin/bash << 'EOF'
+          set -euo pipefail
+          set -x
+
+          cd /wheel
+
+          # Install Python & pip (varies per distro)
+          if command -v apt; then
+            apt update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt install -y python3 python3-pip python3-venv
+          elif command -v dnf; then
+            dnf install -y python3 python3-pip
+          elif command -v pacman; then
+            pacman -Syu --noconfirm python python-pip
+          fi
+
+          # Get major+minor version (e.g. "311" for Python 3.11)
+          PY_VER=$(python3 -c "import sys; print(f'{sys.version_info.major}{sys.version_info.minor}')")
+          echo "Python version: $PY_VER"
+
+          # Look for a matching wheel in the current directory
+          WHEEL=$(ls dftlib-*-py*-*.whl 2>/dev/null | head -n1 || true)
+          echo "Found wheel: $WHEEL"
+          if [ -z "$WHEEL" ]; then
+            echo "Error: No dftlib wheel found for Python ${PY_VER:0:1}.${PY_VER:1}." >&2
+            exit 1
+          fi
+
+          echo "Installing $WHEEL..."
+          python3 -m venv venv
+          source venv/bin/activate
+          python3 -m pip install "$WHEEL"
+
+          # Run a basic import test (replace with pytest if needed)
+          python3 -c "import dftlib; print('Import successful')"
+          pip install pytest stormpy
+          pytest test_files/tests
+          EOF
+
+
+  test_wheels_mac:
+    name: Test wheel on ${{ matrix.distro.name }}
+    needs: [build]
+    runs-on: ${{ matrix.distro.distro }}
+    strategy:
+      fail-fast: false
+      matrix:
+        distro:
+          - {name: "XCode 14.3, Intel",
+             os: macos-intel,
+             distro: "macos-13",
+             xcode: "14.3"
+          }
+          - {name: "XCode 15.4, ARM",
+             os: macos-arm,
+             distro: "macos-14",
+             xcode: "15.4"
+          }
+          - {name: "XCode 16.3, ARM",
+             os: macos-arm,
+             distro: "macos-15",
+             xcode: "16.3"
+          }
+    steps:
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ matrix.distro.xcode }}
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Install from wheel and test
+        working-directory: dist
+        run: |
+          # Get major+minor version (e.g. "311" for Python 3.11)
+          PY_VER=$(python3 -c "import sys; print(f'{sys.version_info.major}{sys.version_info.minor}')")
+          echo "Python version: $PY_VER"
+          # Look for a matching wheel in the current directory
+          WHEEL=$(ls dftlib-*-py*-*.whl 2>/dev/null | head -n1 || true)
+          echo "Found wheel: $WHEEL"
+          if [ -z "$WHEEL" ]; then
+            echo "Error: No dftlib wheel found for Python ${PY_VER:0:1}.${PY_VER:1}." >&2
+            exit 1
+          fi
+          echo "Installing $WHEEL..."
+          python3 -m venv venv
+          source venv/bin/activate
+          python3 -m pip install "$WHEEL"
+      - name: Checkout test files
+        uses: actions/checkout@v4
+        with:
+          path: dist/test_files
+          sparse-checkout: |
+            examples
+            tests
+      - name: Test
+        working-directory: dist
+        run: |
+          source venv/bin/activate
+          python3 -c "import dftlib; print('Import successful')"
+          python3 -m pip install pytest stormpy 
+          pytest test_files/tests
+
+
+  upload_pypi:
+    needs: [build, test_wheels_linux, test_wheels_mac]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/dftlib
+    permissions:
+      id-token: write
+    # Only upload if not using test.pypi and using original repo and triggered by either a release or a manual workflow dispatch
+    if: ${{ !inputs.testPypi && github.repository_owner == 'volkm' && ((github.event_name == 'release' && github.event.action == 'published') || github.event_name == 'workflow_dispatch') }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          verbose: true
+          skip-existing: true
+
+
+  upload_testpypi:
+    needs: [build, test_wheels_linux, test_wheels_mac]
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/dftlib
+    permissions:
+      id-token: write
+    # Only upload if using test.pypi and using original repo and triggered by either a release or a manual workflow dispatch
+    if: ${{ inputs.testPypi && github.repository_owner == 'volkm' && ((github.event_name == 'release' && github.event.action == 'published') || github.event_name == 'workflow_dispatch') }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          verbose: true
+          skip-existing: true
