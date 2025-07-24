@@ -242,7 +242,7 @@ class DftPriorityGate(DftGate):
         if not super().compare(other, respect_ids):
             return False
 
-        if not self.compare_successors(other, ordered=True, respect_ids=respect_ids):
+        if not self.compare_successors(other, ordered=True, respect_ids=True):
             return False
 
         return self.inclusive == other.inclusive
