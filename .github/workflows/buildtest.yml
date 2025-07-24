@@ -32,11 +32,18 @@ jobs:
 
 
   BuildTest:
-    name: Test (Python ${{ matrix.python-version }})
+    name: Test (${{ matrix.dependencies.name }}, Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        dependencies:
+          - {name: "No libs",
+             libs: "test"
+          }
+          - {name: "All libs",
+             libs: "test,smt,stormpy"
+          }
 
     steps:
       - name: Git clone
@@ -46,6 +53,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Build dftlib
-        run: pip install -e .[test]
+        run: pip install -e .[${{ matrix.dependencies.libs }}]
       - name: Run tests
         run: pytest
