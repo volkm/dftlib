@@ -31,7 +31,7 @@ jobs:
         run: docker exec ci bash -c "cd /opt/dftlib; pytest"
 
 
-  BuildTest:
+  buildTests:
     name: Test Python ${{ matrix.python-version }}, Libs ${{ matrix.dependencies }}
     runs-on: ubuntu-latest
     strategy:
@@ -46,13 +46,63 @@ jobs:
             dependencies: "test,smt,stormpy"
 
     steps:
-      - name: Git clone
-        uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Git clone
+        uses: actions/checkout@v4
       - name: Build dftlib
         run: pip install -e .[${{ matrix.dependencies }}]
       - name: Run tests
         run: pytest
+
+
+  buildDoc:
+    name: Build documentation (Python ${{ matrix.python-version }}, Libs ${{ matrix.dependencies }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.13"]
+        dependencies: ["doc,test,smt,stormpy"]
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install documentation dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -qq -y pandoc
+      - name: Git clone
+        uses: actions/checkout@v4
+      - name: Build dftlib
+        run: pip install -e .[${{ matrix.dependencies }}]
+      - name: Run tests
+        run: pytest
+      - name: Build documentation
+        run: |
+          cd doc; make html
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "doc/build/html/"
+
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    name: Publish documentation
+    needs: buildDoc
+    runs-on: ubuntu-latest
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
