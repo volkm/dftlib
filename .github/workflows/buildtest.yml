@@ -44,6 +44,12 @@ jobs:
           - {name: "All libs",
              libs: "test,smt,stormpy"
           }
+        exclude:
+          # Stormpy package only exists for Python >= 3.11
+          - python-version: "3.9"
+            dependencies.name: "All libs"
+          - python-version: "3.10"
+            dependencies.name: "All libs"
 
     steps:
       - name: Git clone
