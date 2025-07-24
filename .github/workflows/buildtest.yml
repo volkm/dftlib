@@ -53,6 +53,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Build dftlib
-        run: pip install -e .[test${{ matrix,dependencies }}]
+        run: pip install -e .[test${{ matrix.dependencies }}]
       - name: Run tests
         run: pytest
