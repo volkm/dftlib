@@ -10,6 +10,7 @@ dftlib is a Python library for dynamic fault tree analysis.
    :caption: Contents:
    
    installation
+   features
 
 
 .. include:: api.rst
