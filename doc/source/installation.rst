@@ -27,7 +27,7 @@ Whenever using the environment, the console prompt is prefixed with ``(env)``.
 Installing dftlib
 -----------------
 
-You can simply install dftlib via its pypi package::
+You can simply install dftlib via its `pypi package <https://pypi.org/project/dftlib/>`_::
 
 	$ pip install dftlib
 
