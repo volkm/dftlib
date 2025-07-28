@@ -36,14 +36,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.11", "3.12", "3.13"]
         dependencies: ["test", "test,smt,stormpy"]
-        exclude:
-          # Stormpy package only exists for Python >= 3.11
-          - python-version: "3.9"
-            dependencies: "test,smt,stormpy"
-          - python-version: "3.10"
-            dependencies: "test,smt,stormpy"
 
     steps:
       - name: Set up Python ${{ matrix.python-version }}

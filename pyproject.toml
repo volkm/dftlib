@@ -12,7 +12,7 @@ dynamic = ["version"]
 authors = [
     { name = "M. Volk", email = "m.volk@tue.nl" }
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     # Currently no dependencies
 ]
@@ -58,11 +58,9 @@ simplify = "simplify:main"
 [tool.hatch.version]
 path = "dftlib/__init__.py"
 
-
 [tool.black]
 line-length = 160
 target-version = [
-    "py310",
     "py311",
     "py312",
     "py313",
