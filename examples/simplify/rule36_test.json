@@ -1,0 +1,173 @@
+{
+    "toplevel": 0,
+    "nodes": [
+        {
+            "data": {
+                "id": "0",
+                "name": "A",
+                "type": "and",
+                "repairable": false,
+                "children": [
+                    "6"
+                ],
+                "label": "A"
+            },
+            "position": {
+                "x": 1017.0111426817175,
+                "y": 121.50932269086826
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "and toplevel"
+        },
+        {
+            "data": {
+                "id": "2",
+                "name": "B1",
+                "type": "be",
+                "distribution": "probability",
+                "repairable": false,
+                "prob": 1,
+                "repair": 0,
+                "dorm": 0,
+                "label": "B1"
+            },
+            "position": {
+                "x": 963.5,
+                "y": 619.5
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be"
+        },
+        {
+            "data": {
+                "id": "3",
+                "name": "B2",
+                "type": "be_exp",
+                "repairable": false,
+                "rate": 2,
+                "repair": 0,
+                "dorm": 0,
+                "label": "B2"
+            },
+            "position": {
+                "x": 1074.5,
+                "y": 619.5
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be be_exp"
+        },
+        {
+            "data": {
+                "id": "5",
+                "name": "F",
+                "type": "pdep",
+		"probability": 0,
+                "repairable": false,
+                "children": [
+                    "3",
+                    "2"
+                ],
+                "label": "F"
+            },
+            "position": {
+                "x": 1238.5,
+                "y": 423.5
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "fdep"
+        },
+        {
+            "data": {
+                "id": "1",
+                "name": "B",
+                "type": "vot",
+                "repairable": false,
+                "children": [
+                    "2",
+                    "3"
+                ],
+                "voting": 2,
+                "label": "B (2/0)"
+            },
+            "position": {
+                "x": 1021.5,
+                "y": 448.5
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "vot"
+        },
+        {
+            "data": {
+                "id": "6",
+                "name": "C",
+                "type": "vot",
+                "repairable": false,
+                "children": [
+                    "1",
+                    "7"
+                ],
+                "voting": 1,
+                "label": "C (1/2)"
+            },
+            "position": {
+                "x": 1010.4647519639977,
+                "y": 285.3273998016879
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "vot"
+        },
+        {
+            "data": {
+                "id": "7",
+                "name": "B3",
+                "type": "be_exp",
+                "repairable": false,
+                "rate": 0,
+                "repair": 0,
+                "dorm": 0,
+                "label": "B3 (λ: 0)"
+            },
+            "position": {
+                "x": 882,
+                "y": 429.5
+            },
+            "group": "nodes",
+            "removed": false,
+            "selected": false,
+            "selectable": true,
+            "locked": false,
+            "grabbable": true,
+            "classes": "be_exp"
+        }
+    ]
+}

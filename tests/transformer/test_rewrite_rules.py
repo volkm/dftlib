@@ -2,6 +2,7 @@ from helpers.helper import get_example_path
 
 import dftlib.io.parser
 import dftlib.transformer.simplifier as simplifier
+from dftlib.storage.dft_element import ElementType
 from dftlib.transformer.rewrite_rules import RewriteRules
 
 
@@ -188,6 +189,26 @@ def test_rewrite_all_rule35():
     assert no_static == 3
     assert no_dynamic == 1
     assert no_elements == 9
+
+
+def test_rewrite_all_rule36():
+    file = get_example_path("simplify", "rule36_test.json")
+    dft = dftlib.io.parser.parse_dft_json_file(file)
+    no_be, no_static, no_dynamic, no_elements = dft.statistics()
+    assert no_be == 3
+    assert no_static == 3
+    assert no_dynamic == 1
+    assert no_elements == 7
+
+    changed = simplifier.simplify_dft_all_rules(dft)
+    assert changed
+    no_be, no_static, no_dynamic, no_elements = dft.statistics()
+    assert no_be == 3
+    assert no_static == 3
+    assert no_dynamic == 0
+    assert no_elements == 6
+    for element in dft.elements.values():
+        assert element.element_type != ElementType.VOT
 
 
 def test_rewrite_all_fdep_cycle():

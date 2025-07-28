@@ -61,6 +61,7 @@ def simplify_dft_all_rules(dft):
         RewriteRules.REMOVE_DEPENDENCIES_TLE,
         RewriteRules.REMOVE_DUPLICATES,
         RewriteRules.FACTOR_COMMON_CAUSE,
+        RewriteRules.USE_SPECIALIZED_GATE,
         RewriteRules.MERGE_IDENTICAL_GATES,
         RewriteRules.REMOVE_SINGLE_SUCCESSOR,
         # RewriteRules.ADD_SINGLE_OR, # Could lead to infinite loop by adding new gates
@@ -79,7 +80,14 @@ def simplify_dft_default_rules(dft):
     :param dft: DFT.
     :return: Simplified DFT.
     """
-    default_rules = [RewriteRules.SPLIT_FDEPS, RewriteRules.MERGE_BES, RewriteRules.TRIM, RewriteRules.REMOVE_SINGLE_SUCCESSOR, RewriteRules.FLATTEN_GATE]
+    default_rules = [
+        RewriteRules.SPLIT_FDEPS,
+        RewriteRules.MERGE_BES,
+        RewriteRules.TRIM,
+        RewriteRules.USE_SPECIALIZED_GATE,
+        RewriteRules.REMOVE_SINGLE_SUCCESSOR,
+        RewriteRules.FLATTEN_GATE,
+    ]
     return simplify_dft_rules(dft, default_rules)
 
 
@@ -114,6 +122,8 @@ def simplify_dft_rules(dft, rules):
             logging.debug("Removed duplicates in gate {}".format(element))
         elif rule == RewriteRules.FACTOR_COMMON_CAUSE:
             logging.debug("Factored out common cause in gate {}".format(element))
+        elif rule == RewriteRules.USE_SPECIALIZED_GATE:
+            logging.debug("Used specialized gate in gate {}".format(element))
         elif rule == RewriteRules.MERGE_IDENTICAL_GATES:
             logging.debug("Merged gate {}".format(element))
         elif rule == RewriteRules.REMOVE_SINGLE_SUCCESSOR:

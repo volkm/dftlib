@@ -26,6 +26,7 @@ class RewriteRules(Enum):
     REMOVE_DEPENDENCIES_TLE = 33
     REMOVE_DUPLICATES = 34
     FACTOR_COMMON_CAUSE = 35
+    USE_SPECIALIZED_GATE = 36
     MERGE_IDENTICAL_GATES = 2
     REMOVE_SINGLE_SUCCESSOR = 3
     ADD_SINGLE_OR = 4
@@ -50,6 +51,8 @@ class RewriteRules(Enum):
             return try_remove_duplicates
         elif rule == RewriteRules.FACTOR_COMMON_CAUSE:
             return try_factor_common_cause
+        elif rule == RewriteRules.USE_SPECIALIZED_GATE:
+            return try_using_specialized_gate
         elif rule == RewriteRules.MERGE_IDENTICAL_GATES:
             # This method requires two gates as input
             return try_merge_identical_gates
@@ -340,6 +343,40 @@ def try_factor_common_cause(dft, gate):
         gate.remove_child(gate.children()[0])
     gate.add_child(or_gate)
     return True
+
+
+def try_using_specialized_gate(dft, gate):
+    """
+    Try to replace general gates by a more specialized version:
+    - VOT-gate with threshold 1 is replaced by OR-gate
+    - VOT-gate with threshold n is replaced by AND-gate
+    - PDEP with probability 1 is replaced by FDEP
+    - PDEP with probability 0 is removed
+    :param dft: DFT.
+    :param gate: Gate which can possibly be replaced.
+    :return: True iff gate has been replaced.
+    """
+    if isinstance(gate, dft_gates.DftVotingGate):
+        assert gate.voting_threshold > 0
+        if gate.voting_threshold == 1:
+            # Replace by OR
+            or_gate = dft_gates.DftOr(gate.element_id, gate.name, gate.children(), gate.position)
+            dft.replace(gate, or_gate)
+            return True
+        if gate.voting_threshold == len(gate.children()):
+            # Replace by AND
+            and_gate = dft_gates.DftAnd(gate.element_id, gate.name, gate.children(), gate.position)
+            dft.replace(gate, and_gate)
+            return True
+
+    if isinstance(gate, dft_gates.DftDependency):
+        # PDEP and FDEP are the same class -> probability 1 is handled by export
+        if gate.probability == 0:
+            # Failure will never be forwarded -> remove
+            dft.remove(gate)
+            return True
+
+    return False
 
 
 def try_merge_identical_gates(dft, gate1, gate2):

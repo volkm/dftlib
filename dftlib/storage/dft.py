@@ -144,7 +144,32 @@ class Dft:
                 self.get_element(child_id).remove_parent(element)
         del self.elements[element.element_id]
 
-    def update_bounds(self, element):
+    def replace(self, orig_element: DftElement, new_element: DftElement) -> None:
+        """
+        Replace original element by new element.
+        :param orig_element: Original element.
+        :param new_element: New element.
+        """
+        assert isinstance(orig_element, DftElement)
+        assert isinstance(new_element, DftElement)
+        assert new_element.element_id == orig_element.element_id
+        self.elements[new_element.element_id] = new_element
+        self.update_bounds(new_element)
+
+        # Replace original element as child of its parents
+        parent_ids = [parent.element_id for parent in orig_element.parents()]
+        for parent_id in parent_ids:
+            self.get_element(parent_id).replace_child(orig_element, new_element)
+
+        # Remove original element as parent from old children
+        if orig_element.is_gate():
+            # Remember ids for iteration
+            # Otherwise we are iterating over the list we are also removing from
+            child_ids = [child.element_id for child in orig_element.children()]
+            for child_id in child_ids:
+                self.get_element(child_id).remove_parent(orig_element)
+
+    def update_bounds(self, element: DftElement) -> None:
         """
         Update position bounds by also including bounds of given element.
         :param element: Element.

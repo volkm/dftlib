@@ -309,7 +309,7 @@ class DftDependency(DftGate):
     """
 
     def __init__(self, element_id: int, name: str, probability: float, children: list[DftElement], position: tuple[float, float]) -> None:
-        DftGate.__init__(self, element_id, name, ElementType.FDEP if probability == 1 else ElementType.PDEP, children, position)
+        DftGate.__init__(self, element_id, name, ElementType.FDEP if numbers.is_one(probability) else ElementType.PDEP, children, position)
         self.probability = probability
 
     def get_json(self) -> dict:
@@ -340,14 +340,15 @@ class DftDependency(DftGate):
         return self.probability == other.probability
 
     def __str__(self) -> str:
-        return super().__str__() + (", probability: {}".format(self.probability) if self.probability != 1 else "")
+        return super().__str__() + (", probability: {}".format(self.probability) if not numbers.is_one(self.probability) else "")
 
     def check_valid(self) -> None:
-        if self.probability == 1:
+        if numbers.is_one(self.probability):
             assert self.element_type == ElementType.FDEP
         else:
             assert self.element_type == ElementType.PDEP
-            assert 0 < self.probability < 1
+            assert numbers.is_probability(self.probability)
+            assert not numbers.is_one(self.probability)
 
 
 class DftSeq(DftGate):
