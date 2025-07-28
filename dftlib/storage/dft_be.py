@@ -1,9 +1,19 @@
+from enum import StrEnum
 import dftlib.utility.numbers as numbers
 from dftlib.exceptions.exceptions import DftTypeNotKnownException
-from dftlib.storage.dft_element import DftElement
+from dftlib.storage.dft_element import DftElement, ElementType
 
 
-def create_from_json(json, parameters=None):
+class Distribution(StrEnum):
+    EXPONENTIAL = "exponential"
+    CONSTANT = "constant"
+    PROBABILITY = "probability"
+    ERLANG = "erlang"
+    WEIBULL = "weibull"
+    LOGNORMAL = "lognormal"
+
+
+def create_from_json(json: dict, parameters: list[str] = None) -> "DftBe":
     """
     Create BE from JSON string.
     :param json: JSON string.
@@ -26,7 +36,7 @@ def create_from_json(json, parameters=None):
     else:
         distribution = "exponential"
 
-    if distribution == "const":
+    if distribution == "const" or distribution == "constant":
         failed = bool(data["failed"])
         element = BeConstant(element_id, name, failed, position)
     elif distribution == "probability":
@@ -67,16 +77,16 @@ class DftBe(DftElement):
     Basic element (BE).
     """
 
-    def __init__(self, element_id, name, distribution, position):
-        DftElement.__init__(self, element_id, name, "be", position)
+    def __init__(self, element_id: int, name: str, distribution: Distribution, position: tuple[float, float]) -> None:
+        DftElement.__init__(self, element_id, name, ElementType.BE, position)
         self.distribution = distribution
 
-    def get_json(self):
+    def get_json(self) -> dict:
         json = DftElement.get_json(self)
         json["data"]["distribution"] = self.distribution
         return json
 
-    def compare(self, other, respect_ids):
+    def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
         return self.distribution == other.distribution
@@ -87,24 +97,28 @@ class BeConstant(DftBe):
     Constant failed/failsafe BE.
     """
 
-    def __init__(self, element_id, name, failed, position):
-        DftBe.__init__(self, element_id, name, "const", position)
+    def __init__(self, element_id: int, name: str, failed: bool, position: tuple[float, float]) -> None:
+        DftBe.__init__(self, element_id, name, Distribution.CONSTANT, position)
         self.failed = failed
 
-    def get_json(self):
+    def get_json(self) -> dict:
         json = DftBe.get_json(self)
         json["data"]["failed"] = self.failed
         return json
 
-    def __str__(self):
+    def __str__(self) -> str:
         s = super().__str__()
         s += " constant, {}".format("failed" if self.failed else "failsafe")
         return s
 
-    def compare(self, other, respect_ids):
+    def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
         return self.failed == other.failed
+
+    def check_valid(self) -> None:
+        assert self.element_type == ElementType.BE
+        assert self.distribution == Distribution.CONSTANT
 
 
 class BeProbability(DftBe):
@@ -112,25 +126,25 @@ class BeProbability(DftBe):
     BE with constant probability distribution.
     """
 
-    def __init__(self, element_id, name, probability, dorm, position):
-        DftBe.__init__(self, element_id, name, "probability", position)
+    def __init__(self, element_id: int, name: str, probability: float, dorm: float, position: tuple[float, float]) -> None:
+        DftBe.__init__(self, element_id, name, Distribution.PROBABILITY, position)
         self.probability = probability
         self.dorm = dorm
 
-    def get_json(self):
+    def get_json(self) -> dict:
         json = DftBe.get_json(self)
         json["data"]["prob"] = str(self.probability)
         json["data"]["dorm"] = str(self.dorm)
         return json
 
-    def __str__(self):
+    def __str__(self) -> str:
         s = super().__str__()
         s += " probability, prob {}".format(self.probability)
         if not numbers.is_one(self.dorm):
             s += ", dormancy {}".format(self.dorm)
         return s
 
-    def compare(self, other, respect_ids):
+    def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
         if self.probability != other.probability:
@@ -139,27 +153,31 @@ class BeProbability(DftBe):
             return False
         return True
 
+    def check_valid(self) -> None:
+        assert self.element_type == ElementType.BE
+        assert self.distribution == Distribution.PROBABILITY
+        assert numbers.is_probability(self.probability)
+
 
 class BeExponential(DftBe):
     """
     BE with exponential distribution.
     """
 
-    def __init__(self, element_id, name, rate, dorm, repair, position):
-        DftBe.__init__(self, element_id, name, "exponential", position)
-        assert self.is_be()
+    def __init__(self, element_id: int, name: str, rate: float, dorm: float, repair: float, position: tuple[float, float]) -> None:
+        DftBe.__init__(self, element_id, name, Distribution.EXPONENTIAL, position)
         self.rate = rate
         self.dorm = dorm
         self.repair = repair
 
-    def get_json(self):
+    def get_json(self) -> dict:
         json = DftBe.get_json(self)
         json["data"]["rate"] = str(self.rate)
         json["data"]["dorm"] = str(self.dorm)
         json["data"]["repair"] = str(self.repair)
         return json
 
-    def __str__(self):
+    def __str__(self) -> str:
         s = super().__str__()
         s += " exponential, rate {}".format(self.rate)
         if not numbers.is_zero(self.repair):
@@ -168,7 +186,7 @@ class BeExponential(DftBe):
             s += ", dormancy {}".format(self.dorm)
         return s
 
-    def compare(self, other, respect_ids):
+    def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
         if self.rate != other.rate:
@@ -179,34 +197,40 @@ class BeExponential(DftBe):
             return False
         return True
 
+    def check_valid(self) -> None:
+        assert self.element_type == ElementType.BE
+        assert self.distribution == Distribution.EXPONENTIAL
+        assert numbers.is_not_negative(self.rate)
+        assert numbers.is_probability(self.dorm)
+        assert numbers.is_not_negative(self.repair)
+
 
 class BeErlang(DftBe):
     """
     BE with Erlang distribution.
     """
 
-    def __init__(self, element_id, name, rate, phases, dorm, position):
-        DftBe.__init__(self, element_id, name, "erlang", position)
-        assert self.is_be()
+    def __init__(self, element_id: int, name: str, rate: float, phases: int, dorm: float, position: tuple[float, float]) -> None:
+        DftBe.__init__(self, element_id, name, Distribution.ERLANG, position)
         self.rate = rate
         self.phases = phases
         self.dorm = dorm
 
-    def get_json(self):
+    def get_json(self) -> dict:
         json = DftBe.get_json(self)
         json["data"]["rate"] = str(self.rate)
         json["data"]["phases"] = str(self.phases)
         json["data"]["dorm"] = str(self.dorm)
         return json
 
-    def __str__(self):
+    def __str__(self) -> str:
         s = super().__str__()
         s += " erlang, rate {}, phases {}".format(self.rate, self.phases)
         if not numbers.is_one(self.dorm):
             s += ", dormancy {}".format(self.dorm)
         return s
 
-    def compare(self, other, respect_ids):
+    def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
         if self.rate != other.rate:
@@ -217,30 +241,36 @@ class BeErlang(DftBe):
             return False
         return True
 
+    def check_valid(self) -> None:
+        assert self.element_type == ElementType.BE
+        assert self.distribution == Distribution.ERLANG
+        assert numbers.is_not_negative(self.rate)
+        assert numbers.is_probability(self.dorm)
+        assert numbers.is_not_negative(self.phases)
+
 
 class BeWeibull(DftBe):
     """
     BE with Weibull distribution.
     """
 
-    def __init__(self, element_id, name, shape, rate, position):
-        DftBe.__init__(self, element_id, name, "weibull", position)
-        assert self.is_be()
+    def __init__(self, element_id: int, name: str, shape: float, rate: float, position: tuple[float, float]) -> None:
+        DftBe.__init__(self, element_id, name, Distribution.WEIBULL, position)
         self.shape = shape
         self.rate = rate
 
-    def get_json(self):
+    def get_json(self) -> dict:
         json = DftBe.get_json(self)
         json["data"]["shape"] = str(self.shape)
         json["data"]["rate"] = str(self.rate)
         return json
 
-    def __str__(self):
+    def __str__(self) -> str:
         s = super().__str__()
         s += " weibull, shape {}, rate {}".format(self.shape, self.rate)
         return s
 
-    def compare(self, other, respect_ids):
+    def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
         if self.shape != other.shape:
@@ -249,30 +279,35 @@ class BeWeibull(DftBe):
             return False
         return True
 
+    def check_valid(self) -> None:
+        assert self.element_type == ElementType.BE
+        assert self.distribution == Distribution.WEIBULL
+        assert numbers.is_not_negative(self.rate)
+        assert numbers.is_not_negative(self.shape)
+
 
 class BeLognormal(DftBe):
     """
     BE with log-normal distribution.
     """
 
-    def __init__(self, element_id, name, mean, stddev, position):
-        DftBe.__init__(self, element_id, name, "lognormal", position)
-        assert self.is_be()
+    def __init__(self, element_id: int, name: str, mean: float, stddev: float, position: tuple[float, float]) -> None:
+        DftBe.__init__(self, element_id, name, Distribution.LOGNORMAL, position)
         self.mean = mean
         self.stddev = stddev
 
-    def get_json(self):
+    def get_json(self) -> dict:
         json = DftBe.get_json(self)
         json["data"]["mean"] = str(self.mean)
         json["data"]["stddev"] = str(self.stddev)
         return json
 
-    def __str__(self):
+    def __str__(self) -> str:
         s = super().__str__()
         s += " lognormal, mean {}, stddev {}".format(self.mean, self.stddev)
         return s
 
-    def compare(self, other, respect_ids):
+    def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
         if self.mean != other.mean:
@@ -280,3 +315,9 @@ class BeLognormal(DftBe):
         if self.stddev != other.stddev:
             return False
         return True
+
+    def check_valid(self) -> None:
+        assert self.element_type == ElementType.BE
+        assert self.distribution == Distribution.LOGNORMAL
+        assert numbers.is_not_negative(self.mean)
+        assert numbers.is_not_negative(self.stddev)

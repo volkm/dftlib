@@ -12,7 +12,7 @@ dynamic = ["version"]
 authors = [
     { name = "M. Volk", email = "m.volk@tue.nl" }
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     # Currently no dependencies
 ]
@@ -62,7 +62,6 @@ path = "dftlib/__init__.py"
 [tool.black]
 line-length = 160
 target-version = [
-    "py39",
     "py310",
     "py311",
     "py312",
