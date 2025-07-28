@@ -1,10 +1,13 @@
+#!/usr/bin/env python
+
 import argparse
 import logging
 
 import dftlib.io.latex
 import dftlib.io.parser
 
-if __name__ == "__main__":
+
+def main():
     parser = argparse.ArgumentParser(description="Generate tikz file visualizing the given DFT.")
 
     parser.add_argument("--dft", "-i", help="The path for the dft file", required=True)
@@ -21,3 +24,7 @@ if __name__ == "__main__":
     # Generate tikz file
     dftlib.io.latex.generate_tikz(dft, args.out)
     logging.info("Generated tikz file.")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse
 import logging
 
@@ -5,7 +7,8 @@ import dftlib.io.export_json
 import dftlib.io.parser
 import dftlib.transformer.anonymizer
 
-if __name__ == "__main__":
+
+def main():
     parser = argparse.ArgumentParser(description="Transform the given DFT into an anonymized DFT.")
 
     parser.add_argument("--dft", help="The path for the dft file", required=True)
@@ -26,3 +29,7 @@ if __name__ == "__main__":
     # Save DFT again
     dftlib.io.export_json.export_dft_file(dft, args.out)
     logging.info("Anonymized DFT.")
+
+
+if __name__ == "__main__":
+    main()

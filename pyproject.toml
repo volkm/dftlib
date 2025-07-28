@@ -46,6 +46,15 @@ test = [
     "pytest",
 ]
 
+[project.scripts]
+analyse_smt = "bin.analyse_smt:main"
+anonymize = "bin.anonymize:main"
+generate_tikz = "bin.generate_tikz:main"
+export_galileo = "bin.export_galileo:main"
+export_json = "bin.export_json:main"
+export_txt = "bin.export_txt:main"
+simplify = "simplify:main"
+
 [tool.hatch.version]
 path = "dftlib/__init__.py"
 

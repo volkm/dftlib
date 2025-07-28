@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse
 import logging
 
@@ -5,7 +7,8 @@ import dftlib.io.export_json
 import dftlib.io.parser
 import dftlib.transformer.simplifier as rewriting
 
-if __name__ == "__main__":
+
+def main():
     parser = argparse.ArgumentParser(description="Simplify a DFT by rewriting.")
 
     parser.add_argument("--dft", "-i", help="The path for the dft file", required=True)
@@ -35,3 +38,7 @@ if __name__ == "__main__":
 
     # Save DFT again
     dftlib.io.export_json.export_dft_file(dft, args.out)
+
+
+if __name__ == "__main__":
+    main()

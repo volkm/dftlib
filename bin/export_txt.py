@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse
 import logging
 
@@ -5,7 +7,8 @@ import dftlib.io.export_txt
 import dftlib.io.parser
 import dftlib.transformer.simplifier
 
-if __name__ == "__main__":
+
+def main():
     parser = argparse.ArgumentParser(description="Export a DFT as textual description.")
 
     parser.add_argument("--dft", "-i", help="The path for the dft file", required=True)
@@ -22,3 +25,7 @@ if __name__ == "__main__":
     # Save DFT again
     dftlib.io.export_txt.export_dft_file(dft, args.out)
     logging.info("Exported DFT in textual description.")
+
+
+if __name__ == "__main__":
+    main()
