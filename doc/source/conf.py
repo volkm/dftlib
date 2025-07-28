@@ -63,6 +63,10 @@ html_theme_options = {
             "link": "installation",
         },
         {
+            "text": "Features",
+            "link": "features",
+        },
+        {
             "text": "API",
             "link": "api",
             "match": "api/*",
