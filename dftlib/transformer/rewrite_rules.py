@@ -252,8 +252,8 @@ def try_remove_duplicates(dft, gate):
     :param gate: Gate.
     :return: True iff removal was successful.
     """
-    # Duplicates must be kept if order of children is important
-    if not (isinstance(gate, dft_gates.DftAnd) or isinstance(gate, dft_gates.DftOr) or isinstance(gate, dft_gates.DftVotingGate)):
+    # Duplicates must be kept if order of children is important or for VOT due to threshold
+    if not (isinstance(gate, dft_gates.DftAnd) or isinstance(gate, dft_gates.DftOr)):
         return False
 
     # Check if duplicates exist
@@ -271,7 +271,6 @@ def try_remove_duplicates(dft, gate):
     # Remove duplicate
     for element in duplicates:
         gate.remove_child(element)
-
     return True
 
 
