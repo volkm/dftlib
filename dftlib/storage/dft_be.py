@@ -6,7 +6,7 @@ from dftlib.storage.dft_element import DftElement, ElementType
 
 class Distribution(StrEnum):
     EXPONENTIAL = "exponential"
-    CONSTANT = "constant"
+    CONSTANT = "const"
     PROBABILITY = "probability"
     ERLANG = "erlang"
     WEIBULL = "weibull"

@@ -57,7 +57,7 @@
                 "rate": 2,
                 "repair": 0,
                 "dorm": 0,
-                "label": "B2"
+                "label": "B2 (λ: 2)"
             },
             "position": {
                 "x": 1074.5,
@@ -76,13 +76,13 @@
                 "id": "5",
                 "name": "F",
                 "type": "pdep",
-		"probability": 0,
+                "probability": 0,
                 "repairable": false,
                 "children": [
                     "3",
                     "2"
                 ],
-                "label": "F"
+                "label": "F (P: 0)"
             },
             "position": {
                 "x": 1238.5,
@@ -94,7 +94,7 @@
             "selectable": true,
             "locked": false,
             "grabbable": true,
-            "classes": "fdep"
+            "classes": "pdep"
         },
         {
             "data": {
@@ -107,7 +107,7 @@
                     "3"
                 ],
                 "voting": 2,
-                "label": "B (2/0)"
+                "label": "B (2/2)"
             },
             "position": {
                 "x": 1021.5,

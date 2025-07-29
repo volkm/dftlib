@@ -1,4 +1,5 @@
-import dftlib.io.export_json
+from dftlib.io.export_json import export_dft_string
+from dftlib.storage.dft import Dft
 from dftlib.exceptions.exceptions import ToolNotFound
 
 """
@@ -29,7 +30,7 @@ def requires_stormpy(func):
 
 
 @requires_stormpy
-def convert_to_json(file):
+def convert_to_json(file: str) -> str:
     """
     Convert galileo file to json string.
     :param file: Galileo file.
@@ -50,14 +51,25 @@ def convert_to_json(file):
 
 
 @requires_stormpy
-def get_stormpy_dft(dft):
+def get_stormpy_dft(dft: Dft) -> "stormpy.dft.DFT_double | stormpy.dft.DFT_ratfunc":
     """
     Convert DFT to representation in stormpy.
     :param dft: DFT as dftlib object.
     :return: DFT as stormpy object.
     """
-    json_string = dftlib.io.export_json.export_dft_string(dft, indent=None)
+    json_string = export_dft_string(dft, indent=None)
     if dft.parametric():
         return _stormpy.dft.load_parametric_dft_json_string(json_string)
     else:
         return _stormpy.dft.load_dft_json_string(json_string)
+
+
+@requires_stormpy
+def analyze_dft(dft: Dft, formula: str) -> float:
+    # Parse formula in stormpy format
+    formulas = _stormpy.parse_properties(formula)
+    # Convert DFT to stormpy DFT
+    sp_dft = get_stormpy_dft(dft)
+    # Model check
+    results = _stormpy.dft.analyze_dft(sp_dft, [formulas[0].raw_formula])
+    return results[0]
