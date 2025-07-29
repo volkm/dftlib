@@ -2,6 +2,8 @@ import itertools
 import logging
 
 from dftlib.exceptions.exceptions import DftInvalidArgumentException
+from dftlib.storage.dft import Dft
+from dftlib.storage.dft_element import DftElement
 from dftlib.transformer.rewrite_rules import RewriteRules
 
 """
@@ -13,7 +15,46 @@ https://doi.org/10.1007/s00165-016-0412-0
 """
 
 
-def apply_rules(dft, rules):
+def get_all_rules() -> list[RewriteRules]:
+    """
+    Get all simplification rules.
+    :return: List of all rewrite rules.
+    """
+    return [
+        RewriteRules.SPLIT_FDEPS,
+        RewriteRules.MERGE_BES,
+        RewriteRules.TRIM,
+        RewriteRules.REMOVE_DEPENDENCIES_TLE,
+        RewriteRules.REMOVE_DUPLICATES,
+        RewriteRules.FACTOR_COMMON_CAUSE,
+        RewriteRules.USE_SPECIALIZED_GATE,
+        RewriteRules.MERGE_IDENTICAL_GATES,
+        RewriteRules.REMOVE_SINGLE_SUCCESSOR,
+        # RewriteRules.ADD_SINGLE_OR, # Could lead to infinite loop by adding new gates
+        RewriteRules.FLATTEN_GATE,
+        RewriteRules.SUBSUME_GATE,
+        RewriteRules.REPLACE_FDEP_BY_OR,
+        RewriteRules.REMOVE_SUPERFLUOUS_FDEP,
+        RewriteRules.REMOVE_SUPERFLUOUS_FDEP_SUCCESSORS,
+    ]
+
+
+def get_default_rules() -> list[RewriteRules]:
+    """
+    Get the default simplification rules.
+    :return: List of default rewrite rules.
+    """
+    return [
+        RewriteRules.SPLIT_FDEPS,
+        RewriteRules.MERGE_BES,
+        RewriteRules.TRIM,
+        RewriteRules.USE_SPECIALIZED_GATE,
+        RewriteRules.REMOVE_SINGLE_SUCCESSOR,
+        RewriteRules.FLATTEN_GATE,
+    ]
+
+
+def apply_rules(dft: Dft, rules: list[RewriteRules]) -> tuple[RewriteRules, DftElement]:
     """
     Try to apply the given rewrite rules (of "Fault trees on a diet").
     The function stops if either a rule could be applied or no change could be made.
@@ -48,50 +89,16 @@ def apply_rules(dft, rules):
     return None, None
 
 
-def simplify_dft_all_rules(dft):
+def simplify_dft_all_rules(dft: Dft) -> Dft:
     """
     Simplify DFT by applying all available rewrite rules.
     :param dft: DFT.
     :return: Simplified DFT.
     """
-    all_rules = [
-        RewriteRules.SPLIT_FDEPS,
-        RewriteRules.MERGE_BES,
-        RewriteRules.TRIM,
-        RewriteRules.REMOVE_DEPENDENCIES_TLE,
-        RewriteRules.REMOVE_DUPLICATES,
-        RewriteRules.FACTOR_COMMON_CAUSE,
-        RewriteRules.USE_SPECIALIZED_GATE,
-        RewriteRules.MERGE_IDENTICAL_GATES,
-        RewriteRules.REMOVE_SINGLE_SUCCESSOR,
-        # RewriteRules.ADD_SINGLE_OR, # Could lead to infinite loop by adding new gates
-        RewriteRules.FLATTEN_GATE,
-        RewriteRules.SUBSUME_GATE,
-        RewriteRules.REPLACE_FDEP_BY_OR,
-        RewriteRules.REMOVE_SUPERFLUOUS_FDEP,
-        RewriteRules.REMOVE_SUPERFLUOUS_FDEP_SUCCESSORS,
-    ]
-    return simplify_dft_rules(dft, all_rules)
+    return simplify_dft_rules(dft, get_all_rules())
 
 
-def simplify_dft_default_rules(dft):
-    """
-    Simplify DFT by applying some default rewrite rules.
-    :param dft: DFT.
-    :return: Simplified DFT.
-    """
-    default_rules = [
-        RewriteRules.SPLIT_FDEPS,
-        RewriteRules.MERGE_BES,
-        RewriteRules.TRIM,
-        RewriteRules.USE_SPECIALIZED_GATE,
-        RewriteRules.REMOVE_SINGLE_SUCCESSOR,
-        RewriteRules.FLATTEN_GATE,
-    ]
-    return simplify_dft_rules(dft, default_rules)
-
-
-def simplify_dft_rules(dft, rules):
+def simplify_dft_rules(dft: Dft, rules: list[RewriteRules]) -> Dft:
     """
     Simplify DFT in place by applying the given rewrite rules of "Fault trees on a diet".
     :param dft: DFT.
