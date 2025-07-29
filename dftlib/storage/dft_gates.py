@@ -1,9 +1,9 @@
 import dftlib.utility.numbers as numbers
-from dftlib.exceptions.exceptions import DftTypeNotKnownException
+from dftlib.exceptions.exceptions import DftTypeNotKnownException, DftInvalidArgumentException
 from dftlib.storage.dft_element import DftElement, ElementType
 
 
-def create_from_json(json, parameters: str = None) -> DftElement:
+def create_from_json(json: dict, parameters: list[str] | None = None) -> DftElement:
     """
     Create DFT gate from JSON string.
     The children are ignored and must be explicitly set afterward when all elements are known.
@@ -121,7 +121,7 @@ class DftGate(DftElement):
         """
         return self._outgoing
 
-    def compare_successors(self, other: DftElement, ordered: bool, respect_ids: bool) -> bool:
+    def compare_successors(self, other: "DftGate", ordered: bool, respect_ids: bool) -> bool:
         """
         Check whether two gates have the same successors.
         :param other: Other gate.
@@ -308,7 +308,7 @@ class DftDependency(DftGate):
     General class for dependencies (FDEP and PDEP).
     """
 
-    def __init__(self, element_id: int, name: str, probability: float, children: list[DftElement], position: tuple[float, float]) -> None:
+    def __init__(self, element_id: int, name: str, probability: float | str, children: list[DftElement], position: tuple[float, float]) -> None:
         DftGate.__init__(self, element_id, name, ElementType.FDEP if numbers.is_one(probability) else ElementType.PDEP, children, position)
         self.probability = probability
 
@@ -322,7 +322,7 @@ class DftDependency(DftGate):
         if self.children():
             return self.children()[0]
         else:
-            return None
+            raise DftInvalidArgumentException("Dependency has no trigger.")
 
     def dependent(self) -> list[DftElement]:
         return self.children()[1:]

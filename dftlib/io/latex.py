@@ -1,9 +1,12 @@
+from dftlib.storage.dft import Dft
+from dftlib.storage.dft_element import DftElement
 import dftlib.storage.dft_be as dft_be
 import dftlib.storage.dft_gates as dft_gates
 from dftlib.exceptions.exceptions import DftTypeNotKnownException, DftTypeNotSupportedException
+import dftlib.utility.numbers as numbers
 
 
-def generate_tikz_node(element, is_tle=False):
+def generate_tikz_node(element: DftElement, is_tle: bool = False) -> str:
     s = ""
     name = element.name
     # Set position information
@@ -14,6 +17,7 @@ def generate_tikz_node(element, is_tle=False):
     # Set node type
     no_children = 0
     if not element.is_be():
+        assert isinstance(element, dft_gates.DftGate)
         if len(element.children()) > 6:
             raise DftTypeNotSupportedException("More than 6 children (for element '{}') are currently not supported for tikz export.".format(element.name))
         else:
@@ -25,9 +29,9 @@ def generate_tikz_node(element, is_tle=False):
         else:
             node_type = "be"
     elif isinstance(element, dft_gates.DftAnd) or isinstance(element, dft_gates.DftVotingGate) or isinstance(element, dft_gates.DftPand):
-        node_type = "and" + no_children
+        node_type = "and" + str(no_children)
     elif isinstance(element, dft_gates.DftOr) or isinstance(element, dft_gates.DftPor):
-        node_type = "or" + no_children
+        node_type = "or" + str(no_children)
     elif isinstance(element, dft_gates.DftSpare):
         node_type = "spare"
     elif isinstance(element, dft_gates.DftDependency):
@@ -72,14 +76,15 @@ def generate_tikz_node(element, is_tle=False):
 
     # Add ratebox for BEs
     if element.is_be():
+        assert isinstance(element, dft_be.DftBe)
         if isinstance(element, dft_be.BeExponential):
-            if element.dorm < 1:
+            if not numbers.is_one(element.dorm):
                 label = "\\ratelabel{{{0}}}{{{1}}}".format(element.rate, element.rate * element.dorm)
             else:
                 label = "\\rateactlabel{{{0}}}".format(element.rate)
             s += "\t\\node[ratebox] ({0}_rate) at ({0}.south) {{{1}}};\n".format(name, label)
         elif isinstance(element, dft_be.BeProbability):
-            if element.dorm < 1:
+            if not numbers.is_one(element.dorm):
                 label = "\\problabel{{{0}}}{{{1}}}".format(element.probability, element.probability * element.dorm)
             else:
                 label = "\\probactlabel{{{0}}}".format(element.probability)
@@ -90,7 +95,7 @@ def generate_tikz_node(element, is_tle=False):
             raise DftTypeNotSupportedException("BE distribution '{}' not supported for tikz export.".format(element.distribution))
 
     # Add probability for PDEP
-    if isinstance(element, dft_gates.DftDependency) and element.probability < 1:
+    if isinstance(element, dft_gates.DftDependency) and not numbers.is_one(element.probability):
         s += "\t\\node[above=0cm of {0}.center] ({0}_p) {{${1}$}};\n".format(name, element.probability)
 
     return s
@@ -114,11 +119,12 @@ FDEP_CHILDREN = {
 }
 
 
-def generate_tikz_edges(element):
+def generate_tikz_edges(element: DftElement) -> str:
     s = ""
 
     if element.is_gate():
         assert element.is_gate()
+        assert isinstance(element, dft_gates.DftGate)
         no_children = len(element.children())
         assert no_children <= 6
         # Handle gate type
@@ -161,7 +167,7 @@ def generate_tikz_edges(element):
     return s
 
 
-def generate_tikz(dft, file):
+def generate_tikz(dft: Dft, file: str) -> None:
     """
     Generate tikz file from DFT.
     :param dft: DFT.

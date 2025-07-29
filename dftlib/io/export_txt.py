@@ -1,8 +1,10 @@
+from dftlib.storage.dft import Dft
 import dftlib.storage.dft_gates as dft_gates
 from dftlib.exceptions.exceptions import DftInvalidArgumentException, DftTypeNotSupportedException
+from dftlib.storage.dft_element import DftElement
 
 
-def export_dft_string(dft):
+def export_dft_string(dft: Dft) -> str:
     """
     Export DFT as textual description.
     :param dft: DFT.
@@ -11,7 +13,7 @@ def export_dft_string(dft):
     exported_elements = dict()
     next_be_id = 0
 
-    def export_element_string(element):
+    def export_element_string(element: DftElement) -> str:
         """
         Export DFT element (and its subtree) as string.
         The method recursively exports the children.
@@ -32,6 +34,7 @@ def export_dft_string(dft):
                 next_be_id += 1
             else:
                 assert element.is_gate()
+                assert isinstance(element, dft_gates.DftGate)
                 # Recursively export children of gate
                 child_strings = []
                 for child in element.children():
@@ -47,7 +50,7 @@ def export_dft_string(dft):
     return dft_string
 
 
-def export_dft_file(dft, file):
+def export_dft_file(dft: Dft, file: str) -> None:
     """
     Export DFT to textual format in file.
     :param dft: DFT.

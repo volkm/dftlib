@@ -13,7 +13,7 @@ class Distribution(StrEnum):
     LOGNORMAL = "lognormal"
 
 
-def create_from_json(json: dict, parameters: list[str] = None) -> "DftBe":
+def create_from_json(json: dict, parameters: list[str] | None = None) -> "DftBe":
     """
     Create BE from JSON string.
     :param json: JSON string.
@@ -126,7 +126,7 @@ class BeProbability(DftBe):
     BE with constant probability distribution.
     """
 
-    def __init__(self, element_id: int, name: str, probability: float, dorm: float, position: tuple[float, float]) -> None:
+    def __init__(self, element_id: int, name: str, probability: float | str, dorm: float | str, position: tuple[float, float]) -> None:
         DftBe.__init__(self, element_id, name, Distribution.PROBABILITY, position)
         self.probability = probability
         self.dorm = dorm
@@ -164,7 +164,7 @@ class BeExponential(DftBe):
     BE with exponential distribution.
     """
 
-    def __init__(self, element_id: int, name: str, rate: float, dorm: float, repair: float, position: tuple[float, float]) -> None:
+    def __init__(self, element_id: int, name: str, rate: float | str, dorm: float | str, repair: float | str, position: tuple[float, float]) -> None:
         DftBe.__init__(self, element_id, name, Distribution.EXPONENTIAL, position)
         self.rate = rate
         self.dorm = dorm
@@ -210,7 +210,7 @@ class BeErlang(DftBe):
     BE with Erlang distribution.
     """
 
-    def __init__(self, element_id: int, name: str, rate: float, phases: int, dorm: float, position: tuple[float, float]) -> None:
+    def __init__(self, element_id: int, name: str, rate: float | str, phases: int, dorm: float | str, position: tuple[float, float]) -> None:
         DftBe.__init__(self, element_id, name, Distribution.ERLANG, position)
         self.rate = rate
         self.phases = phases
@@ -246,7 +246,7 @@ class BeErlang(DftBe):
         assert self.distribution == Distribution.ERLANG
         assert numbers.is_not_negative(self.rate)
         assert numbers.is_probability(self.dorm)
-        assert numbers.is_not_negative(self.phases)
+        assert self.phases >= 1
 
 
 class BeWeibull(DftBe):
@@ -254,7 +254,7 @@ class BeWeibull(DftBe):
     BE with Weibull distribution.
     """
 
-    def __init__(self, element_id: int, name: str, shape: float, rate: float, position: tuple[float, float]) -> None:
+    def __init__(self, element_id: int, name: str, shape: float | str, rate: float | str, position: tuple[float, float]) -> None:
         DftBe.__init__(self, element_id, name, Distribution.WEIBULL, position)
         self.shape = shape
         self.rate = rate
@@ -291,7 +291,7 @@ class BeLognormal(DftBe):
     BE with log-normal distribution.
     """
 
-    def __init__(self, element_id: int, name: str, mean: float, stddev: float, position: tuple[float, float]) -> None:
+    def __init__(self, element_id: int, name: str, mean: float | str, stddev: float | str, position: tuple[float, float]) -> None:
         DftBe.__init__(self, element_id, name, Distribution.LOGNORMAL, position)
         self.mean = mean
         self.stddev = stddev

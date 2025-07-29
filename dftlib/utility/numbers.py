@@ -1,4 +1,4 @@
-def parse_number(number: float | str, parameters: list[str]) -> float | str:
+def parse_number(number: float | str, parameters: list[str] | None) -> float | str:
     """
     Parse number.
     First, the number is parsed as a float. If this is not possible (and parameters are given), simply return the rational function as a string.

@@ -11,7 +11,7 @@ class Dft:
     DFT data structure.
     """
 
-    def __init__(self, json: dict = None):
+    def __init__(self, json: dict | None = None):
         self.max_id = -1
         self.position_bounds = (0, 0, 0, 0)  # Left, Top, Right, Bottom
         self.top_level_element = None
@@ -51,6 +51,7 @@ class Dft:
             node_id = node["data"]["id"]
             element = self.get_element(int(node_id))
             if element.is_gate():
+                assert isinstance(element, dft_gates.DftGate)
                 for child_id in node["data"]["children"]:
                     element.add_child(self.get_element(int(child_id)))
 
@@ -137,8 +138,11 @@ class Dft:
         # Otherwise we are iterating over the list we are also removing from
         parent_ids = [parent.element_id for parent in element.parents()]
         for parent_id in parent_ids:
-            self.get_element(parent_id).remove_child(element)
+            parent = self.get_element(parent_id)
+            assert isinstance(parent, dft_gates.DftGate)
+            parent.remove_child(element)
         if element.is_gate():
+            assert isinstance(element, dft_gates.DftGate)
             child_ids = [child.element_id for child in element.children()]
             for child_id in child_ids:
                 self.get_element(child_id).remove_parent(element)
@@ -159,10 +163,13 @@ class Dft:
         # Replace original element as child of its parents
         parent_ids = [parent.element_id for parent in orig_element.parents()]
         for parent_id in parent_ids:
-            self.get_element(parent_id).replace_child(orig_element, new_element)
+            parent = self.get_element(parent_id)
+            assert isinstance(parent, dft_gates.DftGate)
+            parent.replace_child(orig_element, new_element)
 
         # Remove original element as parent from old children
         if orig_element.is_gate():
+            assert isinstance(orig_element, dft_gates.DftGate)
             # Remember ids for iteration
             # Otherwise we are iterating over the list we are also removing from
             child_ids = [child.element_id for child in orig_element.children()]

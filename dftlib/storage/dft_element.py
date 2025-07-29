@@ -57,7 +57,7 @@ class DftElement:
         assert element in self._ingoing
         self._ingoing.remove(element)
 
-    def parents(self) -> list["DftElement"]:
+    def parents(self) -> list["dftlib.storage.dft_gates.DftGate"]:
         """
         Get parents.
         :return: List of parents.

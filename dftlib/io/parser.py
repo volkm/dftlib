@@ -4,11 +4,12 @@ import dftlib.io.formats as formats
 import dftlib.tools.stormpy as stormpy
 from dftlib.exceptions.exceptions import DftInvalidArgumentException, DftTypeNotKnownException
 from dftlib.storage.dft import Dft
+from dftlib.storage.dft_element import DftElement
 from dftlib.storage.dft_be import BeExponential
 from dftlib.storage.dft_gates import DftAnd, DftOr
 
 
-def parse_dft_galileo_file(file):
+def parse_dft_galileo_file(file: str) -> Dft:
     """
     Parse DFT from Galileo file.
     :param file: File.
@@ -19,7 +20,7 @@ def parse_dft_galileo_file(file):
     return parse_dft_json(json.loads(json_obj))
 
 
-def parse_dft_json(json_obj):
+def parse_dft_json(json_obj: dict) -> Dft:
     """
     Parse DFT from JSON object.
     :param json_obj: JSON object.
@@ -28,7 +29,7 @@ def parse_dft_json(json_obj):
     return Dft(json_obj)
 
 
-def parse_dft_json_file(file):
+def parse_dft_json_file(file: str) -> Dft:
     """
     Parse DFT from JSON file.
     :param file: File.
@@ -39,7 +40,7 @@ def parse_dft_json_file(file):
     return parse_dft_json(json_obj)
 
 
-def parse_dft_json_string(json_string):
+def parse_dft_json_string(json_string: str) -> Dft:
     """
     Parse DFT from JSON string.
     :param json_string: JSON string.
@@ -48,14 +49,14 @@ def parse_dft_json_string(json_string):
     return parse_dft_json(json.loads(json_string))
 
 
-def parse_dft_txt_string(dft_text):
+def parse_dft_txt_string(dft_text: str) -> Dft:
     """
     Parse DFT from string containing textual description.
     :param dft_text: Textual description of DFT.
     :return: DFT.
     """
 
-    def parse_dft_element_txt(dft, element_text):
+    def parse_dft_element_txt(dft: Dft, element_text: str) -> DftElement:
         """
         Parse DFT element from string containing textual description.
         :param dft: DFT containing all previously parsed elements.
@@ -118,7 +119,7 @@ def parse_dft_txt_string(dft_text):
     return dft
 
 
-def parse_dft_txt_file(file):
+def parse_dft_txt_file(file: str) -> Dft:
     """
     Parse DFT from textual description in file.
     :param file: File.
@@ -131,7 +132,7 @@ def parse_dft_txt_file(file):
     return parse_dft_txt_string(text)
 
 
-def parse_dft_file(file):
+def parse_dft_file(file: str) -> Dft:
     """
     Parse DFT from file.
     The file can have the following formats: Galileo, JSON, Text.

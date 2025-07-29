@@ -54,7 +54,7 @@ def get_default_rules() -> list[RewriteRules]:
     ]
 
 
-def apply_rules(dft: Dft, rules: list[RewriteRules]) -> tuple[RewriteRules, DftElement]:
+def apply_rules(dft: Dft, rules: list[RewriteRules]) -> tuple[RewriteRules | None, DftElement | None]:
     """
     Try to apply the given rewrite rules (of "Fault trees on a diet").
     The function stops if either a rule could be applied or no change could be made.
@@ -89,7 +89,7 @@ def apply_rules(dft: Dft, rules: list[RewriteRules]) -> tuple[RewriteRules, DftE
     return None, None
 
 
-def simplify_dft_all_rules(dft: Dft) -> Dft:
+def simplify_dft_all_rules(dft: Dft) -> bool:
     """
     Simplify DFT by applying all available rewrite rules.
     :param dft: DFT.
@@ -98,7 +98,7 @@ def simplify_dft_all_rules(dft: Dft) -> Dft:
     return simplify_dft_rules(dft, get_all_rules())
 
 
-def simplify_dft_rules(dft: Dft, rules: list[RewriteRules]) -> Dft:
+def simplify_dft_rules(dft: Dft, rules: list[RewriteRules]) -> bool:
     """
     Simplify DFT in place by applying the given rewrite rules of "Fault trees on a diet".
     :param dft: DFT.

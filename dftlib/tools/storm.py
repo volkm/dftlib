@@ -31,13 +31,13 @@ class Storm:
     Class wrapping the storm model checker CLI.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Constructor.
         """
         self.binary = storm_path
 
-    def export_smt(self, file):
+    def export_smt(self, file: str) -> str:
         # TODO replace by stormpy binding
         with tempfile.NamedTemporaryFile() as tmp_file:
             args = [self.binary, "-dft", file, "--export-smt", tmp_file.name]

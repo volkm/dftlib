@@ -28,13 +28,13 @@ class Z3:
     Class wrapping Z3
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Constructor.
         """
         self.solver = _z3.Solver()
 
-    def check(self, lines):
+    def check(self, lines: list[str]) -> bool:
         constraints = _z3.parse_smt2_string("\n".join(lines))
         result = self.solver.check(constraints)
         if str(result) == "unsat":
