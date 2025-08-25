@@ -19,7 +19,7 @@ jobs:
         stormpyImg: ["ci", "ci-debug"]
     steps:
       - name: Git clone
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Build dftlib from Dockerfile
         run: |
           docker build -t volkm/dftlib . \
@@ -51,7 +51,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Git clone
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Build dftlib
         run: pip install -e .[${{ matrix.dependencies }}]
       - name: Run tests
@@ -75,7 +75,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -qq -y pandoc
       - name: Git clone
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Build dftlib
         run: pip install -e .[${{ matrix.dependencies }}]
       - name: Run tests
