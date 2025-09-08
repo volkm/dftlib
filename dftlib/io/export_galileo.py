@@ -1,9 +1,12 @@
+from dftlib.storage.dft import Dft
+from dftlib.storage.dft_element import DftElement
 import dftlib.storage.dft_be as dft_be
 import dftlib.storage.dft_gates as dft_gates
 from dftlib.exceptions.exceptions import DftTypeNotKnownException, DftInvalidArgumentException
+import dftlib.utility.numbers as numbers
 
 
-def galileo_name(element):
+def galileo_name(element: DftElement) -> str:
     """
     Get name in Galileo format.
     :param element: Element.
@@ -12,7 +15,7 @@ def galileo_name(element):
     return '"{}"'.format(element.name)
 
 
-def export_dft_file(dft, file):
+def export_dft_file(dft: Dft, file: str) -> None:
     """
     Export DFT to Galileo file.
     :param dft: DFT.
@@ -32,23 +35,27 @@ def export_dft_file(dft, file):
     with open(file, "w") as out_file:
         # Parameters
         if dft.parametric():
+            assert dft.parameters is not None
             for param in dft.parameters:
                 out_file.write("param {};\n".format(param))
         # Top level event
+        assert dft.top_level_element is not None
         out_file.write("toplevel {};\n".format(galileo_name(dft.top_level_element)))
         # DFT elements
         for element in elements:
             if element.is_be():
+                assert isinstance(element, dft_be.DftBe)
                 out_file.write(export_be_string(element) + ";\n")
             else:
+                assert isinstance(element, dft_gates.DftGate)
                 out_file.write(export_gate_string(element) + ";\n")
 
 
-def export_gate_string(gate):
+def export_gate_string(gate: dft_gates.DftGate) -> str:
     """
     Return DFT gate as string in Galileo format.
     :param gate: DFT gate.
-    :return String representing gate.
+    :return: String representing gate.
     """
     assert gate.is_gate()
     s = galileo_name(gate)
@@ -67,7 +74,7 @@ def export_gate_string(gate):
         assert gate.element_type == "spare"
         s += " wsp"
     elif isinstance(gate, dft_gates.DftDependency):
-        if gate.probability == 1:
+        if numbers.is_one(gate.probability):
             s += " fdep"
         else:
             s += " pdep={}".format(gate.probability)
@@ -85,7 +92,7 @@ def export_gate_string(gate):
     return s
 
 
-def export_be_string(be):
+def export_be_string(be: dft_be.DftBe) -> str:
     """
     Return BE as string in Galileo format.
     :param be: BE.
@@ -103,7 +110,7 @@ def export_be_string(be):
     elif isinstance(be, dft_be.BeExponential):
         s += " lambda={}".format(be.rate)
         s += " dorm={}".format(be.dorm)
-        if be.repair > 0:
+        if not numbers.is_zero(be.repair):
             s += " repair={}".format(be.repair)
     elif isinstance(be, dft_be.BeErlang):
         s += " lambda={}".format(be.rate)

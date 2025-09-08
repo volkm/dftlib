@@ -2,6 +2,7 @@ import math
 import tempfile
 
 import dftlib.io.export_galileo
+from dftlib.storage.dft import Dft
 from dftlib.tools.storm import Storm
 from dftlib.tools.z3 import Z3
 
@@ -11,11 +12,11 @@ class SMTAnalysis:
     Analysis using SMT encoding.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.storm = Storm()
         self.z3 = Z3()
 
-    def check_eventually_fail(self, dft, smt_file):
+    def check_eventually_fail(self, dft: Dft, smt_file: str) -> tuple[int, int, int]:
         """
         Check that the DFT will eventually fail using SMT solvers.
         :param dft: DFT.
@@ -78,7 +79,7 @@ class SMTAnalysis:
 
         return lower, upper, length
 
-    def check_threshold(self, lines, threshold_l, threshold_u, toplevel, smt_file):
+    def check_threshold(self, lines: list[str], threshold_l: int, threshold_u: int, toplevel: str, smt_file: str) -> bool:
         assert threshold_l <= threshold_u
         if threshold_l == threshold_u:
             comparison = "= t_{} {}".format(toplevel, threshold_l)

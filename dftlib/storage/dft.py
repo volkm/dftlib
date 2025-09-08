@@ -11,17 +11,17 @@ class Dft:
     DFT data structure.
     """
 
-    def __init__(self, json=""):
-        self.max_id = -1
-        self.position_bounds = [0, 0, 0, 0]  # Left, Top, Right, Bottom
-        self.top_level_element = None
-        self.elements = {}
-        self.parameters = None
+    def __init__(self, json: dict | None = None):
+        self.max_id: int = -1
+        self.position_bounds: tuple[float, float, float, float] = (0, 0, 0, 0)  # Left, Top, Right, Bottom
+        self.top_level_element: DftElement = None
+        self.elements: dict = dict()
+        self.parameters: list[str] = None
         # Parse json
         if json:
             self.from_json(json)
 
-    def from_json(self, json):
+    def from_json(self, json: dict) -> None:
         """
         Initialize from JSON.
         :param json: JSON object.
@@ -51,6 +51,7 @@ class Dft:
             node_id = node["data"]["id"]
             element = self.get_element(int(node_id))
             if element.is_gate():
+                assert isinstance(element, dft_gates.DftGate)
                 for child_id in node["data"]["children"]:
                     element.add_child(self.get_element(int(child_id)))
 
@@ -59,16 +60,16 @@ class Dft:
         if top_level_id < 0:
             raise DftInvalidArgumentException("Top level element not defined")
         self.set_top_level_element(top_level_id)
-        assert self.is_valid()
+        self.check_valid()
 
-    def parametric(self):
+    def parametric(self) -> bool:
         """
         Return whether the DFT contains parameters.
         :return: True iff parameters are defined.
         """
         return self.parameters is not None
 
-    def has_parameter(self, name):
+    def has_parameter(self, name: str) -> bool:
         """
         Check whether the given parameter is known.
         :param name: Name of the parameter.
@@ -77,17 +78,17 @@ class Dft:
         assert self.parametric()
         return name in self.parameters
 
-    def next_id(self):
+    def next_id(self) -> int:
         return self.max_id + 1
 
-    def size(self):
+    def size(self) -> int:
         """
         Get number of elements (gates + BEs)
         :return: Number of elements.
         """
         return len(self.elements)
 
-    def get_element(self, element_id):
+    def get_element(self, element_id: int) -> DftElement:
         """
         Get element by id.
         :param element_id: Id.
@@ -97,7 +98,7 @@ class Dft:
             raise DftInvalidArgumentException("Element with id {} not known.".format(element_id))
         return self.elements[element_id]
 
-    def get_element_by_name(self, name):
+    def get_element_by_name(self, name: str) -> DftElement:
         """
         Get element by name.
         :param name: Name.
@@ -108,7 +109,7 @@ class Dft:
                 return element
         raise DftInvalidArgumentException("Element {} not known.".format(name))
 
-    def set_top_level_element(self, element_id):
+    def set_top_level_element(self, element_id: int) -> None:
         """
         Set top level element.
         :param element_id: Id.
@@ -116,7 +117,7 @@ class Dft:
         self.top_level_element = self.get_element(element_id)
         self.top_level_element.set_relevant(True)
 
-    def add(self, element):
+    def add(self, element: DftElement) -> None:
         """
         Add element.
         :param element: Element.
@@ -127,7 +128,7 @@ class Dft:
         self.max_id = max(self.max_id, element.element_id)
         self.update_bounds(element)
 
-    def remove(self, element):
+    def remove(self, element: DftElement) -> None:
         """
         Remove element.
         :param element: Element.
@@ -135,26 +136,59 @@ class Dft:
         assert element.element_id in self.elements
         # Remember ids for iteration
         # Otherwise we are iterating over the list we are also removing from
-        parent_ids = [element.element_id for element in element.parents()]
+        parent_ids = [parent.element_id for parent in element.parents()]
         for parent_id in parent_ids:
-            self.get_element(parent_id).remove_child(element)
+            parent = self.get_element(parent_id)
+            assert isinstance(parent, dft_gates.DftGate)
+            parent.remove_child(element)
         if element.is_gate():
-            child_ids = [element.element_id for element in element.children()]
+            assert isinstance(element, dft_gates.DftGate)
+            child_ids = [child.element_id for child in element.children()]
             for child_id in child_ids:
                 self.get_element(child_id).remove_parent(element)
         del self.elements[element.element_id]
 
-    def update_bounds(self, element):
+    def replace(self, orig_element: DftElement, new_element: DftElement) -> None:
+        """
+        Replace original element by new element.
+        :param orig_element: Original element.
+        :param new_element: New element.
+        """
+        assert isinstance(orig_element, DftElement)
+        assert isinstance(new_element, DftElement)
+        assert new_element.element_id == orig_element.element_id
+        self.elements[new_element.element_id] = new_element
+        self.update_bounds(new_element)
+
+        # Replace original element as child of its parents
+        parent_ids = [parent.element_id for parent in orig_element.parents()]
+        for parent_id in parent_ids:
+            parent = self.get_element(parent_id)
+            assert isinstance(parent, dft_gates.DftGate)
+            parent.replace_child(orig_element, new_element)
+
+        # Remove original element as parent from old children
+        if orig_element.is_gate():
+            assert isinstance(orig_element, dft_gates.DftGate)
+            # Remember ids for iteration
+            # Otherwise we are iterating over the list we are also removing from
+            child_ids = [child.element_id for child in orig_element.children()]
+            for child_id in child_ids:
+                self.get_element(child_id).remove_parent(orig_element)
+
+    def update_bounds(self, element: DftElement) -> None:
         """
         Update position bounds by also including bounds of given element.
         :param element: Element.
         """
-        self.position_bounds[0] = min(element.position[0], self.position_bounds[0])
-        self.position_bounds[1] = min(element.position[1], self.position_bounds[1])
-        self.position_bounds[2] = max(element.position[0], self.position_bounds[2])
-        self.position_bounds[3] = max(element.position[1], self.position_bounds[3])
+        self.position_bounds = (
+            min(element.position[0], self.position_bounds[0]),
+            min(element.position[1], self.position_bounds[1]),
+            max(element.position[0], self.position_bounds[2]),
+            max(element.position[1], self.position_bounds[3]),
+        )
 
-    def json(self):
+    def json(self) -> dict:
         """
         Get JSON string for DFT.
         :return: JSON string.
@@ -169,7 +203,7 @@ class Dft:
         data["nodes"] = nodes
         return data
 
-    def number_of_be(self):
+    def number_of_be(self) -> int:
         """
         Get number of BEs.
         :return: Number of BEs.
@@ -180,7 +214,7 @@ class Dft:
                 no_be += 1
         return no_be
 
-    def statistics(self):
+    def statistics(self) -> tuple[int, int, int, int]:
         """
         Get general statistics about DFT.
         :return: Tuple (number of BEs, number of static gates, number of dynamic gates, number of elements)
@@ -200,20 +234,20 @@ class Dft:
         assert no_static + no_dynamic + no_be == len(self.elements)
         return no_be, no_static, no_dynamic, len(self.elements)
 
-    def __str__(self):
+    def __str__(self) -> str:
         no_be, no_static, no_dynamic, no_elements = self.statistics()
         return "Dft with {} elements ({} BEs, {} static elements, {} dynamic elements), top element: {}".format(
             no_elements, no_be, no_static, no_dynamic, self.top_level_element.name
         )
 
-    def verbose_str(self):
+    def verbose_str(self) -> str:
         """
         Get verbose string containing information about all elements.
         :return: Verbose string.
         """
         return "{}\n".format(self) + "\n".join([str(element) for element in self.elements.values()])
 
-    def compare(self, other, respect_ids):
+    def compare(self, other: "Dft", respect_ids: bool) -> bool:
         """
         Compare two DFT.
         Note that the comparison currently performs redundant work as for each element comparison the complete subtree is checked.
@@ -254,7 +288,7 @@ class Dft:
 
         return True
 
-    def topological_sort(self):
+    def topological_sort(self) -> list[DftElement]:
         """
         Return the elements in topological sorting from top to bottom.
         :return: List of elements.
@@ -281,7 +315,7 @@ class Dft:
         assert len(elements) == len(self.elements)
         return elements
 
-    def get_module(self, module_repr):
+    def get_module(self, module_repr: DftElement) -> list[DftElement]:
         """
         Compute module of module_repr.
         :param module_repr: Module representative.
@@ -314,21 +348,23 @@ class Dft:
                         visited.add(parent)
         return module
 
-    def is_valid(self):
+    def check_valid(self) -> None:
         """
-        Checks whether the DFT is valid, e.g. acyclic, has TLE, etc.
-        DFTs should be well-formed.
-        :return: True iff the DFT is valid.
+        Checks that the DFT is valid, e.g. acyclic, has TLE, etc.
+        Otherwise, an assertion is raised.
         """
-        if self.size() > self.max_id + 1:
-            return False
-        if not self.top_level_element:
-            return False
-        if self.is_cyclic():
-            return False
-        return True
+        assert self.size() <= self.max_id + 1
+        assert self.top_level_element
+        for element_id, element in self.elements.items():
+            assert element.element_id == element_id
+            element.check_valid()
+            # Check parents and children exist
+            assert all(parent.element_id in self.elements for parent in element.parents())
+            if element.is_gate():
+                assert all(child.element_id in self.elements for child in element.children())
+        assert not self.is_cyclic()
 
-    def is_cyclic(self):
+    def is_cyclic(self) -> bool:
         """
         Checks whether the DFT is cyclic.
         DFTs should be acyclic.

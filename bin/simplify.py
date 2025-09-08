@@ -5,7 +5,7 @@ import logging
 
 import dftlib.io.export_json
 import dftlib.io.parser
-import dftlib.transformer.simplifier as rewriting
+import dftlib.transformer.simplifier as simplifier
 
 
 def main():
@@ -26,9 +26,10 @@ def main():
 
     # Simplify DFT
     if args.all_rules:
-        simplified = rewriting.simplify_dft_all_rules(dft)
+        rules = simplifier.get_all_rules()
     else:
-        simplified = rewriting.simplify_dft_default_rules(dft)
+        rules = simplifier.get_default_rules()
+    simplified = simplifier.simplify_dft_rules(dft, rules)
 
     if simplified:
         logging.info("DFT was simplified")

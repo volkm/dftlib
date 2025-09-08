@@ -14,7 +14,7 @@ class DftFormats(Enum):
     TEXT = 3
 
 
-def get_file_extension(file_format):
+def get_file_extension(file_format: DftFormats) -> str:
     """
     Get file extension for given format.
     :param file_format: DFT file format.
@@ -32,7 +32,7 @@ def get_file_extension(file_format):
         raise DftInvalidArgumentException("DFT format {} not known.".format(file_format))
 
 
-def is_galileo_file(file):
+def is_galileo_file(file: str) -> bool:
     """
     Checks whether the given file is a DFT in the Galileo format.
     :param file: File.
@@ -41,7 +41,7 @@ def is_galileo_file(file):
     return file.endswith(get_file_extension(DftFormats.GALILEO))
 
 
-def is_json_file(file):
+def is_json_file(file: str) -> bool:
     """
     Checks whether the given file is a DFT in the JSON format.
     :param file: File.
@@ -50,7 +50,7 @@ def is_json_file(file):
     return file.endswith(get_file_extension(DftFormats.JSON))
 
 
-def is_text_file(file):
+def is_text_file(file: str) -> bool:
     """
     Checks whether the given file is a text file which contains a DFT description.
     :param file: File.

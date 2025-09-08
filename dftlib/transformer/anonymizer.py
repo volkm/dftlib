@@ -1,4 +1,7 @@
-def make_anonymous(dft, grid_layout=False):
+from dftlib.storage.dft import Dft
+
+
+def make_anonymous(dft: Dft, grid_layout: bool = False):
     """
     Remove all data which could identify the DFT.
     Id and name are increasing counter values.

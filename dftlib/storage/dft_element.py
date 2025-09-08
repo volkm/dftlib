@@ -1,38 +1,55 @@
+from enum import StrEnum
+
+
+class ElementType(StrEnum):
+    BE = "be"
+    AND = "and"
+    OR = "or"
+    VOT = "vot"
+    PAND = "pand"
+    POR = "por"
+    SPARE = "spare"
+    FDEP = "fdep"
+    PDEP = "pdep"
+    SEQ = "seq"
+    MUTEX = "mutex"
+
+
 class DftElement:
     """
     Base class for a DFT element.
     """
 
-    def __init__(self, element_id, name, element_type, position):
-        self.element_id = element_id
-        self.name = name
-        self.element_type = element_type
-        self.position = position
-        self._ingoing = []
-        self.relevant = False
+    def __init__(self, element_id: int, name: str, element_type: ElementType, position: tuple[float, float]) -> None:
+        self.element_id: int = element_id
+        self.name: str = name
+        self.element_type: ElementType = element_type
+        self.position: tuple[float, float] = position
+        self._ingoing: list[DftElement] = []
+        self.relevant: bool = False
 
-    def is_dynamic(self):
+    def is_dynamic(self) -> bool:
         """
         Get whether the element is dynamic.
         :return: True iff element is dynamic.
         """
-        return self.element_type not in ["be", "and", "or", "vot"]
+        return self.element_type not in [ElementType.BE, ElementType.AND, ElementType.OR, ElementType.VOT]
 
-    def is_be(self):
+    def is_be(self) -> bool:
         """
         Get whether the element is a BE.
         :return: True iff element is a BE.
         """
-        return self.element_type == "be"
+        return self.element_type == ElementType.BE
 
-    def is_gate(self):
+    def is_gate(self) -> bool:
         """
         Get whether the element is a gate.
         :return: True iff element is a gate.
         """
         return not self.is_be()
 
-    def remove_parent(self, element):
+    def remove_parent(self, element: "DftElement") -> None:
         """
         Remove parent.
         :param element: Parent to remove.
@@ -40,21 +57,21 @@ class DftElement:
         assert element in self._ingoing
         self._ingoing.remove(element)
 
-    def parents(self):
+    def parents(self) -> list["dftlib.storage.dft_gates.DftGate"]:
         """
         Get parents.
         :return: List of parents.
         """
         return self._ingoing
 
-    def set_relevant(self, relevant=True):
+    def set_relevant(self, relevant: bool = True) -> None:
         """
         Set whether the element is relevant (and will not be set to 'Don't Care' for example).
         :param relevant: Whether the element is relevant.
         """
         self.relevant = relevant
 
-    def get_json(self):
+    def get_json(self) -> dict:
         """
         Get JSON string.
         :return: JSON string.
@@ -71,10 +88,10 @@ class DftElement:
         json = {"data": data, "position": position, "group": "nodes"}
         return json
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "{} - '{}' ({})".format(self.element_type, self.name, self.element_id)
 
-    def compare(self, other, respect_ids):
+    def compare(self, other: "DftElement", respect_ids: bool) -> bool:
         """
         Compare elements.
         :param other: Other element.

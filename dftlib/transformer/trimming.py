@@ -1,9 +1,10 @@
 from collections import deque
 
+from dftlib.storage.dft import Dft
 import dftlib.storage.dft_gates as dft_gates
 
 
-def trim(dft):
+def trim(dft: Dft) -> bool:
     """
     Trim parts of the DFT in place which do not contribute to the top level element.
     :param dft: DFT which will be modified.

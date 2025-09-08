@@ -12,18 +12,18 @@ on:
 
 jobs:
   stormTests:
-    name: Tests with Stormpy (${{ matrix.stormpyImg }})
+    name: Tests with Stormpy (${{ matrix.stormpy_image }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        stormpyImg: ["ci", "ci-debug"]
+        stormpy_image: ["ci", "ci-debug"]
     steps:
       - name: Git clone
         uses: actions/checkout@v5
       - name: Build dftlib from Dockerfile
         run: |
           docker build -t volkm/dftlib . \
-            --build-arg STORMPY_BASE=movesrwth/stormpy:${{ matrix.stormpyImg }} \
+            --build-arg STORMPY_BASE=movesrwth/stormpy:${{ matrix.stormpy_image }} \
             --build-arg options="[smt,stormpy,test]"
       - name: Run Docker
         run: docker run -d -it --name ci volkm/dftlib
@@ -35,15 +35,10 @@ jobs:
     name: Test Python ${{ matrix.python-version }}, Libs ${{ matrix.dependencies }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.11", "3.12", "3.13"]
         dependencies: ["test", "test,smt,stormpy"]
-        exclude:
-          # Stormpy package only exists for Python >= 3.11
-          - python-version: "3.9"
-            dependencies: "test,smt,stormpy"
-          - python-version: "3.10"
-            dependencies: "test,smt,stormpy"
 
     steps:
       - name: Set up Python ${{ matrix.python-version }}

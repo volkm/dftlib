@@ -1,9 +1,13 @@
 from enum import Enum
 
+from dftlib.storage.dft import Dft
+from dftlib.storage.dft_element import DftElement
+import dftlib.storage.dft_be as dft_be
 import dftlib.storage.dft_gates as dft_gates
 import dftlib.transformer.trimming as trimming
 import dftlib.utility.numbers as numbers
 from dftlib.exceptions.exceptions import DftInvalidArgumentException
+
 
 """
 Rewrite rules for DFT simplification.
@@ -26,6 +30,7 @@ class RewriteRules(Enum):
     REMOVE_DEPENDENCIES_TLE = 33
     REMOVE_DUPLICATES = 34
     FACTOR_COMMON_CAUSE = 35
+    USE_SPECIALIZED_GATE = 36
     MERGE_IDENTICAL_GATES = 2
     REMOVE_SINGLE_SUCCESSOR = 3
     ADD_SINGLE_OR = 4
@@ -36,7 +41,7 @@ class RewriteRules(Enum):
     REMOVE_SUPERFLUOUS_FDEP_SUCCESSORS = 27  # also 28
 
     @classmethod
-    def get_function(cls, rule):
+    def get_function(cls, rule: "RewriteRules"):
         if rule == RewriteRules.SPLIT_FDEPS:
             return try_split_fdep
         elif rule == RewriteRules.MERGE_BES:
@@ -50,6 +55,8 @@ class RewriteRules(Enum):
             return try_remove_duplicates
         elif rule == RewriteRules.FACTOR_COMMON_CAUSE:
             return try_factor_common_cause
+        elif rule == RewriteRules.USE_SPECIALIZED_GATE:
+            return try_using_specialized_gate
         elif rule == RewriteRules.MERGE_IDENTICAL_GATES:
             # This method requires two gates as input
             return try_merge_identical_gates
@@ -71,7 +78,7 @@ class RewriteRules(Enum):
             raise DftInvalidArgumentException("Rewrite rule {} not known".format(rule))
 
 
-def try_split_fdep(dft, fdep):
+def try_split_fdep(dft: Dft, fdep: DftElement) -> bool:
     """
     Split FDEPs with two or more children into single FDEPs with only one child.
     :param dft: DFT.
@@ -101,7 +108,7 @@ def try_split_fdep(dft, fdep):
     return True
 
 
-def try_merge_bes_in_or(dft, or_gate):
+def try_merge_bes_in_or(dft: Dft, or_gate: DftElement) -> bool:
     """
     Try to merge BEs under an OR-gate into one BE.
     :param dft: DFT.
@@ -115,10 +122,13 @@ def try_merge_bes_in_or(dft, or_gate):
     child_bes = []
     for child in or_gate.children():
         # Check if rule is applicable for BE
-        if child.is_be() and len(child.parents()) <= 1 and not child.relevant and child.distribution == "exponential":
-            # Repair rates need dedicated handling
-            if numbers.is_zero(child.repair):
-                child_bes.append(child)
+        if child.is_be():
+            assert isinstance(child, dft_be.DftBe)
+            if len(child.parents()) <= 1 and not child.relevant and child.distribution == "exponential":
+                assert isinstance(child, dft_be.BeExponential)
+                # Repair rates need dedicated handling
+                if numbers.is_zero(child.repair):
+                    child_bes.append(child)
 
     if len(child_bes) <= 1:
         return False
@@ -206,7 +216,7 @@ def try_merge_bes_in_or(dft, or_gate):
     return True
 
 
-def has_immediate_failure(dft, gate):
+def has_immediate_failure(dft: Dft, gate: DftElement) -> bool:
     """
     Checks whether a failure of the gate leads to an immediate failure of the top level element.
     In other words, all parents are OR-gates.
@@ -225,7 +235,7 @@ def has_immediate_failure(dft, gate):
         return False
 
 
-def try_remove_dependencies(dft, dependency):
+def try_remove_dependencies(dft: Dft, dependency: DftElement) -> bool:
     """
     Try to remove superfluous dependencies.
     These dependencies have a trigger which already leads to failure of the top level element.
@@ -245,15 +255,15 @@ def try_remove_dependencies(dft, dependency):
     return True
 
 
-def try_remove_duplicates(dft, gate):
+def try_remove_duplicates(dft: Dft, gate: DftElement) -> bool:
     """
     Try to remove duplicate elements in gate successors.
     :param dft: DFT
     :param gate: Gate.
     :return: True iff removal was successful.
     """
-    # Duplicates must be kept if order of children is important
-    if not (isinstance(gate, dft_gates.DftAnd) or isinstance(gate, dft_gates.DftOr) or isinstance(gate, dft_gates.DftVotingGate)):
+    # Duplicates must be kept if order of children is important or for VOT due to threshold
+    if not (isinstance(gate, dft_gates.DftAnd) or isinstance(gate, dft_gates.DftOr)):
         return False
 
     # Check if duplicates exist
@@ -271,11 +281,10 @@ def try_remove_duplicates(dft, gate):
     # Remove duplicate
     for element in duplicates:
         gate.remove_child(element)
-
     return True
 
 
-def try_factor_common_cause(dft, gate):
+def try_factor_common_cause(dft: Dft, gate: DftElement) -> bool:
     """
     Try to factor out a common cause failure.
     A structure (A || B) && (B || C) with common cause B can be rewritten to B || (A && C).
@@ -305,7 +314,7 @@ def try_factor_common_cause(dft, gate):
             # Intersection to only keep common cause failures
             common_causes &= children
 
-    if len(common_causes) == 0:
+    if not common_causes:
         # No common cause failures found
         return False
 
@@ -313,6 +322,7 @@ def try_factor_common_cause(dft, gate):
 
     # Remove common causes from OR-gates
     for or_gate in gate.children():
+        assert isinstance(or_gate, dft_gates.DftOr)
         for common_cause in common_causes:
             or_gate.remove_child(common_cause)
 
@@ -343,7 +353,41 @@ def try_factor_common_cause(dft, gate):
     return True
 
 
-def try_merge_identical_gates(dft, gate1, gate2):
+def try_using_specialized_gate(dft: Dft, gate: DftElement) -> bool:
+    """
+    Try to replace general gates by a more specialized version:
+    - VOT-gate with threshold 1 is replaced by OR-gate
+    - VOT-gate with threshold n is replaced by AND-gate
+    - PDEP with probability 1 is replaced by FDEP
+    - PDEP with probability 0 is removed
+    :param dft: DFT.
+    :param gate: Gate which can possibly be replaced.
+    :return: True iff gate has been replaced.
+    """
+    if isinstance(gate, dft_gates.DftVotingGate):
+        assert gate.voting_threshold > 0
+        if gate.voting_threshold == 1:
+            # Replace by OR
+            or_gate = dft_gates.DftOr(gate.element_id, gate.name, gate.children(), gate.position)
+            dft.replace(gate, or_gate)
+            return True
+        if gate.voting_threshold == len(gate.children()):
+            # Replace by AND
+            and_gate = dft_gates.DftAnd(gate.element_id, gate.name, gate.children(), gate.position)
+            dft.replace(gate, and_gate)
+            return True
+
+    if isinstance(gate, dft_gates.DftDependency):
+        # PDEP and FDEP are the same class -> probability 1 is handled by export
+        if gate.probability == 0:
+            # Failure will never be forwarded -> remove
+            dft.remove(gate)
+            return True
+
+    return False
+
+
+def try_merge_identical_gates(dft: Dft, gate1: DftElement, gate2: DftElement) -> bool:
     """
     (Rule #2): Try to merge gates with the same type and identical successors.
     These gates surely fail simultaneously and thus, one gate can be removed.
@@ -389,7 +433,7 @@ def try_merge_identical_gates(dft, gate1, gate2):
     return True
 
 
-def try_remove_gates_with_one_successor(dft, gate):
+def try_remove_gates_with_one_successor(dft: Dft, gate: DftElement) -> bool:
     """
     (Rule #3): Remove gates with just one successor.
     These gates will fail together with this child, so they can directly be eliminated.
@@ -429,7 +473,7 @@ def try_remove_gates_with_one_successor(dft, gate):
     return True
 
 
-def try_flatten_gate(dft, gate):
+def try_flatten_gate(dft: Dft, gate: DftElement) -> bool:
     """
     (Rule #5): Flattening of AND-/OR-/PAND-gates.
     :param dft: DFT.
@@ -450,6 +494,7 @@ def try_flatten_gate(dft, gate):
         return False
 
     if isinstance(parent, dft_gates.DftPand):
+        assert isinstance(gate, dft_gates.DftPand)
         if parent.inclusive != gate.inclusive:
             return False
         # Flattening for PAND only works if it is the left-most child
@@ -478,7 +523,7 @@ def try_flatten_gate(dft, gate):
     return True
 
 
-def try_subsumption(dft, gate):
+def try_subsumption(dft: Dft, gate: DftElement) -> bool:
     """
     (Rule #8, Rule #9): Subsumption of OR-gate by AND-gate or of AND-gate by OR-gate.
     :param dft: DFT.
@@ -514,14 +559,14 @@ def try_subsumption(dft, gate):
     return False
 
 
-def add_or_as_predecessor(dft, element, name=None):
+def add_or_as_predecessor(dft: Dft, element: DftElement, name: str | None = None) -> dft_gates.DftOr:
     """
     (Rule #4): Add an OR-gate as the single predecessor of element.
     This is helpful for other rules, e.g., rule #24.
     :param dft: DFT.
     :param element: Element which gets an OR as predecessor.
     :param name: Name of new OR-gate.
-    :return: The new OR-gate or None.
+    :return: The new OR-gate.
     """
     if name is None:
         name = "OR_{}".format(dft.next_id())
@@ -541,7 +586,7 @@ def add_or_as_predecessor(dft, element, name=None):
     return or_gate
 
 
-def check_dynamic_predecessor(dft, element):
+def check_dynamic_predecessor(dft: Dft, element: DftElement) -> bool:
     """
     Check whether element has at least one dynamic element (except a dependency) in its predecessor closure.
     Performs DFS of predecessors.
@@ -559,7 +604,7 @@ def check_dynamic_predecessor(dft, element):
     return False
 
 
-def check_for_cycle(dft, element, current):
+def _check_for_cycle(dft: Dft, element: DftElement, current: DftElement) -> bool:
     """
     Check for cycle by checking whether element contains itself in its predecessor closure.
     The cycle check excludes dependencies and restrictors.
@@ -580,17 +625,17 @@ def check_for_cycle(dft, element, current):
     if current.element_id == dft.top_level_element.element_id:
         return False
     for parent in current.parents():
-        if check_for_cycle(dft, element, parent):
+        if _check_for_cycle(dft, element, parent):
             return True
     return False
 
 
-def try_replace_fdep_by_or(dft, fdep):
+def try_replace_fdep_by_or(dft: Dft, fdep: DftElement) -> bool:
     """
     (Rule #24): Eliminate FDEPs by introducing an OR-gate.
     Let A be the trigger and B be the dependent element.
     Both must be connected to the top level element.
-    B must have only one predecessor and no SPARE or PAND/POR in its  predecessor closure.
+    B must have only one predecessor and no dynamic gate (except dependency) in its predecessor closure.
     :param dft: DFT.
     :param fdep: FDEP which can possibly be removed.
     :return: True iff fdep has been removed.
@@ -608,13 +653,21 @@ def try_replace_fdep_by_or(dft, fdep):
     # Check if both trigger and dependent are part of the top module
     top_module = dft.get_module(dft.top_level_element)
     if trigger.element_id not in top_module or dependent.element_id not in top_module:
-        return False
+        # Check if either the two elements is part of a spare module
+        for elem in dft.elements.values():
+            if isinstance(elem, dft_gates.DftSpare):
+                spare_module = dft.get_module(elem)
+                if trigger.element_id in spare_module or dependent.element_id in spare_module:
+                    # One of the two elements is part of a spare module
+                    return False
+        # Elements are "outside" the top module
+
     # Check if dependent has some dynamic elements in the predecessor closure
     if check_dynamic_predecessor(dft, dependent):
         return False
     # Check if rewriting would yield a cycle
     for parent in dependent.parents():
-        if check_for_cycle(dft, trigger, parent):
+        if _check_for_cycle(dft, trigger, parent):
             return False
 
     # Add OR in front of dependent
@@ -626,7 +679,7 @@ def try_replace_fdep_by_or(dft, fdep):
     return True
 
 
-def try_remove_superfluous_fdep(dft, fdep):
+def try_remove_superfluous_fdep(dft: Dft, fdep: DftElement) -> bool:
     """
     (Rule #25, Rule #26): Eliminate superfluous FDEP from AND or OR.
     This FDEP is triggered after the failure of the dependent element and thus, it does not influence anything else.
@@ -677,7 +730,7 @@ def try_remove_superfluous_fdep(dft, fdep):
     return False
 
 
-def try_remove_fdep_successors(dft, fdep):
+def try_remove_fdep_successors(dft: Dft, fdep: DftElement) -> bool:
     """
     (Rule #27, Rule #28): Eliminate FDEP between two successors of an OR or PAND.
     Only supports FDEPs with one common predecessor.

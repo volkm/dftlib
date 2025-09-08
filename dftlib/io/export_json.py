@@ -1,7 +1,9 @@
 import json
 
+from dftlib.storage.dft import Dft
 
-def export_dft_file(dft, file):
+
+def export_dft_file(dft: Dft, file: str) -> None:
     """
     Export DFT to JSON file.
     :param dft: DFT.
@@ -11,7 +13,7 @@ def export_dft_file(dft, file):
         json.dump(dft.json(), outFile, indent=4)
 
 
-def export_dft_string(dft, indent=None):
+def export_dft_string(dft: Dft, indent: int | None = None):
     """
     Export DFT to JSON string.
     :param dft: DFT.
