@@ -87,8 +87,10 @@ def test_rewrite_keep_order():
     assert no_static == 1
     assert no_dynamic == 1
     assert no_elements == 4
+    assert isinstance(dft.top_level_element, dft_gates.DftPand)
     children = dft.top_level_element.children()
     assert children[0].name == "X"
+    assert isinstance(children[0], dft_gates.DftOr)
     assert children[0].children()[0].name == "A"
     assert children[1].name == "B"
 
@@ -113,6 +115,7 @@ def test_rewrite_replace_parents():
     assert no_static == 5
     assert no_dynamic == 3
     assert no_elements == 16
+    assert isinstance(dft.top_level_element, dft_gates.DftOr)
     children = dft.top_level_element.children()
     for child in children:
         assert isinstance(child, dft_gates.DftSpare)

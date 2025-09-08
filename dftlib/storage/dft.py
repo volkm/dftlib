@@ -12,11 +12,11 @@ class Dft:
     """
 
     def __init__(self, json: dict | None = None):
-        self.max_id = -1
-        self.position_bounds = (0, 0, 0, 0)  # Left, Top, Right, Bottom
-        self.top_level_element = None
-        self.elements = {}
-        self.parameters = None
+        self.max_id: int = -1
+        self.position_bounds: tuple[float, float, float, float] = (0, 0, 0, 0)  # Left, Top, Right, Bottom
+        self.top_level_element: DftElement = None
+        self.elements: dict = dict()
+        self.parameters: list[str] = None
         # Parse json
         if json:
             self.from_json(json)

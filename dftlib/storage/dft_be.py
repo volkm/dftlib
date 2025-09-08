@@ -79,7 +79,7 @@ class DftBe(DftElement):
 
     def __init__(self, element_id: int, name: str, distribution: Distribution, position: tuple[float, float]) -> None:
         DftElement.__init__(self, element_id, name, ElementType.BE, position)
-        self.distribution = distribution
+        self.distribution: Distribution = distribution
 
     def get_json(self) -> dict:
         json = DftElement.get_json(self)
@@ -89,6 +89,7 @@ class DftBe(DftElement):
     def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
+        assert isinstance(other, DftBe)
         return self.distribution == other.distribution
 
 
@@ -114,6 +115,7 @@ class BeConstant(DftBe):
     def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
+        assert isinstance(other, BeConstant)
         return self.failed == other.failed
 
     def check_valid(self) -> None:
@@ -147,6 +149,7 @@ class BeProbability(DftBe):
     def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
+        assert isinstance(other, BeProbability)
         if self.probability != other.probability:
             return False
         if self.dorm != other.dorm:
@@ -189,6 +192,7 @@ class BeExponential(DftBe):
     def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
+        assert isinstance(other, BeExponential)
         if self.rate != other.rate:
             return False
         if self.dorm != other.dorm:
@@ -233,6 +237,7 @@ class BeErlang(DftBe):
     def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
+        assert isinstance(other, BeErlang)
         if self.rate != other.rate:
             return False
         if self.phases != other.phases:
@@ -273,6 +278,7 @@ class BeWeibull(DftBe):
     def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
+        assert isinstance(other, BeWeibull)
         if self.shape != other.shape:
             return False
         if self.rate != other.rate:
@@ -310,6 +316,7 @@ class BeLognormal(DftBe):
     def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
+        assert isinstance(other, BeLognormal)
         if self.mean != other.mean:
             return False
         if self.stddev != other.stddev:

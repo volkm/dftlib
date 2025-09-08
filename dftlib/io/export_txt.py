@@ -45,6 +45,7 @@ def export_dft_string(dft: Dft) -> str:
             exported_elements[element.element_id] = s
             return s
 
+    assert dft.top_level_element is not None
     dft_string = export_element_string(dft.top_level_element)
     assert next_be_id == dft.number_of_be()
     return dft_string

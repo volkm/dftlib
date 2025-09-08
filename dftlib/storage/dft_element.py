@@ -21,12 +21,12 @@ class DftElement:
     """
 
     def __init__(self, element_id: int, name: str, element_type: ElementType, position: tuple[float, float]) -> None:
-        self.element_id = element_id
-        self.name = name
-        self.element_type = element_type
-        self.position = position
-        self._ingoing = []
-        self.relevant = False
+        self.element_id: int = element_id
+        self.name: str = name
+        self.element_type: ElementType = element_type
+        self.position: tuple[float, float] = position
+        self._ingoing: list[DftElement] = []
+        self.relevant: bool = False
 
     def is_dynamic(self) -> bool:
         """

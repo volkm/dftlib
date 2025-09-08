@@ -3,6 +3,8 @@ from helpers.helper import get_example_path
 import dftlib.io.parser
 import dftlib.transformer.simplifier as simplifier
 from dftlib.storage.dft_element import ElementType
+from dftlib.storage.dft_be import BeExponential
+from dftlib.storage.dft_gates import DftPand
 from dftlib.transformer.rewrite_rules import RewriteRules
 
 
@@ -96,6 +98,7 @@ def test_rewrite_all_rule5():
     assert no_elements == 5
     pand = dft.top_level_element
     assert pand.element_type == "pand"
+    assert isinstance(pand, DftPand)
     children = pand.children()
     assert len(children) == 3
     assert children[0].name == "C"
@@ -238,9 +241,11 @@ def test_merge_bes_parametric():
     assert no_dynamic == 0
     assert no_elements == 3
     be_a = dft.get_element_by_name("A")
+    assert isinstance(be_a, BeExponential)
     assert be_a.dorm == 1
     assert be_a.rate == "(a)/(1)"
     be_b = dft.get_element_by_name("B")
+    assert isinstance(be_b, BeExponential)
     assert be_b.dorm == 1
     assert be_b.rate == "(b)/(1)"
 
@@ -252,5 +257,6 @@ def test_merge_bes_parametric():
     assert no_dynamic == 0
     assert no_elements == 2
     be = dft.get_element_by_name("A_B")
+    assert isinstance(be, BeExponential)
     assert be.dorm == 1
     assert be.rate == "((a)/(1)) + ((b)/(1))"

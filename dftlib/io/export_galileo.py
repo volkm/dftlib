@@ -39,6 +39,7 @@ def export_dft_file(dft: Dft, file: str) -> None:
             for param in dft.parameters:
                 out_file.write("param {};\n".format(param))
         # Top level event
+        assert dft.top_level_element is not None
         out_file.write("toplevel {};\n".format(galileo_name(dft.top_level_element)))
         # DFT elements
         for element in elements:

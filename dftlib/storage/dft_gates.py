@@ -80,7 +80,7 @@ class DftGate(DftElement):
     def __init__(self, element_id: int, name: str, element_type: ElementType, children: list[DftElement], position: tuple[float, float]) -> None:
         DftElement.__init__(self, element_id, name, element_type, position)
         assert self.is_gate()
-        self._outgoing = []
+        self._outgoing: list[DftElement] = []
         for child in children:
             self.add_child(child)
 
@@ -176,6 +176,7 @@ class DftAnd(DftGate):
     def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
+        assert isinstance(other, DftAnd)
 
         return self.compare_successors(other, ordered=False, respect_ids=respect_ids)
 
@@ -194,6 +195,7 @@ class DftOr(DftGate):
     def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
+        assert isinstance(other, DftOr)
 
         return self.compare_successors(other, ordered=False, respect_ids=respect_ids)
 
@@ -221,6 +223,7 @@ class DftVotingGate(DftGate):
     def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
+        assert isinstance(other, DftVotingGate)
 
         if not self.compare_successors(other, ordered=False, respect_ids=respect_ids):
             return False
@@ -254,6 +257,7 @@ class DftPriorityGate(DftGate):
     def compare(self, other: DftElement, respect_ids: bool):
         if not super().compare(other, respect_ids):
             return False
+        assert isinstance(other, DftPriorityGate)
 
         if not self.compare_successors(other, ordered=True, respect_ids=respect_ids):
             return False
@@ -296,6 +300,7 @@ class DftSpare(DftGate):
     def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
+        assert isinstance(other, DftSpare)
 
         return self.compare_successors(other, ordered=True, respect_ids=respect_ids)
 
@@ -330,6 +335,7 @@ class DftDependency(DftGate):
     def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
+        assert isinstance(other, DftDependency)
 
         if not self.compare_successors(other, ordered=False, respect_ids=respect_ids):
             return False
@@ -362,6 +368,7 @@ class DftSeq(DftGate):
     def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
+        assert isinstance(other, DftSeq)
 
         return self.compare_successors(other, ordered=True, respect_ids=respect_ids)
 
@@ -380,6 +387,7 @@ class DftMutex(DftGate):
     def compare(self, other: DftElement, respect_ids: bool) -> bool:
         if not super().compare(other, respect_ids):
             return False
+        assert isinstance(other, DftMutex)
 
         return self.compare_successors(other, ordered=False, respect_ids=respect_ids)
 
