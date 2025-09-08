@@ -635,7 +635,7 @@ def try_replace_fdep_by_or(dft: Dft, fdep: DftElement) -> bool:
     (Rule #24): Eliminate FDEPs by introducing an OR-gate.
     Let A be the trigger and B be the dependent element.
     Both must be connected to the top level element.
-    B must have only one predecessor and no SPARE or PAND/POR in its  predecessor closure.
+    B must have only one predecessor and no dynamic gate (except dependency) in its predecessor closure.
     :param dft: DFT.
     :param fdep: FDEP which can possibly be removed.
     :return: True iff fdep has been removed.
@@ -653,7 +653,15 @@ def try_replace_fdep_by_or(dft: Dft, fdep: DftElement) -> bool:
     # Check if both trigger and dependent are part of the top module
     top_module = dft.get_module(dft.top_level_element)
     if trigger.element_id not in top_module or dependent.element_id not in top_module:
-        return False
+        # Check if either the two elements is part of a spare module
+        for elem in dft.elements.values():
+            if isinstance(elem, dft_gates.DftSpare):
+                spare_module = dft.get_module(elem)
+                if trigger.element_id in spare_module or dependent.element_id in spare_module:
+                    # One of the two elements is part of a spare module
+                    return False
+        # Elements are "outside" the top module
+
     # Check if dependent has some dynamic elements in the predecessor closure
     if check_dynamic_predecessor(dft, dependent):
         return False
