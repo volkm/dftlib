@@ -18,7 +18,7 @@ jobs:
     name: Build wheels
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
       - name: Set up Python
@@ -54,7 +54,7 @@ jobs:
           path: dist
           merge-multiple: true
       - name: Checkout test files
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           path: dist/test_files
           sparse-checkout: |
@@ -150,7 +150,7 @@ jobs:
           source venv/bin/activate
           python3 -m pip install "$WHEEL"
       - name: Checkout test files
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           path: dist/test_files
           sparse-checkout: |
