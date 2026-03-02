@@ -8,7 +8,6 @@ import dftlib.transformer.trimming as trimming
 import dftlib.utility.numbers as numbers
 from dftlib.exceptions.exceptions import DftInvalidArgumentException
 
-
 """
 Rewrite rules for DFT simplification.
 The rules are in parts based on:
