@@ -259,7 +259,7 @@ class DftPriorityGate(DftGate):
             return False
         assert isinstance(other, DftPriorityGate)
 
-        if not self.compare_successors(other, ordered=True, respect_ids=respect_ids):
+        if not self.compare_successors(other, ordered=True, respect_ids=True):
             return False
 
         return self.inclusive == other.inclusive

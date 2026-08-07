@@ -649,6 +649,9 @@ def try_replace_fdep_by_or(dft: Dft, fdep: DftElement) -> bool:
     trigger = fdep.trigger()
     dependent = fdep.dependent()[0]
 
+    if dependent.relevant:
+        return False
+
     # Check if both trigger and dependent are part of the top module
     top_module = dft.get_module(dft.top_level_element)
     if trigger.element_id not in top_module or dependent.element_id not in top_module:
@@ -696,9 +699,6 @@ def try_remove_superfluous_fdep(dft: Dft, fdep: DftElement) -> bool:
     trigger = fdep.trigger()
     dependent = fdep.dependent()[0]
 
-    # Trigger is single parent of dependent (apart from fdep)
-    if len(dependent.parents()) > 2:
-        return False
     if trigger not in dependent.parents():
         return False
 
@@ -747,10 +747,13 @@ def try_remove_fdep_successors(dft: Dft, fdep: DftElement) -> bool:
     trigger = fdep.trigger()
     dependent = fdep.dependent()[0]
 
+    if dependent.relevant:
+        return False
+
     # Dependent has single parent (apart from fdep)
     if len(dependent.parents()) > 2:
         return False
-    parent = dependent.parents()[0] if not isinstance(dependent, dft_gates.DftDependency) else dependent.parents()[1]
+    parent = dependent.parents()[0] if not isinstance(dependent.parents()[0], dft_gates.DftDependency) else dependent.parents()[1]
 
     # Trigger has the same parent
     if trigger not in parent.children():
